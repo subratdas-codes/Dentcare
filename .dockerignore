@@ -1,0 +1,11 @@
+target/
+.kilo/
+.github/
+.settings/
+.vscode/
+.git/
+.gitignore
+*.log
+README.md
+render.yaml
+.mvn/
