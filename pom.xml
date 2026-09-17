@@ -108,12 +108,13 @@
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
-            <!-- Bundle webapp (JSPs + static) into the executable JAR so
-                 embedded Tomcat can serve /WEB-INF/views and static files -->
-            <resource>
-                <directory>src/main/webapp</directory>
-                <targetPath>META-INF/resources</targetPath>
-            </resource>
+<!-- Bundle webapp (JSPs) into BOOT-INF/classes so embedded Tomcat
+                 serves /WEB-INF/views from the classpath, exactly like static
+                 assets (which already work on Render). -->
+              <resource>
+                  <directory>src/main/webapp</directory>
+                  <targetPath>${project.build.outputDirectory}</targetPath>
+              </resource>
         </resources>
         <plugins>
             <plugin>
