@@ -91,7 +91,8 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/lib/**"),
                                 new AntPathRequestMatcher("/favicon.ico"),
                                 new AntPathRequestMatcher("/actuator/health"),
-                                new AntPathRequestMatcher("/actuator/health/**")).permitAll()
+                                new AntPathRequestMatcher("/actuator/health/**"),
+                                new AntPathRequestMatcher("/debug/views")).permitAll()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
