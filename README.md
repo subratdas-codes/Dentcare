@@ -2,7 +2,7 @@
 
 A full-stack web application for managing a dental clinic — appointment scheduling, patient registration, doctor profiles, and admin operations.
 
-**Live:** [https://dentcare.onrender.com](https://dentcare.onrender.com)
+**Live:** [https://carebydent.onrender.com](https://carebydent.onrender.com)
 
 ---
 
@@ -201,7 +201,7 @@ java -jar target/dentcare.jar
    - Create a free web service (`dentcare`) with Docker build
    - Set all required env vars
 
-4. Click **Deploy** — your app will be live at `https://dentcare.onrender.com`
+4. Click **Deploy** — your app will be live at `https://carebydent.onrender.com`
 
 > Render free instances spin down after 15 min of inactivity and take ~30s to wake up.
 
