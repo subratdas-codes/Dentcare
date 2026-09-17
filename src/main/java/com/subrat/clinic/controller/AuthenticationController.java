@@ -1,13 +1,20 @@
 package com.subrat.clinic.controller;
 
 import com.subrat.clinic.model.Patient;
+import com.subrat.clinic.model.PasswordResetToken;
+import com.subrat.clinic.repository.PasswordResetTokenRepository;
+import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Controller
 public class AuthenticationController {
@@ -17,6 +24,15 @@ public class AuthenticationController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PasswordResetTokenRepository tokenRepository;
+
+    @Autowired
+    private MailService mailService;
+
+    @Value("${app.reset-link-base:http://localhost:8080}")
+    private String resetLinkBase;
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -82,5 +98,70 @@ public class AuthenticationController {
         patientService.save(user);
         model.addAttribute("success", "Password changed successfully!");
         return "change_password";
+    }
+
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordForm() {
+        return "forgot_password";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam String email, Model model) {
+        Patient patient = patientService.findByEmail(email);
+        if (patient != null) {
+            PasswordResetToken existing = tokenRepository.findByEmail(email);
+            if (existing != null) {
+                tokenRepository.delete(existing);
+            }
+
+            PasswordResetToken resetToken = new PasswordResetToken();
+            resetToken.setToken(UUID.randomUUID().toString());
+            resetToken.setEmail(email);
+            resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
+            tokenRepository.save(resetToken);
+
+            String link = resetLinkBase + "/reset-password?token=" + resetToken.getToken();
+            mailService.sendPasswordReset(email, link);
+        }
+        model.addAttribute("success",
+                "If an account exists for that email, a password reset link has been sent.");
+        return "forgot_password";
+    }
+
+    @GetMapping("/reset-password")
+    public String showResetPasswordForm(@RequestParam String token, Model model) {
+        PasswordResetToken resetToken = tokenRepository.findByToken(token);
+        if (resetToken == null || resetToken.isExpired()) {
+            model.addAttribute("error", "The reset link is invalid or has expired.");
+            return "reset_password";
+        }
+        model.addAttribute("token", token);
+        return "reset_password";
+    }
+
+    @PostMapping("/reset-password")
+    public String processResetPassword(@RequestParam String token,
+                                       @RequestParam String newPassword,
+                                       @RequestParam String confirmPassword,
+                                       Model model) {
+        PasswordResetToken resetToken = tokenRepository.findByToken(token);
+        if (resetToken == null || resetToken.isExpired()) {
+            model.addAttribute("error", "The reset link is invalid or has expired.");
+            return "reset_password";
+        }
+        if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("error", "Passwords do not match.");
+            model.addAttribute("token", token);
+            return "reset_password";
+        }
+        Patient patient = patientService.findByEmail(resetToken.getEmail());
+        if (patient == null) {
+            model.addAttribute("error", "No account found for this request.");
+            return "reset_password";
+        }
+        patient.setPassword(passwordEncoder.encode(newPassword));
+        patientService.save(patient);
+        tokenRepository.delete(resetToken);
+        return "redirect:/login?reset=true";
     }
 }

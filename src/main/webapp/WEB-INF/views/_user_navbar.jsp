@@ -39,10 +39,7 @@
                     </c:otherwise>
                 </c:choose>
             </sec:authorize>
-            <sec:authorize access="!isAuthenticated()">
-                <a href="${pageContext.request.contextPath}/login" class="btn btn-primary btn-sm py-2 px-4 ms-lg-2 my-2 my-lg-0">Login</a>
-                <a href="${pageContext.request.contextPath}/register" class="btn btn-outline-primary btn-sm py-2 px-4 ms-lg-2 my-2 my-lg-0">Register</a>
-            </sec:authorize>
+            
         </div>
     </div>
 </nav>
