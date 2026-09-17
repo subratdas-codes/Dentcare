@@ -30,5 +30,22 @@ public class DataInitializer {
             doctorRepository.save(admin);
             System.out.println(" Default admin created: admin@clinic.com / admin123");
         }
+        seedDoctor("Dr. Priya Sharma", "Orthodontist", "priya.sharma@clinic.com", "9864002211", "doctor123", false);
+        seedDoctor("Dr. Amit Verma", "Endodontist", "amit.verma@clinic.com", "9864002212", "doctor123", false);
+        seedDoctor("Dr. Neha Gupta", "Cosmetic Dentist", "neha.gupta@clinic.com", "9864002213", "doctor123", false);
+    }
+
+    private void seedDoctor(String name, String specialization, String email, String phone, String password, boolean admin) {
+        if (doctorRepository.findByEmail(email) == null) {
+            Doctor doctor = new Doctor();
+            doctor.setName(name);
+            doctor.setSpecialization(specialization);
+            doctor.setEmail(email);
+            doctor.setPhone(phone);
+            doctor.setPassword(passwordEncoder.encode(password));
+            doctor.setAdmin(admin);
+            doctorRepository.save(doctor);
+            System.out.println(" Seeded doctor: " + email);
+        }
     }
 }

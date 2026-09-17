@@ -95,7 +95,7 @@
                         <a href="price" class="dropdown-item">Pricing Plan</a>
                         <a href="team" class="dropdown-item">Our Dentist</a>
                         <a href="testimonial" class="dropdown-item">Testimonial</a>
-                       <a href="appointments" class="dropdown-item">Appointment</a>
+                       <a href="book_appointment" class="dropdown-item">Appointment</a>
 
                     </div>
                 </div>
@@ -294,44 +294,48 @@
                 <div class="col-lg-6">
                     <div class="appointment-form h-100 d-flex flex-column justify-content-center text-center p-5 wow zoomIn" data-wow-delay="0.6s">
                         <h1 class="text-white mb-4">Make Appointment</h1>
-                      <form action="/book" method="post">
+                      <form action="${pageContext.request.contextPath}/book" method="post">
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                             <div class="row g-3">
                                 <div class="col-12 col-sm-6">
-                                    <select class="form-select bg-light border-0" style="height: 55px;">
-                                        <option selected>Select A Service</option>
-                                        <option value="1">Service 1</option>
-                                        <option value="2">Service 2</option>
-                                        <option value="3">Service 3</option>
+                                    <select class="form-select bg-light border-0" name="service" style="height: 55px;" required>
+                                        <option value="" disabled selected>Select A Service</option>
+                                        <option value="Teeth Cleaning">Teeth Cleaning</option>
+                                        <option value="Root Canal">Root Canal</option>
+                                        <option value="Braces">Braces</option>
+                                        <option value="Tooth Whitening">Tooth Whitening</option>
+                                        <option value="Dental Implants">Dental Implants</option>
                                     </select>
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <select class="form-select bg-light border-0" style="height: 55px;">
-                                        <option selected>Select Doctor</option>
-                                        <option value="1">Doctor 1</option>
-                                        <option value="2">Doctor 2</option>
-                                        <option value="3">Doctor 3</option>
+                                    <select class="form-select bg-light border-0" name="doctorName" style="height: 55px;" required>
+                                        <option value="" disabled selected>Select Doctor</option>
+                                        <c:forEach var="doc" items="${doctors}">
+                                            <c:if test="${doc.specialization ne 'Admin' and not doc.admin}">
+                                                <option value="${doc.name}">${doc.name} - ${doc.specialization}</option>
+                                            </c:if>
+                                        </c:forEach>
+                                        <c:if test="${empty doctors}">
+                                            <option value="Dr. Priya Sharma">Dr. Priya Sharma - Orthodontist</option>
+                                            <option value="Dr. Amit Verma">Dr. Amit Verma - Endodontist</option>
+                                            <option value="Dr. Neha Gupta">Dr. Neha Gupta - Cosmetic Dentist</option>
+                                        </c:if>
                                     </select>
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <input type="text" class="form-control bg-light border-0" placeholder="Your Name" style="height: 55px;">
+                                    <input type="text" name="patientName" class="form-control bg-light border-0" placeholder="Your Name" style="height: 55px;" required />
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <input type="email" class="form-control bg-light border-0" placeholder="Your Email" style="height: 55px;">
+                                    <input type="email" name="email" class="form-control bg-light border-0" placeholder="Your Email" style="height: 55px;" required />
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <div class="date" id="date1" data-target-input="nearest">
-                                        <input type="text"
-                                            class="form-control bg-light border-0 datetimepicker-input"
-                                            placeholder="Appointment Date" data-target="#date1" data-toggle="datetimepicker" style="height: 55px;">
-                                    </div>
+                                    <input type="text" name="phone" class="form-control bg-light border-0" placeholder="Phone Number" style="height: 55px;" required />
                                 </div>
                                 <div class="col-12 col-sm-6">
-                                    <div class="time" id="time1" data-target-input="nearest">
-                                        <input type="text"
-                                            class="form-control bg-light border-0 datetimepicker-input"
-                                            placeholder="Appointment Time" data-target="#time1" data-toggle="datetimepicker" style="height: 55px;">
-                                    </div>
+                                    <input type="date" name="appointmentDate" class="form-control bg-light border-0" style="height: 55px;" required />
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <input type="time" name="appointmentTime" class="form-control bg-light border-0" style="height: 55px;" required />
                                 </div>
                                 <div class="col-12">
                                     <button class="btn btn-dark w-100 py-3" type="submit">Make Appointment</button>

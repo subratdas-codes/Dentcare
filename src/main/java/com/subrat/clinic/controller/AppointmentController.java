@@ -2,6 +2,7 @@ package com.subrat.clinic.controller;
 
 import com.subrat.clinic.model.Appointment;
 import com.subrat.clinic.service.AppointmentService;
+import com.subrat.clinic.service.DoctorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,10 +21,14 @@ public class AppointmentController {
 	@Autowired
 	private AppointmentService appointmentService;
 
+	@Autowired
+	private DoctorService doctorService;
+
     // Home page
     @GetMapping("/")
     public String showHomePage(Model model) {
         model.addAttribute("appointment", new Appointment());
+        model.addAttribute("doctors", doctorService.findAll());
         return "index";
     }
 
@@ -31,6 +36,7 @@ public class AppointmentController {
     @GetMapping("/book_appointment")
     public String showBookAppointmentForm(Model model) {
         model.addAttribute("appointment", new Appointment());
+        model.addAttribute("doctors", doctorService.findAll());
         return "book_appointment";
     }
 
@@ -65,6 +71,19 @@ public class AppointmentController {
         List<Appointment> userAppointments = appointmentService.findByEmail(email);
         model.addAttribute("appointments", userAppointments);
         return "my_appointments";
+    }
+
+    // Logged-in patient: cancel own appointment
+    @PostMapping("/my/appointments/cancel/{id}")
+    public String cancelAppointment(@PathVariable Long id, Authentication authentication) {
+        Appointment appointment = appointmentService.getById(id);
+        if (appointment != null && authentication != null) {
+            String email = authentication.getName();
+            if (appointment.getEmail() != null && appointment.getEmail().equalsIgnoreCase(email)) {
+                appointmentService.deleteById(id);
+            }
+        }
+        return "redirect:/my/appointments?cancelled=true";
     }
 
     // Static pages

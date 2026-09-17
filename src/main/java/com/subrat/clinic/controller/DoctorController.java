@@ -42,19 +42,19 @@ public class DoctorController {
     @GetMapping("/doctors")
     public String listDoctors(Model model) {
         model.addAttribute("doctors", doctorService.findAll());
-        return "doctor_list";
+        return "admin/doctor_list";
     }
 
     @GetMapping("/doctors/add")
     public String addDoctorForm(Model model) {
         model.addAttribute("doctor", new Doctor());
-        return "doctor_form";
+        return "admin/doctor_form";
     }
 
     @GetMapping("/doctors/edit/{id}")
     public String editDoctor(@PathVariable Long id, Model model) {
         model.addAttribute("doctor", doctorService.findById(id));
-        return "doctor_form";
+        return "admin/doctor_form";
     }
 
     @PostMapping("/doctors/save")
@@ -71,7 +71,7 @@ public class DoctorController {
         return "redirect:/admin/doctors";
     }
 
-    @GetMapping("/doctors/delete/{id}")
+    @PostMapping("/doctors/delete/{id}")
     public String deleteDoctor(@PathVariable Long id) {
         doctorService.deleteById(id);
         return "redirect:/admin/doctors";
@@ -82,7 +82,7 @@ public class DoctorController {
     @GetMapping("/patients")
     public String listPatients(Model model) {
         model.addAttribute("patients", patientService.getAll());
-        return "patient_list";
+        return "admin/patient_list";
     }
 
     // ---------------- APPOINTMENT CRUD ---------------- //
@@ -105,7 +105,7 @@ public class DoctorController {
         return "redirect:/admin/appointments";
     }
 
-    @GetMapping("/appointments/delete/{id}")
+    @PostMapping("/appointments/delete/{id}")
     public String deleteAppointment(@PathVariable Long id) {
         appointmentService.deleteById(id);
         return "redirect:/admin/appointments";

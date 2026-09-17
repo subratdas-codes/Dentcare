@@ -92,13 +92,13 @@
                         <a href="price" class="dropdown-item">Pricing Plan</a>
                         <a href="team" class="dropdown-item">Our Dentist</a>
                         <a href="testimonial" class="dropdown-item">Testimonial</a>
-                        <a href="appointments" class="dropdown-item">Appointment</a>
+                        <a href="book_appointment" class="dropdown-item">Appointment</a>
                     </div>
                 </div>
                 <a href="contact" class="nav-item nav-link">Contact</a>
             </div>
             <button type="button" class="btn text-dark" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa fa-search"></i></button>
-            <a href="appointments" class="btn btn-primary py-2 px-4 ms-3">Appointment</a>
+            <a href="book_appointment" class="btn btn-primary py-2 px-4 ms-3">Appointment</a>
         </div>
     </nav>
     <!-- Navbar End -->
