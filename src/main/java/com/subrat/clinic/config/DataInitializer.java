@@ -18,17 +18,26 @@ public class DataInitializer {
 
     @PostConstruct
     public void createDefaultAdmin() {
-        if (doctorRepository.findByEmail("admin@clinic.com") == null) {
-            Doctor admin = new Doctor();
-            admin.setName("Admin");
-            admin.setEmail("admin@clinic.com");
-            admin.setPhone("9937111000");
-            admin.setSpecialization("Admin");
-            admin.setPassword(passwordEncoder.encode("admin123"));
-            admin.setAdmin(true);
+        String adminEmail = "dentcare.support@gmail.com";
+        Doctor currentAdmin = doctorRepository.findByEmail(adminEmail);
+        if (currentAdmin == null) {
+            Doctor legacyAdmin = doctorRepository.findByEmail("admin@clinic.com");
+            if (legacyAdmin != null) {
+                legacyAdmin.setEmail(adminEmail);
+                doctorRepository.save(legacyAdmin);
+                System.out.println(" Admin email migrated to: " + adminEmail);
+            } else {
+                Doctor admin = new Doctor();
+                admin.setName("Admin");
+                admin.setEmail(adminEmail);
+                admin.setPhone("9437123456");
+                admin.setSpecialization("Admin");
+                admin.setPassword(passwordEncoder.encode("admin123"));
+                admin.setAdmin(true);
 
-            doctorRepository.save(admin);
-            System.out.println(" Default admin created: admin@clinic.com / admin123");
+                doctorRepository.save(admin);
+                System.out.println(" Default admin created: " + adminEmail + " / admin123");
+            }
         }
         seedDoctor("Dr. Priya Sharma", "Orthodontist", "priya.sharma@clinic.com", "9864002211", "doctor123", false);
         seedDoctor("Dr. Amit Verma", "Endodontist", "amit.verma@clinic.com", "9864002212", "doctor123", false);

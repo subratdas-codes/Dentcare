@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -62,10 +64,10 @@
             <div class="col-md-6 text-center text-lg-end">
                 <div class="position-relative d-inline-flex align-items-center bg-primary text-white top-shape px-5">
                     <div class="me-3 pe-3 border-end py-2">
-                        <p class="m-0"><i class="fa fa-envelope-open me-2"></i>info@example.com</p>
+                        <p class="m-0"><i class="fa fa-envelope-open me-2"></i>dentcare.support@gmail.com</p>
                     </div>
                     <div class="py-2">
-                        <p class="m-0"><i class="fa fa-phone-alt me-2"></i>+012 345 6789</p>
+                        <p class="m-0"><i class="fa fa-phone-alt me-2"></i>+91 94371 23456</p>
                     </div>
                 </div>
             </div>
@@ -99,7 +101,34 @@
                 <a href="contact" class="nav-item nav-link active">Contact</a>
             </div>
             <button type="button" class="btn text-dark" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa fa-search"></i></button>
-            <a href="book_appointment" class="btn btn-primary py-2 px-4 ms-3">Appointment</a>
+            <sec:authorize access="isAuthenticated()">
+                <c:choose>
+                    <c:when test="${hasAdminRole}">
+                        <a href="/admin/dashboard" class="btn btn-primary py-2 px-4 ms-3">Admin Dashboard</a>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i> <sec:authentication property="name" />
+                            </a>
+                            <div class="dropdown-menu fade-up m-0">
+                                <a href="/profile" class="dropdown-item">Profile</a>
+                                <a href="/change-password" class="dropdown-item">Change Password</a>
+                                <a href="/my/appointments" class="dropdown-item">My Appointments</a>
+                                <div class="dropdown-divider"></div>
+                                <form action="/logout" method="post" class="m-0">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <button type="submit" class="dropdown-item text-danger">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+            </sec:authorize>
+            <sec:authorize access="!isAuthenticated()">
+                <a href="login" class="btn btn-primary py-2 px-4 ms-3">Login</a>
+                <a href="register" class="btn btn-outline-primary py-2 px-4 ms-2">Register</a>
+            </sec:authorize>
         </div>
     </nav>
     <!-- Navbar End -->
@@ -152,21 +181,21 @@
                             <i class="bi bi-geo-alt fs-1 text-primary me-3"></i>
                             <div class="text-start">
                                 <h5 class="mb-0">Our Office</h5>
-                                <span>123 Street, New York, USA</span>
+                                <span>Patia, Bhubaneswar, Odisha, India - 751024</span>
                             </div>
                         </div>
                         <div class="d-flex align-items-center mb-2">
                             <i class="bi bi-envelope-open fs-1 text-primary me-3"></i>
                             <div class="text-start">
                                 <h5 class="mb-0">Email Us</h5>
-                                <span>info@example.com</span>
+                                <span>dentcare.support@gmail.com</span>
                             </div>
                         </div>
                         <div class="d-flex align-items-center">
                             <i class="bi bi-phone-vibrate fs-1 text-primary me-3"></i>
                             <div class="text-start">
                                 <h5 class="mb-0">Call Us</h5>
-                                <span>+012 345 6789</span>
+                                <span>+91 94371 23456</span>
                             </div>
                         </div>
                     </div>
@@ -194,7 +223,7 @@
                 </div>
                 <div class="col-xl-4 col-lg-12 wow slideInUp" data-wow-delay="0.6s">
                     <iframe class="position-relative rounded w-100 h-100"
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3001156.4288297426!2d-78.01371936852176!3d42.72876761954724!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4ccc4bf0f123a5a9%3A0xddcfc6c1de189567!2sNew%20York%2C%20USA!5e0!3m2!1sen!2sbd!4v1603794290143!5m2!1sen!2sbd"
+                        src="https://www.google.com/maps?q=Patia,%20Bhubaneswar,%20Odisha,%20India%20751024&z=14&output=embed"
                         frameborder="0" style="min-height: 400px; border:0;" allowfullscreen="" aria-hidden="false"
                         tabindex="0"></iframe>
                 </div>
@@ -246,9 +275,9 @@
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h3 class="text-white mb-4">Get In Touch</h3>
-                    <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>123 Street, New York, USA</p>
-                    <p class="mb-2"><i class="bi bi-envelope-open text-primary me-2"></i>info@example.com</p>
-                    <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>+012 345 67890</p>
+                    <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>Patia, Bhubaneswar, Odisha, India - 751024</p>
+                    <p class="mb-2"><i class="bi bi-envelope-open text-primary me-2"></i>dentcare.support@gmail.com</p>
+                    <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>+91 94371 23456</p>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h3 class="text-white mb-4">Follow Us</h3>

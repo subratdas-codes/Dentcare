@@ -64,10 +64,10 @@
             <div class="col-md-6 text-center text-lg-end">
                 <div class="position-relative d-inline-flex align-items-center bg-primary text-white top-shape px-5">
                     <div class="me-3 pe-3 border-end py-2">
-                        <p class="m-0"><i class="fa fa-envelope-open me-2"></i>info@example.com</p>
+                        <p class="m-0"><i class="fa fa-envelope-open me-2"></i>dentcare.support@gmail.com</p>
                     </div>
                     <div class="py-2">
-                        <p class="m-0"><i class="fa fa-phone-alt me-2"></i>+91 8658560689</p>
+                        <p class="m-0"><i class="fa fa-phone-alt me-2"></i>+91 94371 23456</p>
                     </div>
                 </div>
             </div>
@@ -238,7 +238,7 @@
                     <div class="bg-secondary d-flex flex-column p-5" style="height: 300px;">
                         <h3 class="text-white mb-3">Make Appointment</h3>
                         <p class="text-white">Ipsum erat ipsum dolor clita rebum no rebum dolores labore, ipsum magna at eos et eos amet.</p>
-                        <h2 class="text-white mb-0">+012 345 6789</h2>
+                        <h2 class="text-white mb-0">+91 94371 23456</h2>
                     </div>
                 </div>
             </div>
@@ -410,7 +410,7 @@
                     <div class="position-relative bg-primary rounded h-100 d-flex flex-column align-items-center justify-content-center text-center p-4">
                         <h3 class="text-white mb-3">Make Appointment</h3>
                         <p class="text-white mb-3">Clita ipsum magna kasd rebum at ipsum amet dolor justo dolor est magna stet eirmod</p>
-                        <h2 class="text-white mb-0">+012 345 6789</h2>
+                        <h2 class="text-white mb-0">+91 94371 23456</h2>
                     </div>
                 </div>
             </div>
@@ -448,7 +448,7 @@
                     </div>
                     <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum et tempor sit. Aliqu diam amet diam et eos labore. Clita erat ipsum et lorem et sit, sed stet no labore lorem sit. Sanctus clita duo justo eirmod magna dolore erat amet</p>
                     <h5 class="text-uppercase text-primary wow fadeInUp" data-wow-delay="0.3s">Call for Appointment</h5>
-                    <h1 class="wow fadeInUp" data-wow-delay="0.6s">+012 345 6789</h1>
+                    <h1 class="wow fadeInUp" data-wow-delay="0.6s">+91 94371 23456</h1>
                 </div>
                 <div class="col-lg-7">
                     <div class="owl-carousel price-carousel wow zoomIn" data-wow-delay="0.9s">
@@ -678,9 +678,9 @@
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h3 class="text-white mb-4">Get In Touch</h3>
-                    <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>123 Street, New York, USA</p>
-                    <p class="mb-2"><i class="bi bi-envelope-open text-primary me-2"></i>info@example.com</p>
-                    <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>+012 345 67890</p>
+                    <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>Patia, Bhubaneswar, Odisha, India - 751024</p>
+                    <p class="mb-2"><i class="bi bi-envelope-open text-primary me-2"></i>dentcare.support@gmail.com</p>
+                    <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>+91 94371 23456</p>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h3 class="text-white mb-4">Follow Us</h3>

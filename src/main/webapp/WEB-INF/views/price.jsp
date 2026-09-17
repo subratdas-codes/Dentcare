@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -61,10 +63,10 @@
             <div class="col-md-6 text-center text-lg-end">
                 <div class="position-relative d-inline-flex align-items-center bg-primary text-white top-shape px-5">
                     <div class="me-3 pe-3 border-end py-2">
-                        <p class="m-0"><i class="fa fa-envelope-open me-2"></i>info@example.com</p>
+                        <p class="m-0"><i class="fa fa-envelope-open me-2"></i>dentcare.support@gmail.com</p>
                     </div>
                     <div class="py-2">
-                        <p class="m-0"><i class="fa fa-phone-alt me-2"></i>+012 345 6789</p>
+                        <p class="m-0"><i class="fa fa-phone-alt me-2"></i>+91 94371 23456</p>
                     </div>
                 </div>
             </div>
@@ -98,7 +100,34 @@
                 <a href="contact" class="nav-item nav-link">Contact</a>
             </div>
             <button type="button" class="btn text-dark" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa fa-search"></i></button>
-            <a href="book_appointment" class="btn btn-primary py-2 px-4 ms-3">Appointment</a>
+            <sec:authorize access="isAuthenticated()">
+                <c:choose>
+                    <c:when test="${hasAdminRole}">
+                        <a href="/admin/dashboard" class="btn btn-primary py-2 px-4 ms-3">Admin Dashboard</a>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-1"></i> <sec:authentication property="name" />
+                            </a>
+                            <div class="dropdown-menu fade-up m-0">
+                                <a href="/profile" class="dropdown-item">Profile</a>
+                                <a href="/change-password" class="dropdown-item">Change Password</a>
+                                <a href="/my/appointments" class="dropdown-item">My Appointments</a>
+                                <div class="dropdown-divider"></div>
+                                <form action="/logout" method="post" class="m-0">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <button type="submit" class="dropdown-item text-danger">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+            </sec:authorize>
+            <sec:authorize access="!isAuthenticated()">
+                <a href="login" class="btn btn-primary py-2 px-4 ms-3">Login</a>
+                <a href="register" class="btn btn-outline-primary py-2 px-4 ms-2">Register</a>
+            </sec:authorize>
         </div>
     </nav>
     <!-- Navbar End -->
@@ -148,7 +177,7 @@
                     </div>
                     <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum et tempor sit. Aliqu diam amet diam et eos labore. Clita erat ipsum et lorem et sit, sed stet no labore lorem sit. Sanctus clita duo justo eirmod magna dolore erat amet</p>
                     <h5 class="text-uppercase text-primary wow fadeInUp" data-wow-delay="0.3s">Call for Appointment</h5>
-                    <h1 class="wow fadeInUp" data-wow-delay="0.6s">+012 345 6789</h1>
+                    <h1 class="wow fadeInUp" data-wow-delay="0.6s">+91 94371 23456</h1>
                 </div>
                 <div class="col-lg-7">
                     <div class="owl-carousel price-carousel wow zoomIn" data-wow-delay="0.9s">
@@ -250,9 +279,9 @@
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h3 class="text-white mb-4">Get In Touch</h3>
-                    <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>123 Street, New York, USA</p>
-                    <p class="mb-2"><i class="bi bi-envelope-open text-primary me-2"></i>info@example.com</p>
-                    <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>+012 345 67890</p>
+                    <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>Patia, Bhubaneswar, Odisha, India - 751024</p>
+                    <p class="mb-2"><i class="bi bi-envelope-open text-primary me-2"></i>dentcare.support@gmail.com</p>
+                    <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>+91 94371 23456</p>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h3 class="text-white mb-4">Follow Us</h3>

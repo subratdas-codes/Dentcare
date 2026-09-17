@@ -149,7 +149,7 @@ dentcare/
 - **CSRF:** Enabled on all forms (via `${_csrf}` hidden inputs)
 - **Session fixation:** Prevented by Spring Security (session ID regenerated on login)
 - **Authorization:** Role-based route guards in `SecurityConfig`
-- **Admin default credentials:** `admin@clinic.com` / `admin123` (auto-created on first run)
+- **Admin default credentials:** `dentcare.support@gmail.com` / `admin123` (auto-created on first run)
 
 ---
 
@@ -185,7 +185,7 @@ java -jar target/dentcare.jar
 ```
 
 ### Default Admin Login
-- **Email:** `admin@clinic.com`
+- **Email:** `dentcare.support@gmail.com`
 - **Password:** `admin123`
 
 ---
