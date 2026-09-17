@@ -94,12 +94,13 @@
                         <a href="price" class="dropdown-item">Pricing Plan</a>
                         <a href="team" class="dropdown-item">Our Dentist</a>
                         <a href="testimonial" class="dropdown-item active">Testimonial</a>
-                         <a href="book_appointment" class="dropdown-item">Appointment</a>
+                         <sec:authorize access="isAuthenticated()">
+                             <a href="book_appointment" class="dropdown-item">Appointment</a>
+                         </sec:authorize>
                     </div>
                 </div>
                 <a href="contact" class="nav-item nav-link">Contact</a>
             </div>
-            <button type="button" class="btn text-dark" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa fa-search"></i></button>
             <sec:authorize access="isAuthenticated()">
                 <c:choose>
                     <c:when test="${hasAdminRole}">
@@ -130,23 +131,6 @@
     <!-- Navbar End -->
 
 
-    <!-- Full Screen Search Start -->
-    <div class="modal fade" id="searchModal" tabindex="-1">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content" style="background: rgba(9, 30, 62, .7);">
-                <div class="modal-header border-0">
-                    <button type="button" class="btn bg-white btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body d-flex align-items-center justify-content-center">
-                    <div class="input-group" style="max-width: 600px;">
-                        <input type="text" class="form-control bg-transparent border-primary p-3" placeholder="Type search keyword">
-                        <button class="btn btn-primary px-4"><i class="bi bi-search"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Full Screen Search End -->
 
 
     <!-- Hero Start -->
@@ -212,7 +196,12 @@
                         <a class="text-light mb-2" href="/"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
                         <a class="text-light mb-2" href="/about"><i class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
                         <a class="text-light mb-2" href="/service"><i class="bi bi-arrow-right text-primary me-2"></i>Our Services</a>
-                        <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
+                        <sec:authorize access="isAuthenticated()">
+                            <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
+                            <a class="text-light mb-2" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
+                        </sec:authorize>
                         <a class="text-light" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                     </div>
                 </div>
@@ -222,7 +211,12 @@
                         <a class="text-light mb-2" href="/"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
                         <a class="text-light mb-2" href="/about"><i class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
                         <a class="text-light mb-2" href="/service"><i class="bi bi-arrow-right text-primary me-2"></i>Our Services</a>
-                        <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
+                        <sec:authorize access="isAuthenticated()">
+                            <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
+                            <a class="text-light mb-2" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
+                        </sec:authorize>
                         <a class="text-light" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                     </div>
                 </div>

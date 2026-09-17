@@ -72,6 +72,8 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/profile"),
                                 new AntPathRequestMatcher("/change-password"),
+                                new AntPathRequestMatcher("/book_appointment"),
+                                new AntPathRequestMatcher("/book"),
                                 new AntPathRequestMatcher("/my/**")).hasRole("USER")
                         .requestMatchers(
                                 new AntPathRequestMatcher("/login"),
@@ -83,8 +85,6 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/price"),
                                 new AntPathRequestMatcher("/testimonial"),
                                 new AntPathRequestMatcher("/contact"),
-                                new AntPathRequestMatcher("/book_appointment"),
-                                new AntPathRequestMatcher("/book"),
                                 new AntPathRequestMatcher("/css/**"),
                                 new AntPathRequestMatcher("/js/**"),
                                 new AntPathRequestMatcher("/img/**"),

@@ -95,13 +95,14 @@
                         <a href="price" class="dropdown-item">Pricing Plan</a>
                         <a href="team" class="dropdown-item">Our Dentist</a>
                         <a href="testimonial" class="dropdown-item">Testimonial</a>
-                       <a href="book_appointment" class="dropdown-item">Appointment</a>
+                       <sec:authorize access="isAuthenticated()">
+                           <a href="book_appointment" class="dropdown-item">Appointment</a>
+                       </sec:authorize>
 
                     </div>
                 </div>
                 <a href="contact" class="nav-item nav-link">Contact</a>
             </div>
-            <button type="button" class="btn text-dark" data-bs-toggle="modal" data-bs-target="#searchModal"><i class="fa fa-search"></i></button>
             <sec:authorize access="isAuthenticated()">
                 <c:choose>
                     <c:when test="${hasAdminRole}">
@@ -135,23 +136,6 @@
     <!-- Navbar End -->
 
 
-    <!-- Full Screen Search Start -->
-    <div class="modal fade" id="searchModal" tabindex="-1">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content" style="background: rgba(9, 30, 62, .7);">
-                <div class="modal-header border-0">
-                    <button type="button" class="btn bg-white btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body d-flex align-items-center justify-content-center">
-                    <div class="input-group" style="max-width: 600px;">
-                        <input type="text" class="form-control bg-transparent border-primary p-3" placeholder="Type search keyword">
-                        <button class="btn btn-primary px-4"><i class="bi bi-search"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Full Screen Search End -->
 
 
     <!-- Carousel Start -->
@@ -164,7 +148,9 @@
                         <div class="p-3" style="max-width: 900px;">
                             <h5 class="text-white text-uppercase mb-3 animated slideInDown">Keep Your Teeth Healthy</h5>
                             <h1 class="display-1 text-white mb-md-4 animated zoomIn">Take The Best Quality Dental Treatment</h1>
+                            <sec:authorize access="isAuthenticated()">
                             <a href="/book_appointment" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Appointment</a>
+                            </sec:authorize>
                             <a href="/contact" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Contact Us</a>
                         </div>
                     </div>
@@ -175,7 +161,9 @@
                         <div class="p-3" style="max-width: 900px;">
                             <h5 class="text-white text-uppercase mb-3 animated slideInDown">Keep Your Teeth Healthy</h5>
                             <h1 class="display-1 text-white mb-md-4 animated zoomIn">Take The Best Quality Dental Treatment</h1>
+                            <sec:authorize access="isAuthenticated()">
                             <a href="/book_appointment" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Appointment</a>
+                            </sec:authorize>
                             <a href="/contact" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Contact Us</a>
                         </div>
                     </div>
@@ -215,30 +203,34 @@
                             <h6 class="text-white mb-0">Sunday</h6>
                             <p class="mb-0"> 8:00am - 5:00pm</p>
                         </div>
-                        <a class="btn btn-light" href="/book_appointment">Appointment</a>
+                        <sec:authorize access="isAuthenticated()">
+                            <a class="btn btn-light" href="/book_appointment">Appointment</a>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
+                            <a class="btn btn-light" href="/contact">Contact Us</a>
+                        </sec:authorize>
                     </div>
                 </div>
                 <div class="col-lg-4 wow zoomIn" data-wow-delay="0.3s">
                     <div class="bg-dark d-flex flex-column p-5" style="height: 300px;">
-                        <h3 class="text-white mb-3">Search A Doctor</h3>
-                        <div class="date mb-3" id="date" data-target-input="nearest">
-                            <input type="text" class="form-control bg-light border-0 datetimepicker-input"
-                                placeholder="Appointment Date" data-target="#date" data-toggle="datetimepicker" style="height: 40px;">
-                        </div>
-                        <select class="form-select bg-light border-0 mb-3" style="height: 40px;">
-                            <option selected>Select A Service</option>
-                            <option value="1">Service 1</option>
-                            <option value="2">Service 2</option>
-                            <option value="3">Service 3</option>
-                        </select>
-                        <a class="btn btn-light" href="/service">Search Doctor</a>
+                        <h3 class="text-white mb-3">Our Services</h3>
+                        <p class="text-white mb-3">Trusted dental care for the whole family - cleaning, root canal, braces, whitening and implants.</p>
+                        <a class="btn btn-light mt-auto" href="/service">Explore Services</a>
                     </div>
                 </div>
                 <div class="col-lg-4 wow zoomIn" data-wow-delay="0.6s">
                     <div class="bg-secondary d-flex flex-column p-5" style="height: 300px;">
                         <h3 class="text-white mb-3">Make Appointment</h3>
-                        <p class="text-white">Ipsum erat ipsum dolor clita rebum no rebum dolores labore, ipsum magna at eos et eos amet.</p>
-                        <a href="tel:+919437123456" class="text-white text-decoration-none"><h2 class="text-white mb-0">+91 94371 23456</h2></a>
+                        <sec:authorize access="isAuthenticated()">
+                            <p class="text-white">Book your preferred time with our trusted and professional dentists.</p>
+                            <a href="tel:+919437123456" class="text-white text-decoration-none"><h2 class="text-white mb-0">+91 94371 23456</h2></a>
+                            <a class="btn btn-light mt-auto" href="/book_appointment">Book Now</a>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
+                            <p class="text-white">Please login or register to book an appointment with our trusted dentists.</p>
+                            <a href="tel:+919437123456" class="text-white text-decoration-none"><h2 class="text-white mb-0">+91 94371 23456</h2></a>
+                            <a class="btn btn-light mt-auto" href="/login">Login to Book</a>
+                        </sec:authorize>
                     </div>
                 </div>
             </div>
@@ -268,7 +260,12 @@
                             <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>Fair Prices</h5>
                         </div>
                     </div>
+                    <sec:authorize access="isAuthenticated()">
                     <a href="/book_appointment" class="btn btn-primary py-3 px-5 mt-4 wow zoomIn" data-wow-delay="0.6s">Make Appointment</a>
+                    </sec:authorize>
+                    <sec:authorize access="!isAuthenticated()">
+                    <a href="/contact" class="btn btn-primary py-3 px-5 mt-4 wow zoomIn" data-wow-delay="0.6s">Contact Us</a>
+                    </sec:authorize>
                 </div>
                 <div class="col-lg-5" style="min-height: 500px;">
                     <div class="position-relative h-100">
@@ -293,6 +290,7 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="appointment-form h-100 d-flex flex-column justify-content-center text-center p-5 wow zoomIn" data-wow-delay="0.6s">
+                        <sec:authorize access="isAuthenticated()">
                         <h1 class="text-white mb-4">Make Appointment</h1>
                       <form action="${pageContext.request.contextPath}/book" method="post">
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
@@ -342,6 +340,13 @@
                                 </div>
                             </div>
                         </form>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
+                            <h1 class="text-white mb-4">Make Appointment</h1>
+                            <p class="text-white mb-4">Please login or register to book an appointment with our trusted and professional dentists.</p>
+                            <a href="${pageContext.request.contextPath}/login" class="btn btn-light py-3 w-100 mb-3">Login to Book</a>
+                            <a href="${pageContext.request.contextPath}/register" class="btn btn-dark py-3 w-100">Register</a>
+                        </sec:authorize>
                     </div>
                 </div>
             </div>
@@ -427,7 +432,9 @@
                     <div class="offer-text text-center rounded p-5">
                         <h1 class="display-5 text-white">Save 30% On Your First Dental Checkup</h1>
                         <p class="text-white mb-4">Eirmod sed tempor lorem ut dolores sit kasd ipsum. Dolor ea et dolore et at sea ea at dolor justo ipsum duo rebum sea. Eos vero eos vero ea et dolore eirmod diam duo lorem magna sit dolore sed et.</p>
+                        <sec:authorize access="isAuthenticated()">
                         <a href="/book_appointment" class="btn btn-dark py-3 px-5 me-3">Appointment</a>
+                        </sec:authorize>
                         <a href="/service" class="btn btn-light py-3 px-5">Read More</a>
                     </div>
                 </div>
@@ -465,7 +472,12 @@
                                 <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
                                 <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
                                 <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
+                                <sec:authorize access="isAuthenticated()">
                                 <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
+                                </sec:authorize>
+                                <sec:authorize access="!isAuthenticated()">
+                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
+                                </sec:authorize>
                             </div>
                         </div>
                         <div class="price-item pb-4">
@@ -481,7 +493,12 @@
                                 <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
                                 <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
                                 <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
+                                <sec:authorize access="isAuthenticated()">
                                 <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
+                                </sec:authorize>
+                                <sec:authorize access="!isAuthenticated()">
+                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
+                                </sec:authorize>
                             </div>
                         </div>
                         <div class="price-item pb-4">
@@ -497,7 +514,12 @@
                                 <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
                                 <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
                                 <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
+                                <sec:authorize access="isAuthenticated()">
                                 <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
+                                </sec:authorize>
+                                <sec:authorize access="!isAuthenticated()">
+                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
+                                </sec:authorize>
                             </div>
                         </div>
                     </div>
@@ -542,7 +564,12 @@
                     <div class="section-title bg-light rounded h-100 p-5">
                         <h5 class="position-relative d-inline-block text-primary text-uppercase">Our Dentist</h5>
                         <h1 class="display-6 mb-4">Meet Our Certified & Experienced Dentist</h1>
+                        <sec:authorize access="isAuthenticated()">
                         <a href="/book_appointment" class="btn btn-primary py-3 px-5">Appointment</a>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
+                        <a href="/contact" class="btn btn-primary py-3 px-5">Contact Us</a>
+                        </sec:authorize>
                     </div>
                 </div>
                 <div class="col-lg-4 wow slideInUp" data-wow-delay="0.3s">
@@ -662,7 +689,12 @@
                         <a class="text-light mb-2" href="/"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
                         <a class="text-light mb-2" href="/about"><i class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
                         <a class="text-light mb-2" href="/service"><i class="bi bi-arrow-right text-primary me-2"></i>Our Services</a>
-                        <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
+                        <sec:authorize access="isAuthenticated()">
+                            <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
+                            <a class="text-light mb-2" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
+                        </sec:authorize>
                         <a class="text-light" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                     </div>
                 </div>
@@ -672,7 +704,12 @@
                         <a class="text-light mb-2" href="/"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
                         <a class="text-light mb-2" href="/about"><i class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
                         <a class="text-light mb-2" href="/service"><i class="bi bi-arrow-right text-primary me-2"></i>Our Services</a>
-                        <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
+                        <sec:authorize access="isAuthenticated()">
+                            <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
+                        </sec:authorize>
+                        <sec:authorize access="!isAuthenticated()">
+                            <a class="text-light mb-2" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
+                        </sec:authorize>
                         <a class="text-light" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                     </div>
                 </div>
