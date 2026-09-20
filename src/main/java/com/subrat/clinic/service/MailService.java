@@ -10,8 +10,10 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 @Service
 public class MailService {
@@ -19,6 +21,12 @@ public class MailService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MailService.class);
 
     public static final String ADMIN_EMAIL = "dentcare.support@gmail.com";
+
+    @Value("${spring.mail.host:}")
+    private String mailHost;
+
+    @Value("${spring.mail.port:587}")
+    private String mailPort;
 
     @Value("${spring.mail.username:}")
     private String mailUsername;
@@ -33,14 +41,25 @@ public class MailService {
 
     @PostConstruct
     public void init() {
-        if (isConfigured()) {
-            senders.add(build("smtp.gmail.com", 465, true));
-            senders.add(build("smtp.gmail.com", 587, false));
-            LOGGER.info("[MAIL] SMTP configured=true username={} endpoints=smtp.gmail.com:465(SSL), smtp.gmail.com:587(STARTTLS)",
-                    mailUsername);
-        } else {
-            LOGGER.warn("[MAIL] SMTP configured=false - MAIL_USERNAME / MAIL_PASSWORD not set");
+        if (!isConfigured() || mailHost == null || mailHost.isBlank()) {
+            LOGGER.warn("[MAIL] SMTP NOT configured - set SMTP_HOST / SMTP_PORT / MAIL_USERNAME / MAIL_PASSWORD env vars");
+            return;
         }
+        int basePort;
+        try {
+            basePort = Integer.parseInt(mailPort.trim());
+        } catch (NumberFormatException ex) {
+            basePort = 587;
+        }
+        Set<Integer> ports = new LinkedHashSet<>();
+        ports.add(basePort);
+        ports.add(465);
+        ports.add(587);
+        String host = mailHost.trim();
+        for (int p : ports) {
+            senders.add(build(host, p, p == 465));
+        }
+        LOGGER.info("[MAIL] SMTP configured=true host={} username={} ports={}", host, mailUsername, ports);
     }
 
     private JavaMailSender build(String host, int port, boolean ssl) {
@@ -79,7 +98,7 @@ public class MailService {
     public String runConnectivityCheck() {
         String[] targets = {
                 "smtp.gmail.com:465", "smtp.gmail.com:587", "smtp-relay.gmail.com:465",
-                "smtp-relay.brevo.com:587", "smtp.sendgrid.net:587", "example.com:443"
+                "smtp.sendgrid.net:587", "smtp-relay.brevo.com:587", "example.com:443"
         };
         StringBuilder sb = new StringBuilder();
         for (String t : targets) {
@@ -168,7 +187,9 @@ public class MailService {
         List<String> errors = new ArrayList<>();
         for (int i = 0; i < senders.size(); i++) {
             JavaMailSender sender = senders.get(i);
-            String ep = (i == 0 ? "smtp.gmail.com:465 (SSL)" : "smtp.gmail.com:587 (STARTTLS)");
+            String ep = sender instanceof JavaMailSenderImpl impl
+                    ? impl.getHost() + ":" + impl.getPort()
+                    : "unknown";
             try {
                 sender.send(message);
                 SendOutcome o = new SendOutcome();

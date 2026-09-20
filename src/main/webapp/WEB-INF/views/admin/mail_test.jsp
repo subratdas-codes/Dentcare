@@ -51,9 +51,12 @@
                     </li>
                 </ul>
                 <p class="text-muted small mt-3 mb-0">
-                    If <strong>SMTP configured = NO</strong>, add <code>MAIL_USERNAME</code> and
-                    <code>MAIL_PASSWORD</code> (a Google <strong>App Password</strong>, not the Gmail login
-                    password) to the Render environment and re-deploy.
+                    If <strong>SMTP configured = NO</strong>, add these to the Render environment and re-deploy:
+                    <code>MAIL_USERNAME</code>, <code>MAIL_PASSWORD</code> (and optionally <code>SMTP_HOST</code>,
+                    <code>SMTP_PORT</code>).
+                    <br>SendGrid: host <code>smtp.sendgrid.net</code>, username <code>apikey</code>, password = your
+                    API key. Brevo: host <code>smtp-relay.brevo.com</code>, username = your login email, password = SMTP key.
+                    <br>Note: Gmail SMTP (smtp.gmail.com) is blocked from Render - use the Connectivity Check to see what is reachable.
                 </p>
             </div>
         </div>
