@@ -74,6 +74,22 @@
                         <i class="bi bi-send me-1"></i>Send Test Mail
                     </button>
                 </form>
+
+                <hr class="my-4">
+
+                <h5 class="fw-bold mb-1">Network Connectivity Check</h5>
+                <p class="text-muted small mb-2">Probes which email hosts/servers this server can actually reach. Helps if emails never arrive.</p>
+                <c:if test="${not empty connectResult}">
+                    <div class="bg-dark text-light small p-3 rounded mb-3" style="white-space: pre-wrap; word-break: break-all;">
+                        ${connectResult}
+                    </div>
+                </c:if>
+                <form action="${pageContext.request.contextPath}/admin/mail-test/connect" method="post">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-plug me-1"></i>Run Connectivity Check
+                    </button>
+                </form>
             </div>
         </div>
     </div>

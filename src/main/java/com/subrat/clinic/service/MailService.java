@@ -76,6 +76,29 @@ public class MailService {
         return mailUsername;
     }
 
+    public String runConnectivityCheck() {
+        String[] targets = {
+                "smtp.gmail.com:465", "smtp.gmail.com:587", "smtp-relay.gmail.com:465",
+                "smtp-relay.brevo.com:587", "smtp.sendgrid.net:587", "example.com:443"
+        };
+        StringBuilder sb = new StringBuilder();
+        for (String t : targets) {
+            String[] hp = t.split(":");
+            String host = hp[0];
+            int port = Integer.parseInt(hp[1]);
+            long start = System.currentTimeMillis();
+            String result;
+            try (java.net.Socket sock = new java.net.Socket()) {
+                sock.connect(new java.net.InetSocketAddress(host, port), 5000);
+                result = "OPEN (" + (System.currentTimeMillis() - start) + "ms)";
+            } catch (Exception ex) {
+                result = ex.getClass().getSimpleName();
+            }
+            sb.append(t).append(" = ").append(result).append("  |  ");
+        }
+        return sb.toString().trim();
+    }
+
     public String sendTest() {
         if (!isConfigured()) {
             return "Mail is NOT configured - Render env vars MAIL_USERNAME / MAIL_PASSWORD are empty or not set.";

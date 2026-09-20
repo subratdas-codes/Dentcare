@@ -135,5 +135,13 @@ public class DoctorController {
         model.addAttribute("mailUsername", mailService.getMailUsername());
         return "admin/mail_test";
     }
+
+    @PostMapping("/mail-test/connect")
+    public String mailTestConnect(Model model) {
+        model.addAttribute("connectResult", mailService.runConnectivityCheck());
+        model.addAttribute("configured", mailService.isConfigured());
+        model.addAttribute("mailUsername", mailService.getMailUsername());
+        return "admin/mail_test";
+    }
 }
 
