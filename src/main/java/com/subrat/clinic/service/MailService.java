@@ -40,6 +40,29 @@ public class MailService {
         return mailUsername != null && !mailUsername.isBlank();
     }
 
+    public String getMailUsername() {
+        return mailUsername;
+    }
+
+    public String sendTest() {
+        if (!isConfigured()) {
+            return "Mail is NOT configured - Render env vars MAIL_USERNAME / MAIL_PASSWORD are empty or not set.";
+        }
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setFrom(mailUsername);
+        mail.setTo(ADMIN_EMAIL);
+        mail.setSubject("DentCare mail test");
+        mail.setText("If you can read this, DentCare email sending is working correctly.");
+        try {
+            mailSender.send(mail);
+            LOGGER.info("[MAIL] Test email sent to {}", ADMIN_EMAIL);
+            return null;
+        } catch (Exception ex) {
+            LOGGER.error("[MAIL] Test email FAILED", ex);
+            return ex.getMessage();
+        }
+    }
+
     public void sendPasswordReset(String to, String resetLink) {
         if (!isConfigured()) {
             LOGGER.warn("[MAIL FALLBACK] Password reset link for {}: {}", to, resetLink);

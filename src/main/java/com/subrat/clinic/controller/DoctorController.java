@@ -4,6 +4,7 @@ import com.subrat.clinic.model.Appointment;
 import com.subrat.clinic.model.Doctor;
 import com.subrat.clinic.service.AppointmentService;
 import com.subrat.clinic.service.DoctorService;
+import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +29,9 @@ public class DoctorController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MailService mailService;
 
     @GetMapping("/dashboard")
     public String adminDashboard(Model model) {
@@ -109,6 +113,27 @@ public class DoctorController {
     public String deleteAppointment(@PathVariable Long id) {
         appointmentService.deleteById(id);
         return "redirect:/admin/appointments";
+    }
+
+    // ---------------- MAIL TEST ---------------- //
+
+    @GetMapping("/mail-test")
+    public String mailTest(Model model) {
+        model.addAttribute("configured", mailService.isConfigured());
+        model.addAttribute("mailUsername", mailService.getMailUsername());
+        return "admin/mail_test";
+    }
+
+    @PostMapping("/mail-test/send")
+    public String mailTestSend(Model model) {
+        String error = mailService.sendTest();
+        model.addAttribute("sendResult",
+                error == null
+                        ? "Sent OK - check dentcare.support@gmail.com inbox (and spam) now."
+                        : "FAILED: " + error);
+        model.addAttribute("configured", mailService.isConfigured());
+        model.addAttribute("mailUsername", mailService.getMailUsername());
+        return "admin/mail_test";
     }
 }
 
