@@ -29,8 +29,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link ${activePage == 'mail' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/mail-test">
-                    <i class="bi bi-envelope me-1"></i>Mail Test
+                <a class="nav-link ${activePage == 'mailTest' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/mail-test">
+                    <i class="bi bi-envelope-check me-1"></i>Mail Test
                 </a>
             </li>
             <li class="nav-item ms-lg-3">
