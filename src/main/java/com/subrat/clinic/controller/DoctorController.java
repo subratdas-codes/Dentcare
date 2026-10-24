@@ -54,6 +54,9 @@ public class DoctorController {
         model.addAttribute("doctorCount", doctorService.findAll().size());
         model.addAttribute("patientCount", patientService.getAll().size());
         model.addAttribute("appointmentCount", appointmentService.getAll().size());
+        model.addAttribute("doctors", doctorService.findAll());
+        model.addAttribute("appointments", appointmentService.getAll());
+        model.addAttribute("patients", patientService.getAll());
         return "admin/dashboard";
     }
 
