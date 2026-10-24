@@ -89,50 +89,62 @@
                 </div>
             </div>
             <div class="panel-heading text-center">
-                <h1>Portal Login</h1>
-                <div class="d-flex justify-content-center gap-2 mt-3">
-                    <span class="badge rounded-pill" style="background: rgba(59,130,246,0.9); padding: 0.6rem 1.2rem;">Admin / Doctor</span>
+                <h1>Staff Portal</h1>
+                <p class="text-white-50">Login as Admin or Doctor</p>
+            </div>
+
+            <div id="roleSelection" class="mb-4">
+                <label class="form-label text-center d-block">Select Role</label>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn flex-fill" id="btnAdmin" style="border-radius: 999px; background: rgba(59,130,246,0.25); color: #fff; border: 1px solid rgba(59,130,246,0.8);">Admin</button>
+                    <button type="button" class="btn flex-fill" id="btnDoctor" style="border-radius: 999px; background: transparent; color: #fff; border: 1px solid rgba(148,163,184,0.6);">Doctor</button>
                 </div>
             </div>
+
             <c:if test="${param.error != null}">
                 <div class="alert alert-danger text-center mb-4">Invalid email or password.</div>
             </c:if>
             <c:if test="${param.logout != null}">
                 <div class="alert alert-success text-center mb-4">Signed out successfully.</div>
             </c:if>
-            <form action="<c:url value='/login' />" method="post">
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                <div class="mb-4">
-                    <label class="form-label">Email Address</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="far fa-envelope"></i></span>
-                        <input type="email" class="form-control" name="username" placeholder="Enter your email" required autofocus autocomplete="username">
-                    </div>
+
+            <div id="loginForm" style="display:none;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="text-white-50 small">Logging in as <span id="roleLabel" class="text-white fw-semibold">Admin</span></div>
+                    <button type="button" class="btn btn-link btn-sm p-0" id="changeRole" style="color: rgba(226,232,255,0.7); text-decoration: none;">Change Role</button>
                 </div>
-                <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label mb-0">Password</label>
-                        <a href="<c:url value='/forgot-password' />" class="small" style="color: rgba(226,232,255,0.7); text-decoration: none;">Forgot Password?</a>
+                <form action="<c:url value='/login' />" method="post">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <div class="mb-4">
+                        <label class="form-label">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="far fa-envelope"></i></span>
+                            <input type="email" class="form-control" name="username" placeholder="Enter email" required autofocus autocomplete="username">
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" id="adminPassword" class="form-control" name="password" placeholder="Enter your password" required autocomplete="current-password">
-                        <span class="input-group-text" id="toggleAdminPassword" style="cursor: pointer;"><i class="fas fa-eye"></i></span>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Password</label>
+                            <a href="<c:url value='/forgot-password' />" class="small" style="color: rgba(226,232,255,0.7); text-decoration: none;">Forgot Password?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="adminPassword" class="form-control" name="password" placeholder="Enter password" required autocomplete="current-password">
+                            <span class="input-group-text" id="toggleAdminPassword" style="cursor: pointer;"><i class="fas fa-eye"></i></span>
+                        </div>
                     </div>
+                    <button class="btn btn-admin-login text-white" type="submit">Sign In</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="<c:url value='/forgot-password' />" class="small" style="color: rgba(226,232,255,0.7); text-decoration: none;">Reset Password</a>
                 </div>
-                <button class="btn btn-admin-login text-white" type="submit">Sign In</button>
-            </form>
+            </div>
+
             <div class="text-center mt-4">
-                <div class="d-flex flex-column gap-2">
-                    <a class="admin-footer-link justify-content-center m-0" href="<c:url value='/register' />">
-                        <i class="fas fa-user-plus"></i>
-                        <span>Register as Patient</span>
-                    </a>
-                    <a class="admin-footer-link justify-content-center m-0" href="<c:url value='/' />">
-                        <i class="fas fa-long-arrow-alt-left"></i>
-                        <span>Return to DentCare Website</span>
-                    </a>
-                </div>
+                <a class="admin-footer-link justify-content-center m-0" href="<c:url value='/' />">
+                    <i class="fas fa-long-arrow-alt-left"></i>
+                    <span>Return to DentCare Website</span>
+                </a>
             </div>
         </div>
     </div>
@@ -149,6 +161,34 @@
                 icon.classList.toggle('fa-eye');
                 icon.classList.toggle('fa-eye-slash');
             }
+        });
+    }
+
+    const btnAdmin = document.getElementById('btnAdmin');
+    const btnDoctor = document.getElementById('btnDoctor');
+    const roleSelection = document.getElementById('roleSelection');
+    const loginForm = document.getElementById('loginForm');
+    const roleLabel = document.getElementById('roleLabel');
+    const changeRole = document.getElementById('changeRole');
+
+    if (btnAdmin) {
+        btnAdmin.addEventListener('click', function () {
+            roleLabel.textContent = 'Admin';
+            roleSelection.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+    }
+    if (btnDoctor) {
+        btnDoctor.addEventListener('click', function () {
+            roleLabel.textContent = 'Doctor';
+            roleSelection.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+    }
+    if (changeRole) {
+        changeRole.addEventListener('click', function () {
+            loginForm.style.display = 'none';
+            roleSelection.style.display = 'block';
         });
     }
 </script>
