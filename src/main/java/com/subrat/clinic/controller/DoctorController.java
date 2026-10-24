@@ -202,5 +202,27 @@ public class DoctorController {
         model.addAttribute("mailUsername", mailService.getMailUsername());
         return "admin/mail_test";
     }
+
+    @GetMapping("/pricing")
+    public String pricing(Model model) {
+        return "admin/pricing";
+    }
+
+    @GetMapping("/invoices")
+    public String invoices(Model model) {
+        model.addAttribute("appointments", appointmentService.getAll());
+        return "admin/invoices";
+    }
+
+    @GetMapping("/profile")
+    public String profile(org.springframework.security.core.Authentication authentication, Model model) {
+        String email = authentication.getName();
+        com.subrat.clinic.model.Doctor doctor = doctorService.findByEmail(email);
+        if (doctor != null) {
+            model.addAttribute("doctor", doctor);
+            return "admin/profile";
+        }
+        return "admin/profile";
+    }
 }
 
