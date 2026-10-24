@@ -18,6 +18,11 @@ import java.util.List;
 @RequestMapping("/admin")
 public class DoctorController {
 
+    @GetMapping("/login")
+    public String adminLogin() {
+        return "admin/login";
+    }
+
     @Autowired
     private DoctorService doctorService;
 

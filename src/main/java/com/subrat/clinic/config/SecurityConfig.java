@@ -69,6 +69,7 @@ public class SecurityConfig {
                                                    AuthenticationSuccessHandler authenticationSuccessHandler) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(new AntPathRequestMatcher("/admin/login")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/profile"),
                                 new AntPathRequestMatcher("/change-password"),
@@ -93,6 +94,12 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/actuator/health"),
                                 new AntPathRequestMatcher("/actuator/health/**")).permitAll()
                         .anyRequest().permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .defaultAuthenticationEntryPointFor(
+                                (request, response, authException) -> response.sendRedirect(request.getContextPath() + "/admin/login"),
+                                new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/admin/**")
+                        )
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
