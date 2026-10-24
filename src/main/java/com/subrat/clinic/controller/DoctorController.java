@@ -94,8 +94,19 @@ public class DoctorController {
     // ---------------- PATIENT VIEW ---------------- //
 
     @GetMapping("/patients")
-    public String listPatients(Model model) {
-        model.addAttribute("patients", patientService.getAll());
+    public String listPatients(Model model,
+                                @RequestParam(value = "q", required = false) String query) {
+        List<com.subrat.clinic.model.Patient> patients = patientService.getAll();
+        if (query != null && !query.trim().isEmpty()) {
+            String q = query.trim().toLowerCase();
+            patients = patients.stream()
+                    .filter(p -> (p.getName() != null && p.getName().toLowerCase().contains(q))
+                            || (p.getEmail() != null && p.getEmail().toLowerCase().contains(q))
+                            || (p.getPhone() != null && p.getPhone().toLowerCase().contains(q)))
+                    .toList();
+            model.addAttribute("q", query.trim());
+        }
+        model.addAttribute("patients", patients);
         return "admin/patient_list";
     }
 
