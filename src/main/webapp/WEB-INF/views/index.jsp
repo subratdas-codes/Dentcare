@@ -695,7 +695,6 @@
                         <sec:authorize access="!isAuthenticated()">
                             <a class="text-light mb-2" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                         </sec:authorize>
-                        <a class="text-light" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -708,7 +707,8 @@
                             <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
                         </sec:authorize>
                         <sec:authorize access="!isAuthenticated()">
-                            <a class="text-light mb-2" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
+                            <a class="text-light mb-2" href="/login"><i class="bi bi-arrow-right text-primary me-2"></i>Login</a>
+                            <a class="text-light mb-2" href="/register"><i class="bi bi-arrow-right text-primary me-2"></i>Register</a>
                         </sec:authorize>
                         <a class="text-light" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
                     </div>
