@@ -90,7 +90,6 @@
             </div>
             <div class="panel-heading">
                 <h1>Administrator Login</h1>
-                <p>Sign in to manage appointments, doctors, patients and clinic settings.</p>
             </div>
             <c:if test="${param.error != null}">
                 <div class="alert alert-danger text-center mb-4">Invalid admin credentials. Please try again.</div>

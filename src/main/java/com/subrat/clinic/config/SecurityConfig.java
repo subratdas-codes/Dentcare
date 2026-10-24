@@ -40,11 +40,18 @@ public class SecurityConfig {
             }
 
             Doctor doctor = doctorRepository.findByEmail(email);
-            if (doctor != null && doctor.isAdmin()) {
-                return User.withUsername(doctor.getEmail())
-                        .password(doctor.getPassword())
-                        .roles("ADMIN")
-                        .build();
+            if (doctor != null) {
+                if (doctor.isAdmin()) {
+                    return User.withUsername(doctor.getEmail())
+                            .password(doctor.getPassword())
+                            .roles("ADMIN")
+                            .build();
+                } else {
+                    return User.withUsername(doctor.getEmail())
+                            .password(doctor.getPassword())
+                            .roles("DOCTOR")
+                            .build();
+                }
             }
 
             throw new UsernameNotFoundException("No user found with email: " + email);
@@ -56,7 +63,11 @@ public class SecurityConfig {
         return (request, response, authentication) -> {
             boolean admin = authentication.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            boolean doctor = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_DOCTOR"));
             if (admin) {
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            } else if (doctor) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
