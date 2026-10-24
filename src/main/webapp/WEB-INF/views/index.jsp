@@ -463,7 +463,7 @@
                             <div class="position-relative">
                                 <img class="img-fluid rounded-top" src="img/price-1.jpg" alt="">
                                 <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">$35</h2>
+                                    <h2 class="text-primary m-0">&#8377; 2999</h2>
                                 </div>
                             </div>
                             <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
@@ -484,7 +484,7 @@
                             <div class="position-relative">
                                 <img class="img-fluid rounded-top" src="img/price-2.jpg" alt="">
                                 <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">$49</h2>
+                                    <h2 class="text-primary m-0">&#8377; 4999</h2>
                                 </div>
                             </div>
                             <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
@@ -505,7 +505,7 @@
                             <div class="position-relative">
                                 <img class="img-fluid rounded-top" src="img/price-3.jpg" alt="">
                                 <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">$99</h2>
+                                    <h2 class="text-primary m-0">&#8377; 8999</h2>
                                 </div>
                             </div>
                             <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
