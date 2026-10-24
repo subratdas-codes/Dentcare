@@ -51,7 +51,7 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between">
                             <label class="form-label">Password</label>
-                            <a href="<c:url value='/forgot-password' />" class="small">Forgot Password?</a>
+                            <a href="<c:url value='/admin/forgot-password' />" class="small">Forgot Password?</a>
                         </div>
                         <div class="input-group">
                             <input type="password" id="pwd" class="form-control" name="password" required>
@@ -61,10 +61,10 @@
                     <button class="btn btn-primary btn-submit w-100" type="submit">Sign In</button>
                 </form>
                 <div class="text-center mt-3">
-                    <a href="<c:url value='/forgot-password' />" class="small">Reset Password</a>
+                    <a href="<c:url value='/admin/forgot-password' />" class="small">Reset Password</a>
                 </div>
                 <div id="doctorRegister" class="text-center mt-2" style="display:none;">
-                    <a href="<c:url value='/doctor/register' />" class="small">Register as New Doctor</a>
+                    <a href="<c:url value='/admin/register' />" class="small">Register as New Doctor</a>
                 </div>
             </div>
             <div class="text-center mt-3">
