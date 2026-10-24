@@ -108,10 +108,14 @@
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="form-label">Password</label>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label mb-0">Password</label>
+                        <a href="<c:url value='/forgot-password' />" class="small" style="color: rgba(226,232,255,0.7); text-decoration: none;">Forgot Password?</a>
+                    </div>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" class="form-control" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                        <input type="password" id="adminPassword" class="form-control" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                        <span class="input-group-text" id="toggleAdminPassword" style="cursor: pointer;"><i class="fas fa-eye"></i></span>
                     </div>
                 </div>
                 <button class="btn btn-admin-login text-white" type="submit">Sign In</button>
@@ -125,5 +129,20 @@
         </div>
     </div>
 </main>
+<script>
+    const toggle = document.getElementById('toggleAdminPassword');
+    const pwd = document.getElementById('adminPassword');
+    if (toggle && pwd) {
+        toggle.addEventListener('click', function () {
+            const type = pwd.getAttribute('type') === 'password' ? 'text' : 'password';
+            pwd.setAttribute('type', type);
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-eye');
+                icon.classList.toggle('fa-eye-slash');
+            }
+        });
+    }
+</script>
 </body>
 </html>
