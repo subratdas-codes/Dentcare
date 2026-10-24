@@ -81,7 +81,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(new AntPathRequestMatcher("/admin/login")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "DOCTOR")
                         .requestMatchers(new AntPathRequestMatcher("/profile"),
                                 new AntPathRequestMatcher("/change-password"),
                                 new AntPathRequestMatcher("/book_appointment"),
