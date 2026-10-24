@@ -33,6 +33,11 @@ public class DoctorController {
     @Autowired
     private MailService mailService;
 
+    @GetMapping({"", "/"})
+    public String adminRoot() {
+        return "redirect:/admin/dashboard";
+    }
+
     @GetMapping("/dashboard")
     public String adminDashboard(Model model) {
         model.addAttribute("doctorCount", doctorService.findAll().size());
