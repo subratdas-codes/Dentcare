@@ -26,6 +26,14 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    public List<Appointment> findByDoctorName(String doctorName) {
+        if (doctorName == null || doctorName.isBlank()) {
+            return List.of();
+        }
+        return appointmentRepository.findByDoctorName(doctorName);
+    }
+
+    @Override
     public List<Appointment> findByEmail(String email) {
         return appointmentRepository.findByEmail(email);
     }

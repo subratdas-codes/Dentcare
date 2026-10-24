@@ -28,22 +28,24 @@
             <p class="mb-0">Staff Portal - Admin / Doctor</p>
         </div>
         <div class="card-body">
-            <div id="roleSelect">
+            <div id="roleSelect" style="display:${param.error != null ? 'none' : 'block'};">
                 <p class="text-center text-muted mb-3">Select Role</p>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-primary btn-role" onclick="showLogin('Admin')">Login as Admin</button>
                     <button type="button" class="btn btn-outline-primary btn-role" onclick="showLogin('Doctor')">Login as Doctor</button>
                 </div>
             </div>
-            <div id="loginBox" style="display:none;">
+            <div id="loginBox" style="display:${param.error != null ? 'block' : 'none'};">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted">Login as <strong id="roleName">Admin</strong></span>
+                    <span class="text-muted">Login as <strong id="roleName">${param.role == 'DOCTOR' ? 'Doctor' : 'Admin'}</strong></span>
                     <button type="button" class="btn btn-link btn-sm p-0" onclick="backToRole()">Change Role</button>
                 </div>
-                <c:if test="${param.error != null}"><div class="alert alert-danger">Invalid email or password.</div></c:if>
-                <c:if test="${param.logout != null}"><div class="alert alert-success">Logged out successfully.</div></c:if>
+                <c:if test="${param.error != null}"><div class="alert alert-danger" role="alert">Invalid credentials or the account does not match the selected staff role.</div></c:if>
+                <c:if test="${param.logout != null}"><div class="alert alert-success" role="status">Logged out successfully.</div></c:if>
                 <form action="<c:url value='/login' />" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <input type="hidden" name="portal" value="admin" />
+                    <input type="hidden" name="staffRole" id="staffRole" value="${param.role == 'DOCTOR' ? 'DOCTOR' : 'ADMIN'}" />
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="email" class="form-control" name="username" required>
@@ -74,10 +76,11 @@
     </div>
 </div>
 <script>
-function showLogin(r){ 
+function showLogin(r){
     document.getElementById('roleName').innerText=r; 
     document.getElementById('roleSelect').style.display='none'; 
     document.getElementById('loginBox').style.display='block';
+    document.getElementById('staffRole').value = r === 'Doctor' ? 'DOCTOR' : 'ADMIN';
     if(r === 'Doctor') {
         document.getElementById('doctorRegister').style.display = 'block';
     } else {

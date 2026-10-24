@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - DentCare</title>
+    <title>Dashboard - DentCare Portal</title>
     <link href="<c:url value='/css/bootstrap.min.css' />" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -28,7 +28,7 @@
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
         <div>
             <h4 class="fw-bold mb-1">Dashboard Overview</h4>
-            <p class="text-muted mb-0">Manage doctors, patients, appointments and clinic operations from here.</p>
+            <p class="text-muted mb-0">Welcome to DentCare Portal - Manage appointments and clinic operations.</p>
         </div>
         <div class="d-flex gap-2">
             <a href="${pageContext.request.contextPath}/admin/appointments" class="btn btn-primary">

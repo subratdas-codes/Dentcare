@@ -12,10 +12,12 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -65,10 +67,28 @@ public class SecurityConfig {
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
             boolean doctor = authentication.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_DOCTOR"));
+
+            // The staff portal's role selector is enforced on the server; it is
+            // not just a visual choice in the login page.
+            if ("admin".equals(request.getParameter("portal"))) {
+                String selectedRole = request.getParameter("staffRole");
+                boolean roleMatches = ("ADMIN".equals(selectedRole) && admin)
+                        || ("DOCTOR".equals(selectedRole) && doctor);
+                if (!roleMatches) {
+                    SecurityContextHolder.clearContext();
+                    var session = request.getSession(false);
+                    if (session != null) session.invalidate();
+                    response.sendRedirect(request.getContextPath()
+                            + "/admin/login?error=true&role="
+                            + ("DOCTOR".equals(selectedRole) ? "DOCTOR" : "ADMIN"));
+                    return;
+                }
+            }
+
             if (admin) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else if (doctor) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/doctor-dashboard");
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
@@ -76,8 +96,21 @@ public class SecurityConfig {
     }
 
     @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return (request, response, exception) -> {
+            if ("admin".equals(request.getParameter("portal"))) {
+                String role = "DOCTOR".equals(request.getParameter("staffRole")) ? "DOCTOR" : "ADMIN";
+                response.sendRedirect(request.getContextPath() + "/admin/login?error=true&role=" + role);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/login?error=true");
+            }
+        };
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   AuthenticationSuccessHandler authenticationSuccessHandler) throws Exception {
+                                                   AuthenticationSuccessHandler authenticationSuccessHandler,
+                                                   AuthenticationFailureHandler authenticationFailureHandler) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -86,6 +119,21 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/admin/reset-password"),
                                 new AntPathRequestMatcher("/admin/register")
                         ).permitAll()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/admin/doctors"),
+                                new AntPathRequestMatcher("/admin/doctors/**"),
+                                new AntPathRequestMatcher("/admin/patients"),
+                                new AntPathRequestMatcher("/admin/patients/**"),
+                                new AntPathRequestMatcher("/admin/pricing"),
+                                new AntPathRequestMatcher("/admin/pricing/**"),
+                                new AntPathRequestMatcher("/admin/invoices"),
+                                new AntPathRequestMatcher("/admin/invoices/**"),
+                                new AntPathRequestMatcher("/admin/mail-test"),
+                                new AntPathRequestMatcher("/admin/mail-test/**"),
+                                new AntPathRequestMatcher("/admin/appointments/edit/**"),
+                                new AntPathRequestMatcher("/admin/appointments/update"),
+                                new AntPathRequestMatcher("/admin/appointments/delete/**")
+                        ).hasRole("ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "DOCTOR")
                         .requestMatchers(new AntPathRequestMatcher("/profile"),
                                 new AntPathRequestMatcher("/change-password"),
@@ -123,12 +171,18 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler(authenticationSuccessHandler)
-                        .failureUrl("/login?error=true")
+                        .failureHandler(authenticationFailureHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/admin/login?logout=true")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            boolean staff = authentication != null && authentication.getAuthorities().stream()
+                                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
+                                            || a.getAuthority().equals("ROLE_DOCTOR"));
+                            String destination = staff ? "/admin/login?logout=true" : "/login?logout=true";
+                            response.sendRedirect(request.getContextPath() + destination);
+                        })
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                 );

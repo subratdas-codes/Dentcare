@@ -23,8 +23,8 @@
 <div class="container-fluid py-4 px-4">
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
         <div>
-            <h4 class="fw-bold mb-1">Appointment Management</h4>
-            <p class="text-muted mb-0">Track, edit and manage all patient appointments.</p>
+            <h4 class="fw-bold mb-1"><sec:authorize access="hasRole('DOCTOR')">My Assigned Appointments</sec:authorize><sec:authorize access="hasRole('ADMIN')">Appointment Management</sec:authorize></h4>
+            <p class="text-muted mb-0"><sec:authorize access="hasRole('DOCTOR')">View patient appointments assigned to your doctor account.</sec:authorize><sec:authorize access="hasRole('ADMIN')">Track, edit and manage all patient appointments.</sec:authorize></p>
         </div>
         <div class="text-muted small">Total: ${appointments.size()} appointment(s)</div>
     </div>
@@ -59,7 +59,7 @@
                             <td>${a.appointmentDate}</td>
                             <td>${a.appointmentTime}</td>
                             <td class="text-center">
-                                <sec:authorize access="hasAnyRole('ADMIN','DOCTOR')">
+                                <sec:authorize access="hasRole('ADMIN')">
                                     <a href="${pageContext.request.contextPath}/admin/appointments/edit/${a.id}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-pencil"></i>
                                     </a>

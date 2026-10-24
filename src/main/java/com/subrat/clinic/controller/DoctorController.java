@@ -7,12 +7,14 @@ import com.subrat.clinic.service.DoctorService;
 import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/admin")
@@ -46,12 +48,8 @@ public class DoctorController {
     }
 
     @GetMapping("/doctor-dashboard")
-    public String doctorDashboard(org.springframework.security.core.Authentication auth, Model model) {
-        model.addAttribute("doctorCount", doctorService.findAll().size());
-        model.addAttribute("patientCount", patientService.getAll().size());
-        model.addAttribute("appointmentCount", appointmentService.getAll().size());
-        model.addAttribute("appointments", appointmentService.getAll());
-        return "admin/dashboard";
+    public String doctorDashboard(Authentication authentication, Model model) {
+        return populateDoctorDashboard(authentication, model);
     }
 
     @Autowired
@@ -90,19 +88,52 @@ public class DoctorController {
     }
 
     @GetMapping({"", "/"})
-    public String adminRoot() {
-        return "redirect:/admin/dashboard";
+    public String adminRoot(Authentication authentication) {
+        return isDoctor(authentication)
+                ? "redirect:/admin/doctor-dashboard"
+                : "redirect:/admin/dashboard";
     }
 
     @GetMapping("/dashboard")
-    public String adminDashboard(Model model) {
+    public String adminDashboard(Authentication authentication, Model model) {
+        if (isDoctor(authentication)) {
+            return populateDoctorDashboard(authentication, model);
+        }
+        List<Appointment> appointments = appointmentService.getAll();
         model.addAttribute("doctorCount", doctorService.findAll().size());
         model.addAttribute("patientCount", patientService.getAll().size());
-        model.addAttribute("appointmentCount", appointmentService.getAll().size());
+        model.addAttribute("appointmentCount", appointments.size());
         model.addAttribute("doctors", doctorService.findAll());
-        model.addAttribute("appointments", appointmentService.getAll());
+        model.addAttribute("appointments", appointments);
         model.addAttribute("patients", patientService.getAll());
         return "admin/dashboard";
+    }
+
+    private String populateDoctorDashboard(Authentication authentication, Model model) {
+        if (authentication == null || !isDoctor(authentication)) {
+            return "redirect:/admin/login";
+        }
+        Doctor doctor = doctorService.findByEmail(authentication.getName());
+        if (doctor == null || doctor.getName() == null || doctor.getName().isBlank()) {
+            return "redirect:/admin/login?error=true&role=DOCTOR";
+        }
+
+        List<Appointment> appointments = appointmentService.findByDoctorName(doctor.getName());
+        long assignedPatientCount = appointments.stream()
+                .map(Appointment::getEmail)
+                .filter(email -> email != null && !email.isBlank())
+                .distinct()
+                .count();
+        model.addAttribute("doctor", doctor);
+        model.addAttribute("appointments", appointments);
+        model.addAttribute("appointmentCount", appointments.size());
+        model.addAttribute("patientCount", assignedPatientCount);
+        return "admin/doctor_dashboard";
+    }
+
+    private boolean isDoctor(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> Objects.equals(authority.getAuthority(), "ROLE_DOCTOR"));
     }
 
     // ---------------- DOCTOR CRUD ---------------- //
@@ -196,8 +227,15 @@ public class DoctorController {
     // ---------------- APPOINTMENT CRUD ---------------- //
 
     @GetMapping("/appointments")
-    public String listAppointments(Model model) {
-        model.addAttribute("appointments", appointmentService.getAll());
+    public String listAppointments(Authentication authentication, Model model) {
+        List<Appointment> appointments;
+        if (isDoctor(authentication)) {
+            Doctor doctor = doctorService.findByEmail(authentication.getName());
+            appointments = doctor == null ? List.of() : appointmentService.findByDoctorName(doctor.getName());
+        } else {
+            appointments = appointmentService.getAll();
+        }
+        model.addAttribute("appointments", appointments);
         return "admin/appointment_list"; // Use appointment_list.jsp (not 'appointments.jsp' to avoid conflict)
     }
 
