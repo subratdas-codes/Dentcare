@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <c:set var="activePage" value="appointments" />
 <!DOCTYPE html>
 <html lang="en">
@@ -10,60 +11,68 @@
     <link href="<c:url value='/css/bootstrap.min.css' />" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f6fb; }
+        body { background-color: #f6f8fc; }
+        .card-table { border: none; border-radius: 1rem; overflow: hidden; box-shadow: 0 40px 70px -50px rgba(15, 31, 58, 0.9); }
+        .table-hover tbody tr { transition: all 0.2s ease; }
+        .table-hover tbody tr:hover { background-color: rgba(6, 163, 218, 0.05); }
     </style>
 </head>
 <body>
 <%@ include file="_navbar.jsp" %>
 
 <div class="container-fluid py-4 px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
         <div>
             <h4 class="fw-bold mb-1">Appointment Management</h4>
-            <p class="text-muted mb-0">${appointments.size()} appointment(s) booked so far.</p>
+            <p class="text-muted mb-0">Track, edit and manage all patient appointments.</p>
         </div>
+        <div class="text-muted small">Total: ${appointments.size()} appointment(s)</div>
     </div>
 
     <c:if test="${not empty appointments}">
-        <div class="card shadow-sm border-0">
+        <div class="card card-table">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-dark">
+                    <thead class="bg-light">
                     <tr>
-                        <th>#</th>
-                        <th>Patient</th>
-                        <th>Contact</th>
-                        <th>Doctor</th>
-                        <th>Service</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th class="text-center">Actions</th>
+                        <th class="text-uppercase small text-muted">#</th>
+                        <th class="text-uppercase small text-muted">Patient</th>
+                        <th class="text-uppercase small text-muted">Contact</th>
+                        <th class="text-uppercase small text-muted">Doctor</th>
+                        <th class="text-uppercase small text-muted">Service</th>
+                        <th class="text-uppercase small text-muted">Date</th>
+                        <th class="text-uppercase small text-muted">Time</th>
+                        <th class="text-uppercase small text-muted text-center">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
                     <c:forEach var="a" items="${appointments}">
                         <tr>
-                            <td>${a.id}</td>
+                            <td class="text-muted">${a.id}</td>
                             <td>
                                 <div class="fw-semibold">${a.patientName}</div>
                                 <small class="text-muted">${a.email}</small>
                             </td>
                             <td>${a.phone}</td>
-                            <td><span class="badge bg-info bg-opacity-25 text-dark">${a.doctorName}</span></td>
+                            <td><span class="badge bg-primary bg-opacity-10 text-primary">${a.doctorName}</span></td>
                             <td>${a.service}</td>
                             <td>${a.appointmentDate}</td>
                             <td>${a.appointmentTime}</td>
                             <td class="text-center">
-                                <a href="${pageContext.request.contextPath}/admin/appointments/edit/${a.id}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil me-1"></i>Edit
-                                </a>
-                                <form action="${pageContext.request.contextPath}/admin/appointments/delete/${a.id}" method="post" class="d-inline"
-                                      onsubmit="return confirm('Delete appointment #${a.id}?');">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash me-1"></i>Delete
-                                    </button>
-                                </form>
+                                <sec:authorize access="hasAnyRole('ADMIN','DOCTOR')">
+                                    <a href="${pageContext.request.contextPath}/admin/appointments/edit/${a.id}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </sec:authorize>
+                                <sec:authorize access="hasRole('ADMIN')">
+                                    <form action="${pageContext.request.contextPath}/admin/appointments/delete/${a.id}" method="post" class="d-inline"
+                                          onsubmit="return confirm('Delete appointment #${a.id}?');">
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </sec:authorize>
                             </td>
                         </tr>
                     </c:forEach>
@@ -74,12 +83,13 @@
     </c:if>
 
     <c:if test="${empty appointments}">
-        <div class="alert alert-info shadow-sm">
-            <i class="bi bi-info-circle me-2"></i>No appointments yet. They appear here as soon as patients book.
+        <div class="card card-table">
+            <div class="card-body text-center py-5 text-muted">
+                <i class="bi bi-calendar-x fs-1 mb-3"></i>
+                <div>No appointments yet.</div>
+            </div>
         </div>
     </c:if>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
