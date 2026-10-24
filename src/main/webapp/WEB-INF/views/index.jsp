@@ -764,7 +764,19 @@
     <script src="lib/twentytwenty/jquery.twentytwenty.js"></script>
 
     <!-- Template Javascript -->
-    <script src="js/main.js"></script>
+    <script src="js/main.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var dateInput = document.querySelector('input[name="appointmentDate"]');
+            if (dateInput) {
+                var today = new Date();
+                var yyyy = today.getFullYear();
+                var mm = String(today.getMonth() + 1).padStart(2, '0');
+                var dd = String(today.getDate()).padStart(2, '0');
+                dateInput.min = yyyy + '-' + mm + '-' + dd;
+            }
+        });
+    </script>
 </body>
 
 </html>

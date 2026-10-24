@@ -137,9 +137,19 @@
 <script src="<c:url value='/lib/easing/easing.min.js' />"></script>
 <script src="<c:url value='/lib/waypoints/waypoints.min.js' />"></script>
 <script src="<c:url value='/lib/owlcarousel/owl.carousel.min.js' />"></script>
-<script src="<c:url value='/js/main.js' />"></script>
+<script src="<c:url value='/js/main.js' />" defer></script>
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+    document.addEventListener('DOMContentLoaded', function () {
+        var dateInput = document.querySelector('input[name="appointmentDate"]');
+        if (dateInput) {
+            var today = new Date();
+            var yyyy = today.getFullYear();
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var dd = String(today.getDate()).padStart(2, '0');
+            dateInput.min = yyyy + '-' + mm + '-' + dd;
+        }
+    });
 </script>
 </body>
 </html>
