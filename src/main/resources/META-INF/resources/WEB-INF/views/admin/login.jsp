@@ -51,7 +51,7 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between">
                             <label class="form-label">Password</label>
-                            <a href="<c:url value='/forgot-password' />" class="small">Forgot Password?</a>
+                            <a href="<c:url value='/admin/forgot-password' />" class="small">Forgot Password?</a>
                         </div>
                         <div class="input-group">
                             <input type="password" id="pwd" class="form-control" name="password" required>
@@ -61,7 +61,10 @@
                     <button class="btn btn-primary btn-submit w-100" type="submit">Sign In</button>
                 </form>
                 <div class="text-center mt-3">
-                    <a href="<c:url value='/forgot-password' />" class="small">Reset Password</a>
+                    <a href="<c:url value='/admin/forgot-password' />" class="small">Reset Password</a>
+                </div>
+                <div id="doctorRegister" class="text-center mt-2" style="display:none;">
+                    <a href="<c:url value='/admin/register' />" class="small">Register as New Doctor</a>
                 </div>
             </div>
             <div class="text-center mt-3">
@@ -71,8 +74,17 @@
     </div>
 </div>
 <script>
-function showLogin(r){ document.getElementById('roleName').innerText=r; document.getElementById('roleSelect').style.display='none'; document.getElementById('loginBox').style.display='block'; }
-function backToRole(){ document.getElementById('loginBox').style.display='none'; document.getElementById('roleSelect').style.display='block'; }
+function showLogin(r){ 
+    document.getElementById('roleName').innerText=r; 
+    document.getElementById('roleSelect').style.display='none'; 
+    document.getElementById('loginBox').style.display='block';
+    if(r === 'Doctor') {
+        document.getElementById('doctorRegister').style.display = 'block';
+    } else {
+        document.getElementById('doctorRegister').style.display = 'none';
+    }
+}
+function backToRole(){ document.getElementById('loginBox').style.display='none'; document.getElementById('roleSelect').style.display='block'; document.getElementById('doctorRegister').style.display='none'; }
 function togglePwd(){ var p=document.getElementById('pwd'); var e=document.getElementById('eye'); if(p.type==='password'){p.type='text';e.classList.remove('fa-eye');e.classList.add('fa-eye-slash');}else{p.type='password';e.classList.remove('fa-eye-slash');e.classList.add('fa-eye');}}
 </script>
 </body>
