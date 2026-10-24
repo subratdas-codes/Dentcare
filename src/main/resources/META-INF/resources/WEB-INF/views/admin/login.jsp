@@ -4,193 +4,76 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>DentCare | Admin Login</title>
+    <title>DentCare | Staff Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Jost:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <link href="<c:url value='/css/bootstrap.min.css' />" rel="stylesheet">
     <style>
-        :root {
-            --admin-primary: #1f6bff;
-            --admin-bg: #0b1026;
-        }
-        * { font-family: 'Inter', 'Jost', sans-serif; }
-        body {
-            background: radial-gradient(circle at top, #151b2f, var(--admin-bg));
-            min-height: 100vh;
-            color: #f8fafc;
-            margin: 0;
-        }
-        .admin-shell { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
-        .admin-card {
-            position: relative;
-            width: min(460px, 100%);
-            border-radius: 18px;
-            overflow: hidden;
-            background: linear-gradient(180deg, rgba(31, 107, 255, 0.22) 0%, rgba(11, 16, 38, 0.98) 55%);
-            box-shadow: 0 60px 120px -60px rgba(31, 107, 255, 0.45);
-            border: 1px solid rgba(148, 163, 184, 0.25);
-        }
-        .admin-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 65%);
-            pointer-events: none;
-        }
-        .admin-card-body { position: relative; padding: clamp(2rem, 4vw, 3.25rem); }
-        .brand-row { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 2rem; }
-        .brand-mark {
-            width: 52px; height: 52px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.9), rgba(29, 78, 216, 0.9));
-            box-shadow: 0 30px 60px -30px rgba(59, 130, 246, 0.9);
-        }
-        .brand-text small { display: block; text-transform: uppercase; letter-spacing: 0.6rem; font-size: 0.7rem; color: rgba(226, 232, 255, 0.5); }
-        .brand-text strong { display: block; margin-top: 0.4rem; font-size: 1.25rem; letter-spacing: 0.4rem; text-transform: uppercase; }
-        .panel-heading { margin-bottom: 2rem; }
-        .panel-heading h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 0.6rem; }
-        .panel-heading p { color: rgba(226, 232, 255, 0.6); margin-bottom: 0; }
-        .form-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.3rem; color: rgba(226, 232, 255, 0.6); margin-bottom: 0.8rem; }
-        .input-group {
-            border-radius: 999px; overflow: hidden;
-            border: 1px solid rgba(148, 163, 184, 0.4);
-            background: rgba(15, 23, 42, 0.7);
-            transition: border 0.2s ease, box-shadow 0.2s ease;
-        }
-        .input-group:focus-within { border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.12); }
-        .input-group-text { background: transparent; border: none; color: rgba(226, 232, 255, 0.6); padding: 0 1.2rem 0 1.6rem; }
-        .form-control { background: transparent; border: none; color: #f8fafc; padding: 0.9rem 1.6rem 0.9rem 0; }
-        .form-control::placeholder { color: rgba(226, 232, 255, 0.4); }
-        .form-control:focus { box-shadow: none; background: transparent; color: #f8fafc; }
-        .btn-admin-login {
-            width: 100%; border-radius: 999px; border: none; padding: 1rem 2rem;
-            text-transform: uppercase; letter-spacing: 0.5rem; font-weight: 600;
-            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-            box-shadow: 0 40px 70px -40px rgba(59, 130, 246, 0.9);
-        }
-        .btn-admin-login:hover { filter: brightness(1.05); }
-        .admin-footer-link { display: inline-flex; align-items: center; gap: 0.6rem; color: rgba(226, 232, 255, 0.5); text-decoration: none; margin-top: 2rem; }
-        .admin-footer-link:hover { color: rgba(226, 232, 255, 0.9); }
-        .alert { border-radius: 999px; border: none; padding: 0.8rem 1.6rem; }
+        body { background: #0f1f3a; min-height: 100vh; font-family: 'Open Sans', sans-serif; }
+        .wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+        .card { width: min(420px, 100%); border: none; border-radius: 12px; overflow: hidden; box-shadow: 0 40px 80px rgba(15, 31, 58, 0.5); }
+        .card-header { background: linear-gradient(90deg, #06A3DA 0%, #091E3E 100%); color: #fff; text-align: center; padding: 2rem; border: none; }
+        .card-body { padding: 2rem; background: #fff; }
+        .btn-role { border-radius: 999px; padding: 0.8rem 1rem; }
+        .form-control { border-radius: 10px; padding: 0.8rem 1rem; }
+        .btn-submit { border-radius: 999px; padding: 0.9rem 1rem; letter-spacing: 0.3rem; text-transform: uppercase; }
     </style>
 </head>
 <body>
-<main class="admin-shell">
-    <div class="admin-card">
-        <div class="admin-card-body">
-            <div class="brand-row">
-                <div class="brand-mark">
-                    <i class="fa fa-tooth text-white fa-lg"></i>
-                </div>
-                <div class="brand-text">
-                    <small>DentCare</small>
-                    <strong>Admin Panel</strong>
-                </div>
-            </div>
-            <div class="panel-heading text-center">
-                <h1>Staff Portal</h1>
-                <p class="text-white-50">Login as Admin or Doctor</p>
-            </div>
-
-            <div id="roleSelection" class="mb-4">
-                <label class="form-label text-center d-block">Select Role</label>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn flex-fill" id="btnAdmin" style="border-radius: 999px; background: rgba(59,130,246,0.25); color: #fff; border: 1px solid rgba(59,130,246,0.8);">Admin</button>
-                    <button type="button" class="btn flex-fill" id="btnDoctor" style="border-radius: 999px; background: transparent; color: #fff; border: 1px solid rgba(148,163,184,0.6);">Doctor</button>
+<div class="wrap">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="mb-1"><i class="fa fa-tooth me-2"></i>DentCare</h3>
+            <p class="mb-0">Staff Portal - Admin / Doctor</p>
+        </div>
+        <div class="card-body">
+            <div id="roleSelect">
+                <p class="text-center text-muted mb-3">Select Role</p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary btn-role" onclick="showLogin('Admin')">Login as Admin</button>
+                    <button type="button" class="btn btn-outline-primary btn-role" onclick="showLogin('Doctor')">Login as Doctor</button>
                 </div>
             </div>
-
-            <c:if test="${param.error != null}">
-                <div class="alert alert-danger text-center mb-4">Invalid email or password.</div>
-            </c:if>
-            <c:if test="${param.logout != null}">
-                <div class="alert alert-success text-center mb-4">Signed out successfully.</div>
-            </c:if>
-
-            <div id="loginForm" style="display:none;">
+            <div id="loginBox" style="display:none;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="text-white-50 small">Logging in as <span id="roleLabel" class="text-white fw-semibold">Admin</span></div>
-                    <button type="button" class="btn btn-link btn-sm p-0" id="changeRole" style="color: rgba(226,232,255,0.7); text-decoration: none;">Change Role</button>
+                    <span class="text-muted">Login as <strong id="roleName">Admin</strong></span>
+                    <button type="button" class="btn btn-link btn-sm p-0" onclick="backToRole()">Change Role</button>
                 </div>
+                <c:if test="${param.error != null}"><div class="alert alert-danger">Invalid email or password.</div></c:if>
+                <c:if test="${param.logout != null}"><div class="alert alert-success">Logged out successfully.</div></c:if>
                 <form action="<c:url value='/login' />" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                    <div class="mb-4">
-                        <label class="form-label">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="far fa-envelope"></i></span>
-                            <input type="email" class="form-control" name="username" placeholder="Enter email" required autofocus autocomplete="username">
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="username" required>
                     </div>
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label mb-0">Password</label>
-                            <a href="<c:url value='/forgot-password' />" class="small" style="color: rgba(226,232,255,0.7); text-decoration: none;">Forgot Password?</a>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label">Password</label>
+                            <a href="<c:url value='/forgot-password' />" class="small">Forgot Password?</a>
                         </div>
                         <div class="input-group">
-                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            <input type="password" id="adminPassword" class="form-control" name="password" placeholder="Enter password" required autocomplete="current-password">
-                            <span class="input-group-text" id="toggleAdminPassword" style="cursor: pointer;"><i class="fas fa-eye"></i></span>
+                            <input type="password" id="pwd" class="form-control" name="password" required>
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePwd()"><i class="fas fa-eye" id="eye"></i></button>
                         </div>
                     </div>
-                    <button class="btn btn-admin-login text-white" type="submit">Sign In</button>
+                    <button class="btn btn-primary btn-submit w-100" type="submit">Sign In</button>
                 </form>
                 <div class="text-center mt-3">
-                    <a href="<c:url value='/forgot-password' />" class="small" style="color: rgba(226,232,255,0.7); text-decoration: none;">Reset Password</a>
+                    <a href="<c:url value='/forgot-password' />" class="small">Reset Password</a>
                 </div>
             </div>
-
-            <div class="text-center mt-4">
-                <a class="admin-footer-link justify-content-center m-0" href="<c:url value='/' />">
-                    <i class="fas fa-long-arrow-alt-left"></i>
-                    <span>Return to DentCare Website</span>
-                </a>
+            <div class="text-center mt-3">
+                <a href="<c:url value='/' />" class="text-muted small"><i class="fas fa-arrow-left me-1"></i>Back to Website</a>
             </div>
         </div>
     </div>
-</main>
+</div>
 <script>
-    const toggle = document.getElementById('toggleAdminPassword');
-    const pwd = document.getElementById('adminPassword');
-    if (toggle && pwd) {
-        toggle.addEventListener('click', function () {
-            const type = pwd.getAttribute('type') === 'password' ? 'text' : 'password';
-            pwd.setAttribute('type', type);
-            const icon = this.querySelector('i');
-            if (icon) {
-                icon.classList.toggle('fa-eye');
-                icon.classList.toggle('fa-eye-slash');
-            }
-        });
-    }
-
-    const btnAdmin = document.getElementById('btnAdmin');
-    const btnDoctor = document.getElementById('btnDoctor');
-    const roleSelection = document.getElementById('roleSelection');
-    const loginForm = document.getElementById('loginForm');
-    const roleLabel = document.getElementById('roleLabel');
-    const changeRole = document.getElementById('changeRole');
-
-    if (btnAdmin) {
-        btnAdmin.addEventListener('click', function () {
-            roleLabel.textContent = 'Admin';
-            roleSelection.style.display = 'none';
-            loginForm.style.display = 'block';
-        });
-    }
-    if (btnDoctor) {
-        btnDoctor.addEventListener('click', function () {
-            roleLabel.textContent = 'Doctor';
-            roleSelection.style.display = 'none';
-            loginForm.style.display = 'block';
-        });
-    }
-    if (changeRole) {
-        changeRole.addEventListener('click', function () {
-            loginForm.style.display = 'none';
-            roleSelection.style.display = 'block';
-        });
-    }
+function showLogin(r){ document.getElementById('roleName').innerText=r; document.getElementById('roleSelect').style.display='none'; document.getElementById('loginBox').style.display='block'; }
+function backToRole(){ document.getElementById('loginBox').style.display='none'; document.getElementById('roleSelect').style.display='block'; }
+function togglePwd(){ var p=document.getElementById('pwd'); var e=document.getElementById('eye'); if(p.type==='password'){p.type='text';e.classList.remove('fa-eye');e.classList.add('fa-eye-slash');}else{p.type='password';e.classList.remove('fa-eye-slash');e.classList.add('fa-eye');}}
 </script>
 </body>
 </html>
