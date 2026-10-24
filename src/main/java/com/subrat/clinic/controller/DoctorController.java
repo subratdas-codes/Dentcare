@@ -45,6 +45,15 @@ public class DoctorController {
         return "ok";
     }
 
+    @GetMapping("/doctor-dashboard")
+    public String doctorDashboard(org.springframework.security.core.Authentication auth, Model model) {
+        model.addAttribute("doctorCount", doctorService.findAll().size());
+        model.addAttribute("patientCount", patientService.getAll().size());
+        model.addAttribute("appointmentCount", appointmentService.getAll().size());
+        model.addAttribute("appointments", appointmentService.getAll());
+        return "admin/dashboard";
+    }
+
     @Autowired
     private DoctorService doctorService;
 
