@@ -3,6 +3,8 @@ package com.subrat.clinic.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Appointment {
@@ -18,6 +20,9 @@ public class Appointment {
     private String service;
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
+
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<AppointmentMessage> messages = new ArrayList<>();
 
     // Getters and Setters
 

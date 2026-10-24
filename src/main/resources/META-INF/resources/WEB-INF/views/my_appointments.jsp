@@ -55,6 +55,7 @@
                             <td>${a.appointmentDate}</td>
                             <td>${a.appointmentTime}</td>
                             <td class="text-center">
+                                <a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/my/appointments/${a.id}/chat"><i class="fa fa-comments me-1"></i>Message Doctor</a>
                                 <form action="${pageContext.request.contextPath}/my/appointments/cancel/${a.id}" method="post" class="d-inline"
                                       onsubmit="return confirm('Cancel this appointment?');">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />

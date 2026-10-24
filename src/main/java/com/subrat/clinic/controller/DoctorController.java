@@ -6,11 +6,23 @@ import com.subrat.clinic.service.AppointmentService;
 import com.subrat.clinic.service.DoctorService;
 import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
+import javax.imageio.ImageIO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +34,18 @@ public class DoctorController {
 
     @GetMapping("/login")
     public String adminLogin() {
+        return "admin/login";
+    }
+
+    @GetMapping("/login/admin")
+    public String adminLoginSelected(Model model) {
+        model.addAttribute("selectedRole", "ADMIN");
+        return "admin/login";
+    }
+
+    @GetMapping("/login/doctor")
+    public String doctorLoginSelected(Model model) {
+        model.addAttribute("selectedRole", "DOCTOR");
         return "admin/login";
     }
 
@@ -47,9 +71,14 @@ public class DoctorController {
         return "ok";
     }
 
-    @GetMapping("/doctor-dashboard")
+    @GetMapping("/doctor/dashboard")
     public String doctorDashboard(Authentication authentication, Model model) {
         return populateDoctorDashboard(authentication, model);
+    }
+
+    @GetMapping("/doctor-dashboard")
+    public String legacyDoctorDashboard() {
+        return "redirect:/admin/doctor/dashboard";
     }
 
     @Autowired
@@ -67,6 +96,9 @@ public class DoctorController {
     @Autowired
     private MailService mailService;
 
+    @Value("${app.upload-dir:uploads}")
+    private String uploadDirectory;
+
     @GetMapping("/register")
     public String doctorRegisterForm(Model model) {
         model.addAttribute("doctor", new com.subrat.clinic.model.Doctor());
@@ -74,23 +106,31 @@ public class DoctorController {
     }
 
     @PostMapping("/register")
-    public String doctorRegister(@ModelAttribute com.subrat.clinic.model.Doctor doctor) {
-        Doctor existing = doctorService.findByEmail(doctor.getEmail());
-        if (existing != null) {
-            return "redirect:/admin/login?error=true";
+    public String doctorRegister(@ModelAttribute Doctor doctor, Model model) {
+        String email = doctor.getEmail() == null ? "" : doctor.getEmail().trim().toLowerCase();
+        if (doctor.getName() == null || doctor.getName().isBlank()
+                || doctor.getPassword() == null || doctor.getPassword().length() < 8) {
+            model.addAttribute("error", "Enter your full name and a password of at least 8 characters.");
+            model.addAttribute("doctor", doctor);
+            return "admin/doctor_register";
         }
+        if (doctorService.findByEmail(email) != null) {
+            model.addAttribute("error", "An account with this email already exists.");
+            model.addAttribute("doctor", doctor);
+            return "admin/doctor_register";
+        }
+        doctor.setEmail(email);
+        doctor.setName(doctor.getName().trim());
         doctor.setAdmin(false);
-        if (doctor.getPassword() != null) {
-            doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
-        }
+        doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
         doctorService.save(doctor);
-        return "redirect:/admin/login?registered=true";
+        return "redirect:/admin/login/doctor?registered=true";
     }
 
     @GetMapping({"", "/"})
     public String adminRoot(Authentication authentication) {
         return isDoctor(authentication)
-                ? "redirect:/admin/doctor-dashboard"
+                ? "redirect:/admin/doctor/dashboard"
                 : "redirect:/admin/dashboard";
     }
 
@@ -115,7 +155,7 @@ public class DoctorController {
         }
         Doctor doctor = doctorService.findByEmail(authentication.getName());
         if (doctor == null || doctor.getName() == null || doctor.getName().isBlank()) {
-            return "redirect:/admin/login?error=true&role=DOCTOR";
+            return "redirect:/admin/login/doctor?error=true";
         }
 
         List<Appointment> appointments = appointmentService.findByDoctorName(doctor.getName());
@@ -165,6 +205,10 @@ public class DoctorController {
             }
         } else {
             doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
+        }
+        if (existing != null) {
+            if (doctor.getDescription() == null) doctor.setDescription(existing.getDescription());
+            if (doctor.getProfileImagePath() == null) doctor.setProfileImagePath(existing.getProfileImagePath());
         }
         doctorService.save(doctor);
         return "redirect:/admin/doctors";
@@ -298,14 +342,114 @@ public class DoctorController {
     }
 
     @GetMapping("/profile")
-    public String profile(org.springframework.security.core.Authentication authentication, Model model) {
-        String email = authentication.getName();
-        com.subrat.clinic.model.Doctor doctor = doctorService.findByEmail(email);
-        if (doctor != null) {
-            model.addAttribute("doctor", doctor);
-            return "admin/profile";
-        }
+    public String profile(Authentication authentication, Model model) {
+        Doctor doctor = doctorService.findByEmail(authentication.getName());
+        if (doctor == null) return "redirect:/admin/login";
+        model.addAttribute("doctor", doctor);
         return "admin/profile";
+    }
+
+    @PostMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Transactional
+    public String updateProfile(Authentication authentication,
+                                @RequestParam String phone,
+                                @RequestParam String specialization,
+                                @RequestParam(required = false, defaultValue = "") String description,
+                                @RequestParam(required = false) MultipartFile photo,
+                                RedirectAttributes redirectAttributes) {
+        Doctor doctor = doctorService.findByEmail(authentication.getName());
+        if (doctor == null) return "redirect:/admin/login";
+        if (phone.length() > 40 || specialization.isBlank() || specialization.length() > 120
+                || description.length() > 2000) {
+            redirectAttributes.addFlashAttribute("error", "Please check the profile fields and try again.");
+            return "redirect:/admin/profile";
+        }
+
+        String priorPhoto = doctor.getProfileImagePath();
+        try {
+            if (photo != null && !photo.isEmpty()) {
+                doctor.setProfileImagePath(saveDoctorPhoto(photo));
+            }
+        } catch (IOException | IllegalArgumentException exception) {
+            redirectAttributes.addFlashAttribute("error", exception.getMessage());
+            return "redirect:/admin/profile";
+        }
+
+        doctor.setPhone(phone.trim());
+        doctor.setSpecialization(specialization.trim());
+        doctor.setDescription(description.trim());
+        doctorService.save(doctor);
+        if (photo != null && !photo.isEmpty() && priorPhoto != null) {
+            deletePriorDoctorPhoto(priorPhoto);
+        }
+        redirectAttributes.addFlashAttribute("success", "Your profile has been updated.");
+        return "redirect:/admin/profile";
+    }
+
+    @GetMapping("/change-password")
+    public String showStaffChangePassword() {
+        return "admin/change_password";
+    }
+
+    @PostMapping("/change-password")
+    public String changeStaffPassword(Authentication authentication,
+                                     @RequestParam String currentPassword,
+                                     @RequestParam String newPassword,
+                                     @RequestParam String confirmPassword,
+                                     Model model) {
+        Doctor doctor = doctorService.findByEmail(authentication.getName());
+        if (doctor == null) return "redirect:/admin/login";
+        if (!passwordEncoder.matches(currentPassword, doctor.getPassword())) {
+            model.addAttribute("error", "Current password is incorrect.");
+        } else if (newPassword.length() < 8) {
+            model.addAttribute("error", "Use a password with at least 8 characters.");
+        } else if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("error", "The new passwords do not match.");
+        } else {
+            doctor.setPassword(passwordEncoder.encode(newPassword));
+            doctorService.save(doctor);
+            model.addAttribute("success", "Password changed successfully.");
+        }
+        return "admin/change_password";
+    }
+
+    private String saveDoctorPhoto(MultipartFile photo) throws IOException {
+        if (photo.getSize() > 5L * 1024 * 1024) {
+            throw new IllegalArgumentException("Choose an image smaller than 5 MB.");
+        }
+        byte[] bytes = photo.getBytes();
+        String extension;
+        if (bytes.length >= 8 && (bytes[0] & 0xff) == 0x89 && bytes[1] == 'P'
+                && bytes[2] == 'N' && bytes[3] == 'G') {
+            extension = ".png";
+        } else if (bytes.length >= 3 && (bytes[0] & 0xff) == 0xff
+                && (bytes[1] & 0xff) == 0xd8 && (bytes[2] & 0xff) == 0xff) {
+            extension = ".jpg";
+        } else {
+            throw new IllegalArgumentException("Use a valid JPEG or PNG image.");
+        }
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes));
+        if (image == null || image.getWidth() > 6000 || image.getHeight() > 6000) {
+            throw new IllegalArgumentException("The selected image is invalid or too large in dimensions.");
+        }
+
+        Path directory = Path.of(uploadDirectory).toAbsolutePath().normalize().resolve("doctors");
+        Files.createDirectories(directory);
+        String filename = UUID.randomUUID() + extension;
+        Files.write(directory.resolve(filename), bytes);
+        return "/uploads/doctors/" + filename;
+    }
+
+    private void deletePriorDoctorPhoto(String imagePath) {
+        if (!imagePath.matches("/uploads/doctors/[a-fA-F0-9-]+\\.(jpg|png)")) return;
+        try {
+            Path uploadRoot = Path.of(uploadDirectory).toAbsolutePath().normalize();
+            Path doctorPhotoDirectory = uploadRoot.resolve("doctors").normalize();
+            Path image = doctorPhotoDirectory.resolve(imagePath.substring(imagePath.lastIndexOf('/') + 1)).normalize();
+            if (image.startsWith(doctorPhotoDirectory)) Files.deleteIfExists(image);
+        } catch (IOException ignored) {
+            // A failed cleanup must not undo a successfully saved profile.
+        }
     }
 }
 

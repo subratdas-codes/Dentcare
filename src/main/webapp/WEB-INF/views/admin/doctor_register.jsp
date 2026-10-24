@@ -26,6 +26,7 @@
             <p class="mb-0">Doctor Registration</p>
         </div>
         <div class="card-body">
+            <c:if test="${not empty error}"><div class="alert alert-danger" role="alert"><c:out value="${error}" /></div></c:if>
             <form action="<c:url value='/admin/register' />" method="post">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                 <div class="mb-3">
@@ -46,15 +47,30 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input type="password" class="form-control" name="password" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="doctorPassword" name="password" autocomplete="new-password" minlength="8" required>
+                        <button class="btn btn-outline-secondary" type="button" id="toggleDoctorPassword" aria-label="Show password" aria-pressed="false"><i class="fa fa-eye" aria-hidden="true"></i></button>
+                    </div>
                 </div>
                 <button class="btn btn-primary btn-submit w-100" type="submit">Register</button>
             </form>
             <div class="text-center mt-3">
-                <a href="<c:url value='/admin/login' />" class="small">Back to Login</a>
+                <a href="<c:url value='/admin/login/doctor' />" class="small">Back to Doctor Login</a>
             </div>
         </div>
     </div>
 </div>
+<script>
+document.getElementById('toggleDoctorPassword').addEventListener('click', function () {
+    const field = document.getElementById('doctorPassword');
+    const icon = this.querySelector('i');
+    const show = field.type === 'password';
+    field.type = show ? 'text' : 'password';
+    icon.classList.toggle('fa-eye', !show);
+    icon.classList.toggle('fa-eye-slash', show);
+    this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    this.setAttribute('aria-pressed', String(show));
+});
+</script>
 </body>
 </html>

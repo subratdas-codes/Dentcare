@@ -16,6 +16,11 @@ public class Doctor {
     private String phone;
     private String password;
 
+    @Column(length = 2000)
+    private String description;
+
+    private String profileImagePath;
+
     private boolean admin;
 
     // Getters and Setters
@@ -66,6 +71,22 @@ public class Doctor {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getProfileImagePath() {
+        return profileImagePath;
+    }
+
+    public void setProfileImagePath(String profileImagePath) {
+        this.profileImagePath = profileImagePath;
     }
 
     public boolean isAdmin() {

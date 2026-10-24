@@ -78,9 +78,9 @@ public class SecurityConfig {
                     SecurityContextHolder.clearContext();
                     var session = request.getSession(false);
                     if (session != null) session.invalidate();
-                    response.sendRedirect(request.getContextPath()
-                            + "/admin/login?error=true&role="
-                            + ("DOCTOR".equals(selectedRole) ? "DOCTOR" : "ADMIN"));
+                    String roleLoginPath = "DOCTOR".equals(selectedRole)
+                            ? "/admin/login/doctor" : "/admin/login/admin";
+                    response.sendRedirect(request.getContextPath() + roleLoginPath + "?error=true");
                     return;
                 }
             }
@@ -88,7 +88,7 @@ public class SecurityConfig {
             if (admin) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
             } else if (doctor) {
-                response.sendRedirect(request.getContextPath() + "/admin/doctor-dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/doctor/dashboard");
             } else {
                 response.sendRedirect(request.getContextPath() + "/");
             }
@@ -100,7 +100,8 @@ public class SecurityConfig {
         return (request, response, exception) -> {
             if ("admin".equals(request.getParameter("portal"))) {
                 String role = "DOCTOR".equals(request.getParameter("staffRole")) ? "DOCTOR" : "ADMIN";
-                response.sendRedirect(request.getContextPath() + "/admin/login?error=true&role=" + role);
+                String loginPath = "DOCTOR".equals(role) ? "/admin/login/doctor" : "/admin/login/admin";
+                response.sendRedirect(request.getContextPath() + loginPath + "?error=true");
             } else {
                 response.sendRedirect(request.getContextPath() + "/login?error=true");
             }
@@ -115,6 +116,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 new AntPathRequestMatcher("/admin/login"),
+                                new AntPathRequestMatcher("/admin/login/**"),
                                 new AntPathRequestMatcher("/admin/forgot-password"),
                                 new AntPathRequestMatcher("/admin/reset-password"),
                                 new AntPathRequestMatcher("/admin/register")
@@ -177,10 +179,12 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
-                            boolean staff = authentication != null && authentication.getAuthorities().stream()
-                                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
-                                            || a.getAuthority().equals("ROLE_DOCTOR"));
-                            String destination = staff ? "/admin/login?logout=true" : "/login?logout=true";
+                            boolean admin = authentication != null && authentication.getAuthorities().stream()
+                                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                            boolean doctor = authentication != null && authentication.getAuthorities().stream()
+                                    .anyMatch(a -> a.getAuthority().equals("ROLE_DOCTOR"));
+                            String destination = admin ? "/admin/login/admin?logout=true"
+                                    : doctor ? "/admin/login/doctor?logout=true" : "/login?logout=true";
                             response.sendRedirect(request.getContextPath() + destination);
                         })
                         .invalidateHttpSession(true)

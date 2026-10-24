@@ -28,24 +28,25 @@
             <p class="mb-0">Staff Portal - Admin / Doctor</p>
         </div>
         <div class="card-body">
-            <div id="roleSelect" style="display:${param.error != null ? 'none' : 'block'};">
+            <div id="roleSelect" style="display:${empty selectedRole ? 'block' : 'none'};">
                 <p class="text-center text-muted mb-3">Select Role</p>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-primary btn-role" onclick="showLogin('Admin')">Login as Admin</button>
                     <button type="button" class="btn btn-outline-primary btn-role" onclick="showLogin('Doctor')">Login as Doctor</button>
                 </div>
             </div>
-            <div id="loginBox" style="display:${param.error != null ? 'block' : 'none'};">
+            <div id="loginBox" style="display:${empty selectedRole ? 'none' : 'block'};">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted">Login as <strong id="roleName">${param.role == 'DOCTOR' ? 'Doctor' : 'Admin'}</strong></span>
-                    <button type="button" class="btn btn-link btn-sm p-0" onclick="backToRole()">Change Role</button>
+                    <span class="text-muted">Login as <strong id="roleName"><c:choose><c:when test="${selectedRole == 'DOCTOR'}">Doctor</c:when><c:otherwise>Admin</c:otherwise></c:choose></strong></span>
+                    <a class="btn btn-link btn-sm p-0" href="<c:url value='/admin/login' />">Change Role</a>
                 </div>
                 <c:if test="${param.error != null}"><div class="alert alert-danger" role="alert">Invalid credentials or the account does not match the selected staff role.</div></c:if>
                 <c:if test="${param.logout != null}"><div class="alert alert-success" role="status">Logged out successfully.</div></c:if>
+                <c:if test="${param.registered == 'true'}"><div class="alert alert-success" role="status">Doctor account created. Sign in to continue.</div></c:if>
                 <form action="<c:url value='/login' />" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <input type="hidden" name="portal" value="admin" />
-                    <input type="hidden" name="staffRole" id="staffRole" value="${param.role == 'DOCTOR' ? 'DOCTOR' : 'ADMIN'}" />
+                    <input type="hidden" name="staffRole" id="staffRole" value="${selectedRole}" />
                     <div class="mb-3">
                         <label class="form-label">Email</label>
                         <input type="email" class="form-control" name="username" required>
@@ -65,7 +66,7 @@
                 <div class="text-center mt-3">
                     <a href="<c:url value='/admin/forgot-password' />" class="small">Reset Password</a>
                 </div>
-                <div id="doctorRegister" class="text-center mt-2" style="display:none;">
+                <div id="doctorRegister" class="text-center mt-2" style="display:${selectedRole == 'DOCTOR' ? 'block' : 'none'};">
                     <a href="<c:url value='/admin/register' />" class="small">Register as New Doctor</a>
                 </div>
             </div>
@@ -76,18 +77,10 @@
     </div>
 </div>
 <script>
-function showLogin(r){
-    document.getElementById('roleName').innerText=r; 
-    document.getElementById('roleSelect').style.display='none'; 
-    document.getElementById('loginBox').style.display='block';
-    document.getElementById('staffRole').value = r === 'Doctor' ? 'DOCTOR' : 'ADMIN';
-    if(r === 'Doctor') {
-        document.getElementById('doctorRegister').style.display = 'block';
-    } else {
-        document.getElementById('doctorRegister').style.display = 'none';
-    }
+const staffLoginRoot = '<c:url value="/admin/login" />';
+function showLogin(role){
+    window.location.assign(staffLoginRoot + '/' + (role === 'Doctor' ? 'doctor' : 'admin'));
 }
-function backToRole(){ document.getElementById('loginBox').style.display='none'; document.getElementById('roleSelect').style.display='block'; document.getElementById('doctorRegister').style.display='none'; }
 function togglePwd(){ var p=document.getElementById('pwd'); var e=document.getElementById('eye'); if(p.type==='password'){p.type='text';e.classList.remove('fa-eye');e.classList.add('fa-eye-slash');}else{p.type='password';e.classList.remove('fa-eye-slash');e.classList.add('fa-eye');}}
 </script>
 </body>

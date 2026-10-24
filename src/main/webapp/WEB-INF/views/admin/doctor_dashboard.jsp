@@ -70,7 +70,7 @@
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light"><tr>
-                            <th class="ps-4">Patient</th><th>Contact</th><th>Service</th><th>Date</th><th>Time</th>
+                            <th class="ps-4">Patient</th><th>Contact</th><th>Service</th><th>Date</th><th>Time</th><th>Conversation</th>
                         </tr></thead>
                         <tbody>
                         <c:forEach var="appointment" items="${appointments}">
@@ -80,6 +80,7 @@
                                 <td><c:out value="${appointment.service}" /></td>
                                 <td><c:out value="${appointment.appointmentDate}" /></td>
                                 <td><c:out value="${appointment.appointmentTime}" /></td>
+                                <td><a class="btn btn-sm btn-outline-primary" href="<c:url value='/admin/doctor/appointments/${appointment.id}/chat' />"><i class="bi bi-chat-dots me-1"></i>Message</a></td>
                             </tr>
                         </c:forEach>
                         </tbody>
