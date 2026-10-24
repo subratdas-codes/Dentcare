@@ -23,6 +23,12 @@ public class DoctorController {
         return "admin/login";
     }
 
+    @GetMapping("/debug")
+    @org.springframework.web.bind.annotation.ResponseBody
+    public String debug() {
+        return "ok";
+    }
+
     @Autowired
     private DoctorService doctorService;
 
