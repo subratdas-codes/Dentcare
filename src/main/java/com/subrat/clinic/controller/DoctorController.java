@@ -121,13 +121,13 @@ public class DoctorController {
 
     @GetMapping("/patients/edit/{id}")
     public String editPatient(@PathVariable Long id, Model model) {
-        model.addAttribute("patient", patientService.findById(id));
+        model.addAttribute("patient", patientService.getById(id));
         return "admin/patient_form";
     }
 
     @PostMapping("/patients/save")
     public String savePatient(@ModelAttribute com.subrat.clinic.model.Patient patient) {
-        com.subrat.clinic.model.Patient existing = patientService.findById(patient.getId());
+        com.subrat.clinic.model.Patient existing = patient.getId() != null ? patientService.getById(patient.getId()) : null;
         if (patient.getPassword() == null || patient.getPassword().isBlank()) {
             if (existing != null) {
                 patient.setPassword(existing.getPassword());
