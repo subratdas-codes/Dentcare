@@ -44,13 +44,30 @@ public class AuthenticationController {
     public String registerUser(@ModelAttribute Patient patient,
                                @RequestParam String confirmPassword,
                                Model model) {
-        if (!patient.getPassword().equals(confirmPassword)) {
+        if (patient.getPassword() == null || !patient.getPassword().equals(confirmPassword)) {
             model.addAttribute("error", "Passwords do not match.");
+            model.addAttribute("patient", patient);
+            return "register";
+        }
+        if (patient.getEmail() == null || patient.getEmail().trim().isEmpty()) {
+            model.addAttribute("error", "Email address is required.");
+            model.addAttribute("patient", patient);
             return "register";
         }
         if (patientService.findByEmail(patient.getEmail()) != null) {
             model.addAttribute("error", "An account with this email already exists.");
+            model.addAttribute("patient", patient);
             return "register";
+        }
+        if (patient.getName() == null || patient.getName().trim().isEmpty()) {
+            model.addAttribute("error", "Full name is required.");
+            model.addAttribute("patient", patient);
+            return "register";
+        }
+        patient.setEmail(patient.getEmail().trim().toLowerCase());
+        if (patient.getName() != null) patient.setName(patient.getName().trim());
+        if (patient.getPhone() != null && patient.getPhone().trim().isEmpty()) {
+            patient.setPhone(null);
         }
         patient.setPassword(passwordEncoder.encode(patient.getPassword()));
         patientService.save(patient);
