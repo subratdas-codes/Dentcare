@@ -88,11 +88,14 @@
                     <strong>Admin Panel</strong>
                 </div>
             </div>
-            <div class="panel-heading">
-                <h1>Administrator Login</h1>
+            <div class="panel-heading text-center">
+                <h1>Portal Login</h1>
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="badge rounded-pill" style="background: rgba(59,130,246,0.9); padding: 0.6rem 1.2rem;">Admin / Doctor</span>
+                </div>
             </div>
             <c:if test="${param.error != null}">
-                <div class="alert alert-danger text-center mb-4">Invalid admin credentials. Please try again.</div>
+                <div class="alert alert-danger text-center mb-4">Invalid email or password.</div>
             </c:if>
             <c:if test="${param.logout != null}">
                 <div class="alert alert-success text-center mb-4">Signed out successfully.</div>
@@ -103,7 +106,7 @@
                     <label class="form-label">Email Address</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="far fa-envelope"></i></span>
-                        <input type="email" class="form-control" name="username" placeholder="admin@dentcare.in" required autofocus autocomplete="username">
+                        <input type="email" class="form-control" name="username" placeholder="Enter your email" required autofocus autocomplete="username">
                     </div>
                 </div>
                 <div class="mb-4">
@@ -119,11 +122,17 @@
                 </div>
                 <button class="btn btn-admin-login text-white" type="submit">Sign In</button>
             </form>
-            <div class="text-center">
-                <a class="admin-footer-link" href="<c:url value='/' />">
-                    <i class="fas fa-long-arrow-alt-left"></i>
-                    <span>Return to DentCare Website</span>
-                </a>
+            <div class="text-center mt-4">
+                <div class="d-flex flex-column gap-2">
+                    <a class="admin-footer-link justify-content-center m-0" href="<c:url value='/register' />">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Register as Patient</span>
+                    </a>
+                    <a class="admin-footer-link justify-content-center m-0" href="<c:url value='/' />">
+                        <i class="fas fa-long-arrow-alt-left"></i>
+                        <span>Return to DentCare Website</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
