@@ -63,6 +63,9 @@
                 <div class="text-center mt-3">
                     <a href="<c:url value='/forgot-password' />" class="small">Reset Password</a>
                 </div>
+                <div id="doctorRegister" class="text-center mt-2" style="display:none;">
+                    <a href="<c:url value='/doctor/register' />" class="small">Register as New Doctor</a>
+                </div>
             </div>
             <div class="text-center mt-3">
                 <a href="<c:url value='/' />" class="text-muted small"><i class="fas fa-arrow-left me-1"></i>Back to Website</a>
@@ -71,8 +74,17 @@
     </div>
 </div>
 <script>
-function showLogin(r){ document.getElementById('roleName').innerText=r; document.getElementById('roleSelect').style.display='none'; document.getElementById('loginBox').style.display='block'; }
-function backToRole(){ document.getElementById('loginBox').style.display='none'; document.getElementById('roleSelect').style.display='block'; }
+function showLogin(r){ 
+    document.getElementById('roleName').innerText=r; 
+    document.getElementById('roleSelect').style.display='none'; 
+    document.getElementById('loginBox').style.display='block';
+    if(r === 'Doctor') {
+        document.getElementById('doctorRegister').style.display = 'block';
+    } else {
+        document.getElementById('doctorRegister').style.display = 'none';
+    }
+}
+function backToRole(){ document.getElementById('loginBox').style.display='none'; document.getElementById('roleSelect').style.display='block'; document.getElementById('doctorRegister').style.display='none'; }
 function togglePwd(){ var p=document.getElementById('pwd'); var e=document.getElementById('eye'); if(p.type==='password'){p.type='text';e.classList.remove('fa-eye');e.classList.add('fa-eye-slash');}else{p.type='password';e.classList.remove('fa-eye-slash');e.classList.add('fa-eye');}}
 </script>
 </body>

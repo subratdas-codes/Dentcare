@@ -44,6 +44,26 @@ public class DoctorController {
     @Autowired
     private MailService mailService;
 
+    @GetMapping("/register")
+    public String doctorRegisterForm(Model model) {
+        model.addAttribute("doctor", new com.subrat.clinic.model.Doctor());
+        return "admin/doctor_register";
+    }
+
+    @PostMapping("/register")
+    public String doctorRegister(@ModelAttribute com.subrat.clinic.model.Doctor doctor) {
+        Doctor existing = doctorService.findByEmail(doctor.getEmail());
+        if (existing != null) {
+            return "redirect:/admin/login?error=true";
+        }
+        doctor.setAdmin(false);
+        if (doctor.getPassword() != null) {
+            doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
+        }
+        doctorService.save(doctor);
+        return "redirect:/admin/login?registered=true";
+    }
+
     @GetMapping({"", "/"})
     public String adminRoot() {
         return "redirect:/admin/dashboard";
