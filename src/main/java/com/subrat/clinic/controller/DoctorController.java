@@ -119,6 +119,35 @@ public class DoctorController {
         return "admin/patient_list";
     }
 
+    @GetMapping("/patients/edit/{id}")
+    public String editPatient(@PathVariable Long id, Model model) {
+        model.addAttribute("patient", patientService.findById(id));
+        return "admin/patient_form";
+    }
+
+    @PostMapping("/patients/save")
+    public String savePatient(@ModelAttribute com.subrat.clinic.model.Patient patient) {
+        com.subrat.clinic.model.Patient existing = patientService.findById(patient.getId());
+        if (patient.getPassword() == null || patient.getPassword().isBlank()) {
+            if (existing != null) {
+                patient.setPassword(existing.getPassword());
+            }
+        } else {
+            patient.setPassword(passwordEncoder.encode(patient.getPassword()));
+        }
+        if (existing != null && (patient.getPassword() == null || patient.getPassword().isBlank())) {
+            patient.setPassword(existing.getPassword());
+        }
+        patientService.save(patient);
+        return "redirect:/admin/patients";
+    }
+
+    @GetMapping("/patients/delete/{id}")
+    public String deletePatient(@PathVariable Long id) {
+        patientService.deleteById(id);
+        return "redirect:/admin/patients";
+    }
+
     // ---------------- APPOINTMENT CRUD ---------------- //
 
     @GetMapping("/appointments")
