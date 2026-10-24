@@ -80,7 +80,12 @@ public class SecurityConfig {
                                                    AuthenticationSuccessHandler authenticationSuccessHandler) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(new AntPathRequestMatcher("/admin/login")).permitAll()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/admin/login"),
+                                new AntPathRequestMatcher("/admin/forgot-password"),
+                                new AntPathRequestMatcher("/admin/reset-password"),
+                                new AntPathRequestMatcher("/admin/register")
+                        ).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasAnyRole("ADMIN", "DOCTOR")
                         .requestMatchers(new AntPathRequestMatcher("/profile"),
                                 new AntPathRequestMatcher("/change-password"),
