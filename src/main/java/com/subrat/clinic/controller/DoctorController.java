@@ -2,12 +2,16 @@ package com.subrat.clinic.controller;
 
 import com.subrat.clinic.model.Appointment;
 import com.subrat.clinic.model.Doctor;
+import com.subrat.clinic.model.ServicePrice;
 import com.subrat.clinic.service.AppointmentService;
 import com.subrat.clinic.service.DoctorPhotoStorage;
 import com.subrat.clinic.service.DoctorService;
 import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
+import com.subrat.clinic.service.ServicePriceService;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -92,6 +96,9 @@ public class DoctorController {
 
     @Autowired
     private MailService mailService;
+
+    @Autowired
+    private ServicePriceService servicePriceService;
 
     @GetMapping("/register")
     public String doctorRegisterForm() {
@@ -291,7 +298,30 @@ public class DoctorController {
 
     @GetMapping("/pricing")
     public String pricing(Model model) {
+        model.addAttribute("servicePrices", servicePriceService.findAll());
         return "admin/pricing";
+    }
+
+    @PostMapping("/pricing/update")
+    public String updatePricing(@RequestParam(required = false) Long id,
+                                @RequestParam(required = false) BigDecimal fee,
+                                RedirectAttributes redirectAttributes) {
+        ServicePrice price = servicePriceService.findById(id);
+        if (price == null) {
+            redirectAttributes.addFlashAttribute("error", "That service could not be found.");
+            return "redirect:/admin/pricing";
+        }
+        if (fee == null || fee.compareTo(BigDecimal.ZERO) < 0
+                || fee.compareTo(new BigDecimal("1000000")) > 0) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Enter a fee between ₹0 and ₹10,00,000.");
+            return "redirect:/admin/pricing";
+        }
+        price.setFee(fee.setScale(2, RoundingMode.HALF_UP));
+        servicePriceService.save(price);
+        redirectAttributes.addFlashAttribute("success",
+                price.getServiceName() + " fee updated to ₹" + price.getFee() + ".");
+        return "redirect:/admin/pricing";
     }
 
     @GetMapping("/invoices")

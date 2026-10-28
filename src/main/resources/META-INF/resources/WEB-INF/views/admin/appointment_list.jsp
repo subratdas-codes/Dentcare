@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <c:set var="activePage" value="appointments" />
 <!DOCTYPE html>
@@ -40,6 +41,8 @@
                         <th class="text-uppercase small text-muted">Contact</th>
                         <th class="text-uppercase small text-muted">Doctor</th>
                         <th class="text-uppercase small text-muted">Service</th>
+                        <th class="text-uppercase small text-muted">Fee</th>
+                        <th class="text-uppercase small text-muted">Payment</th>
                         <th class="text-uppercase small text-muted">Date</th>
                         <th class="text-uppercase small text-muted">Time</th>
                         <th class="text-uppercase small text-muted text-center">Actions</th>
@@ -56,6 +59,25 @@
                             <td>${a.phone}</td>
                             <td><span class="badge bg-primary bg-opacity-10 text-primary">${a.doctorName}</span></td>
                             <td>${a.service}</td>
+                            <td class="fw-semibold">
+                                <c:choose>
+                                    <c:when test="${not empty a.amount}">
+                                        ₹<fmt:formatNumber value="${a.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                    </c:when>
+                                    <c:otherwise>—</c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <span class="badge bg-${a.paymentStatus.badgeClass} bg-opacity-10 text-${a.paymentStatus.badgeClass}">
+                                    ${a.paymentStatus.label}
+                                </span>
+                                <c:if test="${not empty a.paymentMethod}">
+                                    <div class="small text-muted mt-1">${a.paymentMethod.label}</div>
+                                </c:if>
+                                <c:if test="${not empty a.paymentReference}">
+                                    <div class="small text-muted font-monospace">${a.paymentReference}</div>
+                                </c:if>
+                            </td>
                             <td>${a.appointmentDate}</td>
                             <td>${a.appointmentTime}</td>
                             <td class="text-center">

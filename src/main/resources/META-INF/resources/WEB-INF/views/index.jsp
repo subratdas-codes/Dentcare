@@ -292,11 +292,9 @@
                                 <div class="col-12 col-sm-6">
                                     <select class="form-select bg-light border-0" name="service" style="height: 55px;" required>
                                         <option value="" disabled selected>Select A Service</option>
-                                        <option value="Teeth Cleaning">Teeth Cleaning</option>
-                                        <option value="Root Canal">Root Canal</option>
-                                        <option value="Braces">Braces</option>
-                                        <option value="Tooth Whitening">Tooth Whitening</option>
-                                        <option value="Dental Implants">Dental Implants</option>
+                                        <c:forEach var="sp" items="${servicePrices}">
+                                            <option value="${sp.serviceName}">${sp.serviceName} - ₹${sp.fee}</option>
+                                        </c:forEach>
                                     </select>
                                 </div>
                                 <div class="col-12 col-sm-6">

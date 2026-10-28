@@ -38,6 +38,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentRepository.findByEmail(email);
     }
 
+    @Override
+    public Appointment findByReference(String reference) {
+        if (reference == null || reference.isBlank()) {
+            return null;
+        }
+        return appointmentRepository.findByPaymentReference(reference.trim());
+    }
+
     
     @Override
     public Appointment getById(Long id) {

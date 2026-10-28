@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -156,69 +157,37 @@
                 </div>
                 <div class="col-lg-7">
                     <div class="owl-carousel price-carousel wow zoomIn" data-wow-delay="0.9s">
-                        <div class="price-item pb-4">
-                            <div class="position-relative">
-                                <img class="img-fluid rounded-top" src="img/price-1.jpg" alt="">
-                                <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">&#8377; 2999</h2>
+                        <c:forEach var="sp" items="${servicePrices}" varStatus="status">
+                            <div class="price-item pb-4">
+                                <div class="position-relative">
+                                    <img class="img-fluid rounded-top" src="img/price-${(status.index mod 3) + 1}.jpg" alt="${sp.serviceName}">
+                                    <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
+                                        <h2 class="text-primary m-0">&#8377; <fmt:formatNumber value="${sp.fee}" type="number" minFractionDigits="0" maxFractionDigits="2" /></h2>
+                                    </div>
+                                </div>
+                                <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
+                                    <h4>${sp.serviceName}</h4>
+                                    <hr class="text-primary w-50 mx-auto mt-0">
+                                    <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
+                                    <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
+                                    <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
+                                    <sec:authorize access="isAuthenticated()">
+                                    <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
+                                    </sec:authorize>
+                                    <sec:authorize access="!isAuthenticated()">
+                                    <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
+                                    </sec:authorize>
                                 </div>
                             </div>
-                            <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
-                                <h4>Teeth Whitening</h4>
-                                <hr class="text-primary w-50 mx-auto mt-0">
-                                <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <sec:authorize access="isAuthenticated()">
-                                <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
-                                </sec:authorize>
-                                <sec:authorize access="!isAuthenticated()">
-                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
-                                </sec:authorize>
-                            </div>
-                        </div>
-                        <div class="price-item pb-4">
-                            <div class="position-relative">
-                                <img class="img-fluid rounded-top" src="img/price-2.jpg" alt="">
-                                <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">&#8377; 4999</h2>
+                        </c:forEach>
+                        <c:if test="${empty servicePrices}">
+                            <div class="price-item pb-4">
+                                <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
+                                    <h4>Pricing is being updated</h4>
+                                    <p class="text-muted mb-0">Please call the clinic for current treatment fees.</p>
                                 </div>
                             </div>
-                            <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
-                                <h4>Dental Implant</h4>
-                                <hr class="text-primary w-50 mx-auto mt-0">
-                                <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <sec:authorize access="isAuthenticated()">
-                                <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
-                                </sec:authorize>
-                                <sec:authorize access="!isAuthenticated()">
-                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
-                                </sec:authorize>
-                            </div>
-                        </div>
-                        <div class="price-item pb-4">
-                            <div class="position-relative">
-                                <img class="img-fluid rounded-top" src="img/price-3.jpg" alt="">
-                                <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">&#8377; 8999</h2>
-                                </div>
-                            </div>
-                            <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
-                                <h4>Root Canal</h4>
-                                <hr class="text-primary w-50 mx-auto mt-0">
-                                <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <sec:authorize access="isAuthenticated()">
-                                <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
-                                </sec:authorize>
-                                <sec:authorize access="!isAuthenticated()">
-                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
-                                </sec:authorize>
-                            </div>
-                        </div>
+                        </c:if>
                     </div>
                 </div>
             </div>

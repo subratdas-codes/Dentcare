@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="activePage" value="invoices" />
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +21,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h4 class="fw-bold mb-1">Invoice Management</h4>
-            <p class="text-muted mb-0">Generate and track invoices for appointments.</p>
+            <p class="text-muted mb-0">Track appointment fees, payment status and booking references.</p>
         </div>
     </div>
     <div class="card">
@@ -28,13 +29,15 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                 <tr>
-                    <th class="text-uppercase small text-muted">Appointment ID</th>
+                    <th class="text-uppercase small text-muted">Appointment</th>
                     <th class="text-uppercase small text-muted">Patient</th>
                     <th class="text-uppercase small text-muted">Doctor</th>
                     <th class="text-uppercase small text-muted">Service</th>
                     <th class="text-uppercase small text-muted">Date</th>
-                    <th class="text-uppercase small text-muted">Status</th>
-                    <th class="text-uppercase small text-muted text-center">Action</th>
+                    <th class="text-uppercase small text-muted">Amount</th>
+                    <th class="text-uppercase small text-muted">Payment</th>
+                    <th class="text-uppercase small text-muted">Reference</th>
+                    <th class="text-uppercase small text-muted text-center">Receipt</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -45,15 +48,41 @@
                         <td>${a.doctorName}</td>
                         <td>${a.service}</td>
                         <td>${a.appointmentDate}</td>
-                        <td><span class="badge bg-warning bg-opacity-10 text-warning">Pending</span></td>
+                        <td class="fw-semibold">
+                            <c:choose>
+                                <c:when test="${not empty a.amount}">
+                                    ₹<fmt:formatNumber value="${a.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                </c:when>
+                                <c:otherwise>—</c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td>
+                            <span class="badge bg-${a.paymentStatus.badgeClass} bg-opacity-10 text-${a.paymentStatus.badgeClass}">
+                                ${a.paymentStatus.label}
+                            </span>
+                            <c:if test="${not empty a.paymentMethod}">
+                                <div class="small text-muted mt-1">${a.paymentMethod.label}</div>
+                            </c:if>
+                        </td>
+                        <td class="font-monospace small">${empty a.paymentReference ? '—' : a.paymentReference}</td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-primary" disabled>Generate Invoice</button>
+                            <c:choose>
+                                <c:when test="${a.paymentPending or empty a.paymentReference}">
+                                    <span class="text-muted small">Awaiting payment</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       href="${pageContext.request.contextPath}/booking/confirmation/${a.paymentReference}">
+                                        <i class="bi bi-receipt me-1"></i>View
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
                         </td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty appointments}">
                     <tr>
-                        <td colspan="7" class="text-center py-4 text-muted">No appointments to invoice.</td>
+                        <td colspan="9" class="text-center py-4 text-muted">No appointments to invoice.</td>
                     </tr>
                 </c:if>
                 </tbody>

@@ -172,6 +172,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 new AntPathRequestMatcher("/login"),
                                 new AntPathRequestMatcher("/register"),
+                                new AntPathRequestMatcher("/book"),
+                                new AntPathRequestMatcher("/booking/**"),
                                 new AntPathRequestMatcher("/doctor/register"),
                                 new AntPathRequestMatcher("/forgot-password"),
                                 new AntPathRequestMatcher("/reset-password"),

@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,6 +44,8 @@
                         <th>Service</th>
                         <th>Date</th>
                         <th>Time</th>
+                        <th>Fee</th>
+                        <th>Payment</th>
                         <th class="text-center">Actions</th>
                     </tr>
                     </thead>
@@ -54,8 +57,37 @@
                             <td>${a.service}</td>
                             <td>${a.appointmentDate}</td>
                             <td>${a.appointmentTime}</td>
+                            <td class="fw-semibold">
+                                <c:choose>
+                                    <c:when test="${not empty a.amount}">
+                                        ₹<fmt:formatNumber value="${a.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" />
+                                    </c:when>
+                                    <c:otherwise>—</c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <span class="badge bg-${a.paymentStatus.badgeClass} bg-opacity-10 text-${a.paymentStatus.badgeClass}">
+                                    ${a.paymentStatus.label}
+                                </span>
+                                <c:if test="${not empty a.paymentMethod}">
+                                    <div class="small text-muted mt-1">${a.paymentMethod.label}</div>
+                                </c:if>
+                                <c:if test="${not empty a.paymentReference}">
+                                    <div class="small text-muted font-monospace">${a.paymentReference}</div>
+                                </c:if>
+                            </td>
                             <td class="text-center">
                                 <a class="btn btn-sm btn-outline-primary" href="${pageContext.request.contextPath}/my/appointments/${a.id}/chat"><i class="fa fa-comments me-1"></i>Message Doctor</a>
+                                <c:if test="${a.paymentPending and not empty a.paymentReference}">
+                                    <a class="btn btn-sm btn-success" href="${pageContext.request.contextPath}/booking/pay/${a.paymentReference}">
+                                        <i class="fas fa-wallet me-1"></i>Pay Now
+                                    </a>
+                                </c:if>
+                                <c:if test="${not a.paymentPending and not empty a.paymentReference}">
+                                    <a class="btn btn-sm btn-outline-dark" href="${pageContext.request.contextPath}/booking/confirmation/${a.paymentReference}">
+                                        <i class="fas fa-receipt me-1"></i>Receipt
+                                    </a>
+                                </c:if>
                                 <form action="${pageContext.request.contextPath}/my/appointments/cancel/${a.id}" method="post" class="d-inline"
                                       onsubmit="return confirm('Cancel this appointment?');">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />

@@ -1,8 +1,11 @@
 package com.subrat.clinic.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +23,23 @@ public class Appointment {
     private String service;
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    @Column(unique = true, length = 40)
+    private String paymentReference;
+
+    @Column(length = 160)
+    private String paymentDetail;
+
+    private LocalDateTime paidAt;
 
     @OneToMany(mappedBy = "appointment", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<AppointmentMessage> messages = new ArrayList<>();
@@ -88,5 +108,66 @@ public class Appointment {
 
     public void setAppointmentTime(LocalTime appointmentTime) {
         this.appointmentTime = appointmentTime;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus == null ? PaymentStatus.PENDING : paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public String getPaymentReference() {
+        return paymentReference;
+    }
+
+    public void setPaymentReference(String paymentReference) {
+        this.paymentReference = paymentReference;
+    }
+
+    public String getPaymentDetail() {
+        return paymentDetail;
+    }
+
+    public void setPaymentDetail(String paymentDetail) {
+        this.paymentDetail = paymentDetail;
+    }
+
+    public LocalDateTime getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(LocalDateTime paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public String getPaidAtDisplay() {
+        return paidAt == null ? null
+                : paidAt.format(DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a"));
+    }
+
+    public boolean isCashPayment() {
+        return getPaymentStatus() == PaymentStatus.PAY_AT_CLINIC;
+    }
+
+    public boolean isPaymentPending() {
+        return getPaymentStatus() == PaymentStatus.PENDING;
     }
 }

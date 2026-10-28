@@ -8,6 +8,7 @@ public interface AppointmentService {
     List<Appointment> getAll();
     List<Appointment> findByDoctorName(String doctorName);
     List<Appointment> findByEmail(String email);
+    Appointment findByReference(String reference);
 
     Appointment getById(Long id);     
     void deleteById(Long id);         
