@@ -9,8 +9,17 @@ public class GlobalModelAdvice {
 
     @ModelAttribute("hasAdminRole")
     public boolean hasAdminRole(Authentication authentication) {
+        return hasRole(authentication, "ROLE_ADMIN");
+    }
+
+    @ModelAttribute("hasDoctorRole")
+    public boolean hasDoctorRole(Authentication authentication) {
+        return hasRole(authentication, "ROLE_DOCTOR");
+    }
+
+    private boolean hasRole(Authentication authentication, String role) {
         if (authentication == null) return false;
         return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals(role));
     }
 }

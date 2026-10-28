@@ -33,7 +33,7 @@
                 <h1 class="h3 fw-bold mb-2">Welcome, Dr. <c:out value="${doctor.name}" /></h1>
                 <p class="mb-0 text-white-50"><c:out value="${doctor.specialization}" /> · Your assigned appointments and patients</p>
             </div>
-            <a class="btn btn-light fw-semibold" href="<c:url value='/admin/appointments' />">
+            <a class="btn btn-light fw-semibold" href="<c:url value='/doctor/appointments' />">
                 <i class="bi bi-calendar-week me-2"></i>View assigned appointments
             </a>
         </div>
@@ -80,7 +80,7 @@
                                 <td><c:out value="${appointment.service}" /></td>
                                 <td><c:out value="${appointment.appointmentDate}" /></td>
                                 <td><c:out value="${appointment.appointmentTime}" /></td>
-                                <td><a class="btn btn-sm btn-outline-primary" href="<c:url value='/admin/doctor/appointments/${appointment.id}/chat' />"><i class="bi bi-chat-dots me-1"></i>Message</a></td>
+                                <td><a class="btn btn-sm btn-outline-primary" href="<c:url value='/doctor/appointments/${appointment.id}/chat' />"><i class="bi bi-chat-dots me-1"></i>Message</a></td>
                             </tr>
                         </c:forEach>
                         </tbody>

@@ -1,6 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <c:set var="activePage" value="profile" />
+<sec:authorize access="hasRole('DOCTOR')"><c:set var="staffRoot" value="/doctor" /></sec:authorize>
+<sec:authorize access="hasRole('ADMIN')"><c:set var="staffRoot" value="/admin" /></sec:authorize>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +41,7 @@
             </div>
 
             <h2 class="h5 fw-bold mb-3">Edit profile</h2>
-            <form action="<c:url value='/admin/profile' />" method="post" enctype="multipart/form-data">
+            <form action="${pageContext.request.contextPath}${staffRoot}/profile" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -70,7 +73,7 @@
                     </div>
                 </div>
                 <div class="d-flex flex-column flex-sm-row justify-content-between gap-2 mt-4">
-                    <a class="btn btn-outline-secondary" href="<c:url value='/admin/change-password' />"><i class="bi bi-shield-lock me-1"></i>Change password</a>
+                    <a class="btn btn-outline-secondary" href="${pageContext.request.contextPath}${staffRoot}/change-password"><i class="bi bi-shield-lock me-1"></i>Change password</a>
                     <button class="btn btn-primary" type="submit"><i class="bi bi-check2-circle me-1"></i>Save profile</button>
                 </div>
             </form>

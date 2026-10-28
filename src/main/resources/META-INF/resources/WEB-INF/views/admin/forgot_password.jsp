@@ -38,7 +38,7 @@
                 <button class="btn btn-primary btn-submit w-100" type="submit">Send Reset Link</button>
             </form>
             <div class="text-center mt-3">
-                <a href="<c:url value='/admin/login' />" class="small">Back to Login</a>
+                <a href="${pageContext.request.contextPath}${selectedRole == 'DOCTOR' ? '/doctor/login' : '/admin/login/admin'}" class="small">Back to Login</a>
             </div>
         </div>
     </div>

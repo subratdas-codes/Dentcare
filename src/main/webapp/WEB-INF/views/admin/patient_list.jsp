@@ -57,8 +57,7 @@
                     <th class="text-uppercase small text-muted">#</th>
                     <th class="text-uppercase small text-muted">Patient</th>
                     <th class="text-uppercase small text-muted">Contact</th>
-                    <th class="text-uppercase small text-muted">Age / Gender</th>
-                    <th class="text-uppercase small text-muted">Address</th>
+                    <th class="text-uppercase small text-muted">Age</th>
                     <th class="text-uppercase small text-muted text-center">Actions</th>
                 </tr>
                 </thead>
@@ -83,11 +82,7 @@
                         </td>
                         <td>
                             <span class="badge bg-light text-dark border">${p.age} yrs</span>
-                            <c:if test="${not empty p.gender}">
-                                <span class="badge bg-light text-dark border text-capitalize">${p.gender}</span>
-                            </c:if>
                         </td>
-                        <td class="text-muted">${p.address}</td>
                         <td class="text-center">
                             <sec:authorize access="hasRole('ADMIN')">
                                 <a href="${pageContext.request.contextPath}/admin/patients/edit/${p.id}" class="btn btn-sm btn-outline-primary">
@@ -102,7 +97,7 @@
                 </c:forEach>
                 <c:if test="${empty patients}">
                     <tr>
-                        <td colspan="6" class="text-center py-5">
+                        <td colspan="5" class="text-center py-5">
                             <div class="text-muted">
                                 <i class="fas fa-users fa-2x mb-3"></i>
                                 <div>No patients found for this search.</div>

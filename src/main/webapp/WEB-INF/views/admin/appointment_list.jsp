@@ -73,6 +73,11 @@
                                         </button>
                                     </form>
                                 </sec:authorize>
+                                <sec:authorize access="hasRole('DOCTOR')">
+                                    <a href="${pageContext.request.contextPath}/doctor/appointments/${a.id}/chat" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-chat-dots"></i>
+                                    </a>
+                                </sec:authorize>
                             </td>
                         </tr>
                     </c:forEach>

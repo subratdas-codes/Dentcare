@@ -33,7 +33,7 @@ public class AppointmentChatController {
         this.messageRepository = messageRepository;
     }
 
-    @GetMapping("/admin/doctor/appointments/{appointmentId}/chat")
+    @GetMapping("/doctor/appointments/{appointmentId}/chat")
     public String doctorChat(@PathVariable Long appointmentId,
                              Authentication authentication,
                              Model model) {
@@ -44,7 +44,7 @@ public class AppointmentChatController {
         return "appointment_chat";
     }
 
-    @PostMapping("/admin/doctor/appointments/{appointmentId}/chat")
+    @PostMapping("/doctor/appointments/{appointmentId}/chat")
     public String doctorSendMessage(@PathVariable Long appointmentId,
                                     Authentication authentication,
                                     @RequestParam String body) {
@@ -52,7 +52,20 @@ public class AppointmentChatController {
         Appointment appointment = requireAppointment(appointmentId);
         requireAssignedDoctor(doctor, appointment);
         return saveMessage(appointment, authentication.getName(), "DOCTOR", body,
-                "/admin/doctor/appointments/" + appointmentId + "/chat");
+                "/doctor/appointments/" + appointmentId + "/chat");
+    }
+
+    /** Old doctor chat URL kept so existing links and notifications still work. */
+    @GetMapping("/admin/doctor/appointments/{appointmentId}/chat")
+    public String legacyDoctorChat(@PathVariable Long appointmentId) {
+        return "redirect:/doctor/appointments/" + appointmentId + "/chat";
+    }
+
+    @PostMapping("/admin/doctor/appointments/{appointmentId}/chat")
+    public String legacyDoctorSendMessage(@PathVariable Long appointmentId,
+                                          Authentication authentication,
+                                          @RequestParam String body) {
+        return doctorSendMessage(appointmentId, authentication, body);
     }
 
     @GetMapping("/my/appointments/{appointmentId}/chat")
@@ -113,10 +126,10 @@ public class AppointmentChatController {
         model.addAttribute("messages", messageRepository.findByAppointment_IdOrderBySentAtAsc(appointment.getId()));
         model.addAttribute("staffConversation", staffConversation);
         model.addAttribute("postUrl", staffConversation
-                ? "/admin/doctor/appointments/" + appointment.getId() + "/chat"
+                ? "/doctor/appointments/" + appointment.getId() + "/chat"
                 : "/my/appointments/" + appointment.getId() + "/chat");
         model.addAttribute("backUrl", staffConversation
-                ? "/admin/doctor/dashboard"
+                ? "/doctor/dashboard"
                 : "/my/appointments");
     }
 

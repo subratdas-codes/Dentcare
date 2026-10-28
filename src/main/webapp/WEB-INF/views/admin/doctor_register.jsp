@@ -27,7 +27,7 @@
         </div>
         <div class="card-body">
             <c:if test="${not empty error}"><div class="alert alert-danger" role="alert"><c:out value="${error}" /></div></c:if>
-            <form action="<c:url value='/admin/register' />" method="post">
+            <form action="<c:url value='/doctor/register' />" method="post">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                 <div class="mb-3">
                     <label class="form-label">Full Name</label>
@@ -55,7 +55,7 @@
                 <button class="btn btn-primary btn-submit w-100" type="submit">Register</button>
             </form>
             <div class="text-center mt-3">
-                <a href="<c:url value='/admin/login/doctor' />" class="small">Back to Doctor Login</a>
+                <a href="<c:url value='/doctor/login' />" class="small">Back to Doctor Login</a>
             </div>
         </div>
     </div>

@@ -20,6 +20,11 @@
                             <i class="fa fa-lock me-1"></i>Admin Dashboard
                         </a>
                     </c:when>
+                    <c:when test="${hasDoctorRole}">
+                        <a href="${pageContext.request.contextPath}/doctor/dashboard" class="btn btn-sm btn-primary me-lg-2 mb-2 mb-lg-0 mt-2 mt-lg-0">
+                            <i class="fa fa-user-md me-1"></i>Doctor Dashboard
+                        </a>
+                    </c:when>
                     <c:otherwise>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle fw-semibold" data-bs-toggle="dropdown">
@@ -32,6 +37,7 @@
                                 <div class="dropdown-divider"></div>
                                 <form action="${pageContext.request.contextPath}/logout" method="post" class="m-0">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <input type="hidden" name="portal" value="PATIENT" />
                                     <button type="submit" class="dropdown-item text-danger">Logout</button>
                                 </form>
                             </div>

@@ -2,7 +2,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <nav class="navbar navbar-expand-xl navbar-dark shadow-sm px-4 py-2" style="background: linear-gradient(90deg, #0f1f3a 0%, #06A3DA 100%);">
     <sec:authorize access="hasRole('ADMIN')"><a href="${pageContext.request.contextPath}/admin/dashboard" class="navbar-brand fw-bold d-flex align-items-center gap-2"><i class="fa fa-tooth"></i><span>DentCare Admin</span></a></sec:authorize>
-    <sec:authorize access="hasRole('DOCTOR')"><a href="${pageContext.request.contextPath}/admin/doctor/dashboard" class="navbar-brand fw-bold d-flex align-items-center gap-2"><i class="fa fa-tooth"></i><span>DentCare Doctor Portal</span></a></sec:authorize>
+    <sec:authorize access="hasRole('DOCTOR')"><a href="${pageContext.request.contextPath}/doctor/dashboard" class="navbar-brand fw-bold d-flex align-items-center gap-2"><i class="fa fa-tooth"></i><span>DentCare Doctor Portal</span></a></sec:authorize>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -10,7 +10,7 @@
         <ul class="navbar-nav ms-auto align-items-xl-center gap-xl-1">
             <li class="nav-item">
                 <sec:authorize access="hasRole('ADMIN')"><a class="nav-link px-3 ${activePage == 'dashboard' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></sec:authorize>
-                <sec:authorize access="hasRole('DOCTOR')"><a class="nav-link px-3 ${activePage == 'dashboard' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/doctor/dashboard"><i class="bi bi-speedometer2 me-1"></i>My Dashboard</a></sec:authorize>
+                <sec:authorize access="hasRole('DOCTOR')"><a class="nav-link px-3 ${activePage == 'dashboard' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/doctor/dashboard"><i class="bi bi-speedometer2 me-1"></i>My Dashboard</a></sec:authorize>
             </li>
             <sec:authorize access="hasRole('ADMIN')">
                 <li class="nav-item">
@@ -26,7 +26,7 @@
             </sec:authorize>
             <li class="nav-item">
                 <sec:authorize access="hasRole('ADMIN')"><a class="nav-link px-3 ${activePage == 'appointments' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/appointments"><i class="bi bi-calendar-check me-1"></i>Appointments</a></sec:authorize>
-                <sec:authorize access="hasRole('DOCTOR')"><a class="nav-link px-3 ${activePage == 'appointments' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/appointments"><i class="bi bi-calendar-check me-1"></i>My Patients</a></sec:authorize>
+                <sec:authorize access="hasRole('DOCTOR')"><a class="nav-link px-3 ${activePage == 'appointments' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/doctor/appointments"><i class="bi bi-calendar-check me-1"></i>My Patients</a></sec:authorize>
             </li>
             <sec:authorize access="hasRole('ADMIN')">
                 <li class="nav-item">
@@ -46,9 +46,8 @@
                 </li>
             </sec:authorize>
             <li class="nav-item">
-                <a class="nav-link px-3" href="${pageContext.request.contextPath}/admin/profile">
-                    <i class="bi bi-person-circle me-1"></i>My Profile
-                </a>
+                <sec:authorize access="hasRole('ADMIN')"><a class="nav-link px-3" href="${pageContext.request.contextPath}/admin/profile"><i class="bi bi-person-circle me-1"></i>My Profile</a></sec:authorize>
+                <sec:authorize access="hasRole('DOCTOR')"><a class="nav-link px-3" href="${pageContext.request.contextPath}/doctor/profile"><i class="bi bi-person-circle me-1"></i>My Profile</a></sec:authorize>
             </li>
             <li class="nav-item ms-xl-3">
                 <a class="btn btn-light btn-sm fw-semibold" href="${pageContext.request.contextPath}/">
@@ -58,6 +57,8 @@
             <li class="nav-item ms-xl-2">
                 <form action="${pageContext.request.contextPath}/logout" method="post" class="m-0">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                    <sec:authorize access="hasRole('ADMIN')"><input type="hidden" name="portal" value="ADMIN" /></sec:authorize>
+                    <sec:authorize access="hasRole('DOCTOR')"><input type="hidden" name="portal" value="DOCTOR" /></sec:authorize>
                     <button type="submit" class="btn btn-outline-light btn-sm fw-semibold">
                         <i class="bi bi-box-arrow-right me-1"></i>Logout
                     </button>

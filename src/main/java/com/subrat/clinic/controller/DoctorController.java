@@ -3,18 +3,12 @@ package com.subrat.clinic.controller;
 import com.subrat.clinic.model.Appointment;
 import com.subrat.clinic.model.Doctor;
 import com.subrat.clinic.service.AppointmentService;
+import com.subrat.clinic.service.DoctorPhotoStorage;
 import com.subrat.clinic.service.DoctorService;
 import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
-import javax.imageio.ImageIO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,27 +20,31 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Objects;
 
 @Controller
 @RequestMapping("/admin")
 public class DoctorController {
 
     @GetMapping("/login")
-    public String adminLogin() {
+    public String adminLogin(Authentication authentication) {
+        if (hasAdminRole(authentication)) {
+            return "redirect:/admin/dashboard";
+        }
         return "admin/login";
     }
 
     @GetMapping("/login/admin")
-    public String adminLoginSelected(Model model) {
+    public String adminLoginSelected(Authentication authentication, Model model) {
+        if (hasAdminRole(authentication)) {
+            return "redirect:/admin/dashboard";
+        }
         model.addAttribute("selectedRole", "ADMIN");
         return "admin/login";
     }
 
     @GetMapping("/login/doctor")
-    public String doctorLoginSelected(Model model) {
-        model.addAttribute("selectedRole", "DOCTOR");
-        return "admin/login";
+    public String doctorLoginSelected() {
+        return "redirect:/doctor/login";
     }
 
     @GetMapping("/forgot-password")
@@ -71,14 +69,9 @@ public class DoctorController {
         return "ok";
     }
 
-    @GetMapping("/doctor/dashboard")
-    public String doctorDashboard(Authentication authentication, Model model) {
-        return populateDoctorDashboard(authentication, model);
-    }
-
-    @GetMapping("/doctor-dashboard")
+    @GetMapping({"/doctor", "/doctor/dashboard", "/doctor-dashboard"})
     public String legacyDoctorDashboard() {
-        return "redirect:/admin/doctor/dashboard";
+        return "redirect:/doctor/dashboard";
     }
 
     @Autowired
@@ -94,50 +87,32 @@ public class DoctorController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private DoctorPhotoStorage doctorPhotoStorage;
+
+    @Autowired
     private MailService mailService;
 
-    @Value("${app.upload-dir:uploads}")
-    private String uploadDirectory;
-
     @GetMapping("/register")
-    public String doctorRegisterForm(Model model) {
-        model.addAttribute("doctor", new com.subrat.clinic.model.Doctor());
-        return "admin/doctor_register";
+    public String doctorRegisterForm() {
+        return "redirect:/doctor/register";
     }
 
     @PostMapping("/register")
-    public String doctorRegister(@ModelAttribute Doctor doctor, Model model) {
-        String email = doctor.getEmail() == null ? "" : doctor.getEmail().trim().toLowerCase();
-        if (doctor.getName() == null || doctor.getName().isBlank()
-                || doctor.getPassword() == null || doctor.getPassword().length() < 8) {
-            model.addAttribute("error", "Enter your full name and a password of at least 8 characters.");
-            model.addAttribute("doctor", doctor);
-            return "admin/doctor_register";
-        }
-        if (doctorService.findByEmail(email) != null) {
-            model.addAttribute("error", "An account with this email already exists.");
-            model.addAttribute("doctor", doctor);
-            return "admin/doctor_register";
-        }
-        doctor.setEmail(email);
-        doctor.setName(doctor.getName().trim());
-        doctor.setAdmin(false);
-        doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
-        doctorService.save(doctor);
-        return "redirect:/admin/login/doctor?registered=true";
+    public String doctorRegister() {
+        return "redirect:/doctor/register";
     }
 
     @GetMapping({"", "/"})
     public String adminRoot(Authentication authentication) {
-        return isDoctor(authentication)
-                ? "redirect:/admin/doctor/dashboard"
-                : "redirect:/admin/dashboard";
+        return hasAdminRole(authentication)
+                ? "redirect:/admin/dashboard"
+                : "redirect:/admin/login";
     }
 
     @GetMapping("/dashboard")
     public String adminDashboard(Authentication authentication, Model model) {
-        if (isDoctor(authentication)) {
-            return populateDoctorDashboard(authentication, model);
+        if (!hasAdminRole(authentication)) {
+            return "redirect:/admin/login";
         }
         List<Appointment> appointments = appointmentService.getAll();
         model.addAttribute("doctorCount", doctorService.findAll().size());
@@ -149,31 +124,9 @@ public class DoctorController {
         return "admin/dashboard";
     }
 
-    private String populateDoctorDashboard(Authentication authentication, Model model) {
-        if (authentication == null || !isDoctor(authentication)) {
-            return "redirect:/admin/login";
-        }
-        Doctor doctor = doctorService.findByEmail(authentication.getName());
-        if (doctor == null || doctor.getName() == null || doctor.getName().isBlank()) {
-            return "redirect:/admin/login/doctor?error=true";
-        }
-
-        List<Appointment> appointments = appointmentService.findByDoctorName(doctor.getName());
-        long assignedPatientCount = appointments.stream()
-                .map(Appointment::getEmail)
-                .filter(email -> email != null && !email.isBlank())
-                .distinct()
-                .count();
-        model.addAttribute("doctor", doctor);
-        model.addAttribute("appointments", appointments);
-        model.addAttribute("appointmentCount", appointments.size());
-        model.addAttribute("patientCount", assignedPatientCount);
-        return "admin/doctor_dashboard";
-    }
-
-    private boolean isDoctor(Authentication authentication) {
+    private boolean hasAdminRole(Authentication authentication) {
         return authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(authority -> Objects.equals(authority.getAuthority(), "ROLE_DOCTOR"));
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 
     // ---------------- DOCTOR CRUD ---------------- //
@@ -271,16 +224,9 @@ public class DoctorController {
     // ---------------- APPOINTMENT CRUD ---------------- //
 
     @GetMapping("/appointments")
-    public String listAppointments(Authentication authentication, Model model) {
-        List<Appointment> appointments;
-        if (isDoctor(authentication)) {
-            Doctor doctor = doctorService.findByEmail(authentication.getName());
-            appointments = doctor == null ? List.of() : appointmentService.findByDoctorName(doctor.getName());
-        } else {
-            appointments = appointmentService.getAll();
-        }
-        model.addAttribute("appointments", appointments);
-        return "admin/appointment_list"; // Use appointment_list.jsp (not 'appointments.jsp' to avoid conflict)
+    public String listAppointments(Model model) {
+        model.addAttribute("appointments", appointmentService.getAll());
+        return "admin/appointment_list";
     }
 
     @GetMapping("/appointments/edit/{id}")
@@ -368,7 +314,7 @@ public class DoctorController {
         String priorPhoto = doctor.getProfileImagePath();
         try {
             if (photo != null && !photo.isEmpty()) {
-                doctor.setProfileImagePath(saveDoctorPhoto(photo));
+                doctor.setProfileImagePath(doctorPhotoStorage.save(photo));
             }
         } catch (IOException | IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("error", exception.getMessage());
@@ -380,7 +326,7 @@ public class DoctorController {
         doctor.setDescription(description.trim());
         doctorService.save(doctor);
         if (photo != null && !photo.isEmpty() && priorPhoto != null) {
-            deletePriorDoctorPhoto(priorPhoto);
+            doctorPhotoStorage.delete(priorPhoto);
         }
         redirectAttributes.addFlashAttribute("success", "Your profile has been updated.");
         return "redirect:/admin/profile";
@@ -411,45 +357,6 @@ public class DoctorController {
             model.addAttribute("success", "Password changed successfully.");
         }
         return "admin/change_password";
-    }
-
-    private String saveDoctorPhoto(MultipartFile photo) throws IOException {
-        if (photo.getSize() > 5L * 1024 * 1024) {
-            throw new IllegalArgumentException("Choose an image smaller than 5 MB.");
-        }
-        byte[] bytes = photo.getBytes();
-        String extension;
-        if (bytes.length >= 8 && (bytes[0] & 0xff) == 0x89 && bytes[1] == 'P'
-                && bytes[2] == 'N' && bytes[3] == 'G') {
-            extension = ".png";
-        } else if (bytes.length >= 3 && (bytes[0] & 0xff) == 0xff
-                && (bytes[1] & 0xff) == 0xd8 && (bytes[2] & 0xff) == 0xff) {
-            extension = ".jpg";
-        } else {
-            throw new IllegalArgumentException("Use a valid JPEG or PNG image.");
-        }
-        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes));
-        if (image == null || image.getWidth() > 6000 || image.getHeight() > 6000) {
-            throw new IllegalArgumentException("The selected image is invalid or too large in dimensions.");
-        }
-
-        Path directory = Path.of(uploadDirectory).toAbsolutePath().normalize().resolve("doctors");
-        Files.createDirectories(directory);
-        String filename = UUID.randomUUID() + extension;
-        Files.write(directory.resolve(filename), bytes);
-        return "/uploads/doctors/" + filename;
-    }
-
-    private void deletePriorDoctorPhoto(String imagePath) {
-        if (!imagePath.matches("/uploads/doctors/[a-fA-F0-9-]+\\.(jpg|png)")) return;
-        try {
-            Path uploadRoot = Path.of(uploadDirectory).toAbsolutePath().normalize();
-            Path doctorPhotoDirectory = uploadRoot.resolve("doctors").normalize();
-            Path image = doctorPhotoDirectory.resolve(imagePath.substring(imagePath.lastIndexOf('/') + 1)).normalize();
-            if (image.startsWith(doctorPhotoDirectory)) Files.deleteIfExists(image);
-        } catch (IOException ignored) {
-            // A failed cleanup must not undo a successfully saved profile.
-        }
     }
 }
 

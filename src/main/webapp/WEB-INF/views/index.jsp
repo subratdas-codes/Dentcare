@@ -108,6 +108,9 @@
                     <c:when test="${hasAdminRole}">
                         <a href="/admin/dashboard" class="btn btn-primary py-2 px-4 ms-3">Admin Dashboard</a>
                     </c:when>
+                    <c:when test="${hasDoctorRole}">
+                        <a href="/doctor/dashboard" class="btn btn-primary py-2 px-4 ms-3">Doctor Dashboard</a>
+                    </c:when>
                     <c:otherwise>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -120,6 +123,7 @@
                                 <div class="dropdown-divider"></div>
                                 <form action="/logout" method="post" class="m-0">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                    <input type="hidden" name="portal" value="PATIENT" />
                                     <button type="submit" class="dropdown-item text-danger">Logout</button>
                                 </form>
                             </div>
