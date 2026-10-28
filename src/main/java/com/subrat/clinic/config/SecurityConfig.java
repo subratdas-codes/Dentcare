@@ -88,10 +88,20 @@ public class SecurityConfig {
                         || "admin".equalsIgnoreCase(requestedPortal);
             }
 
+            // Admin and doctor accounts must use their own login page. This keeps
+            // the patient login page patient-only and stops staff sessions from
+            // appearing inside the user portal.
+            if ((admin || doctor) && !staffAdmin && !staffDoctor) {
+                SecurityContextHolder.clearContext();
+                String staffLogin = admin ? "/admin/login" : "/doctor/login";
+                response.sendRedirect(request.getContextPath() + staffLogin + "?error=portal");
+                return;
+            }
+
             if ((staffAdmin && !admin) || (staffDoctor && !doctor)) {
                 portalSecurityContextRepository.clearContext(request);
                 SecurityContextHolder.clearContext();
-                String roleLoginPath = staffDoctor ? "/doctor/login" : "/admin/login/admin";
+                String roleLoginPath = staffDoctor ? "/doctor/login" : "/admin/login";
                 response.sendRedirect(request.getContextPath() + roleLoginPath + "?error=role");
                 return;
             }
@@ -120,7 +130,7 @@ public class SecurityConfig {
             if (staffDoctor) {
                 response.sendRedirect(request.getContextPath() + "/doctor/login?error=true");
             } else if (staffAdmin) {
-                response.sendRedirect(request.getContextPath() + "/admin/login/admin?error=true");
+                response.sendRedirect(request.getContextPath() + "/admin/login?error=true");
             } else {
                 response.sendRedirect(request.getContextPath() + "/login?error=true");
             }
@@ -213,7 +223,7 @@ public class SecurityConfig {
                                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
                             boolean doctor = authentication != null && authentication.getAuthorities().stream()
                                     .anyMatch(a -> a.getAuthority().equals("ROLE_DOCTOR"));
-                            String destination = admin ? "/admin/login/admin?logout=true"
+                            String destination = admin ? "/admin/login?logout=true"
                                     : doctor ? "/doctor/login?logout=true" : "/login?logout=true";
                             response.sendRedirect(request.getContextPath() + destination);
                         })

@@ -33,6 +33,16 @@
         </sec:authorize>
     </div>
 
+    <c:if test="${param.error == 'duplicate'}">
+        <div class="alert alert-danger">A staff account with this email already exists.</div>
+    </c:if>
+    <c:if test="${param.error == 'duplicatePatient'}">
+        <div class="alert alert-danger">A patient account already uses this email. Choose a different email.</div>
+    </c:if>
+    <c:if test="${param.error == 'email'}">
+        <div class="alert alert-danger">Email address is required.</div>
+    </c:if>
+
     <c:if test="${not empty doctors}">
         <div class="card card-table">
             <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">

@@ -2,6 +2,7 @@ package com.subrat.clinic.controller;
 
 import com.subrat.clinic.model.Patient;
 import com.subrat.clinic.model.PasswordResetToken;
+import com.subrat.clinic.repository.DoctorRepository;
 import com.subrat.clinic.repository.PasswordResetTokenRepository;
 import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
@@ -21,6 +22,9 @@ public class AuthenticationController {
 
     @Autowired
     private PatientService patientService;
+
+    @Autowired
+    private DoctorRepository doctorRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -54,7 +58,9 @@ public class AuthenticationController {
             model.addAttribute("patient", patient);
             return "register";
         }
-        if (patientService.findByEmail(patient.getEmail()) != null) {
+        patient.setEmail(patient.getEmail().trim().toLowerCase());
+        if (patientService.findByEmail(patient.getEmail()) != null
+                || doctorRepository.findByEmail(patient.getEmail()) != null) {
             model.addAttribute("error", "An account with this email already exists.");
             model.addAttribute("patient", patient);
             return "register";
@@ -64,7 +70,6 @@ public class AuthenticationController {
             model.addAttribute("patient", patient);
             return "register";
         }
-        patient.setEmail(patient.getEmail().trim().toLowerCase());
         if (patient.getName() != null) patient.setName(patient.getName().trim());
         if (patient.getPhone() != null && patient.getPhone().trim().isEmpty()) {
             patient.setPhone(null);

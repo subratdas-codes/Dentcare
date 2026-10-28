@@ -103,33 +103,23 @@
                 </div>
                 <a href="contact" class="nav-item nav-link">Contact</a>
             </div>
-            <sec:authorize access="isAuthenticated()">
-                <c:choose>
-                    <c:when test="${hasAdminRole}">
-                        <a href="/admin/dashboard" class="btn btn-primary py-2 px-4 ms-3">Admin Dashboard</a>
-                    </c:when>
-                    <c:when test="${hasDoctorRole}">
-                        <a href="/doctor/dashboard" class="btn btn-primary py-2 px-4 ms-3">Doctor Dashboard</a>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i> <sec:authentication property="name" />
-                            </a>
-                            <div class="dropdown-menu fade-up m-0">
-                                <a href="/profile" class="dropdown-item">Profile</a>
-                                <a href="/change-password" class="dropdown-item">Change Password</a>
-                                <a href="/my/appointments" class="dropdown-item">My Appointments</a>
-                                <div class="dropdown-divider"></div>
-                                <form action="/logout" method="post" class="m-0">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                    <input type="hidden" name="portal" value="PATIENT" />
-                                    <button type="submit" class="dropdown-item text-danger">Logout</button>
-                                </form>
-                            </div>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
+            <sec:authorize access="hasRole('USER')">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i> <sec:authentication property="name" />
+                    </a>
+                    <div class="dropdown-menu fade-up m-0">
+                        <a href="/profile" class="dropdown-item">Profile</a>
+                        <a href="/change-password" class="dropdown-item">Change Password</a>
+                        <a href="/my/appointments" class="dropdown-item">My Appointments</a>
+                        <div class="dropdown-divider"></div>
+                        <form action="/logout" method="post" class="m-0">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            <input type="hidden" name="portal" value="PATIENT" />
+                            <button type="submit" class="dropdown-item text-danger">Logout</button>
+                        </form>
+                    </div>
+                </div>
             </sec:authorize>
             <sec:authorize access="!isAuthenticated()">
                 <a href="login" class="btn btn-primary py-2 px-4 ms-3">Login</a>

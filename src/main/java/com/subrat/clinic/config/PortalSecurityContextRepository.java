@@ -39,13 +39,10 @@ public class PortalSecurityContextRepository implements SecurityContextRepositor
         HttpSession session = request.getSession(false);
         Portal explicitPortal = portalForRequest(request);
 
-        Portal portal = explicitPortal;
-        if (portal == null) {
-            portal = activePortal(session);
-            if (read(session, portal) == null) {
-                portal = firstAvailable(session);
-            }
-        }
+        // Public pages and the patient portal always load the patient context.
+        // Admin and doctor contexts are only visible on their own URLs, so staff
+        // details can never leak into the user-facing website.
+        Portal portal = explicitPortal != null ? explicitPortal : Portal.PATIENT;
 
         if (explicitPortal != null && session != null) {
             session.setAttribute(ACTIVE_PORTAL, explicitPortal.name());
@@ -57,10 +54,21 @@ public class PortalSecurityContextRepository implements SecurityContextRepositor
 
     @Override
     public void saveContext(SecurityContext context, HttpServletRequest request, HttpServletResponse response) {
+        Portal requestedPortal = portalForRequest(request);
+        Authentication authentication = context.getAuthentication();
+
+        // A staff account must never be saved by the patient login form (or by a
+        // login request without a staff portal). The success handler redirects
+        // these accounts to their own login page instead.
+        if (authentication != null && isStaff(authentication)
+                && (requestedPortal == null || requestedPortal == Portal.PATIENT)) {
+            return;
+        }
+
         HttpSession session = request.getSession(true);
-        Portal portal = portalForRequest(request);
+        Portal portal = requestedPortal;
         if (portal == null) {
-            portal = portalForAuthentication(context.getAuthentication());
+            portal = portalForAuthentication(authentication);
         }
         if (portal == null) {
             portal = activePortal(session);
@@ -69,7 +77,7 @@ public class PortalSecurityContextRepository implements SecurityContextRepositor
             portal = Portal.PATIENT;
         }
 
-        if (context.getAuthentication() == null) {
+        if (authentication == null) {
             session.removeAttribute(portal.sessionKey());
             refreshActivePortal(session);
             return;
@@ -85,15 +93,11 @@ public class PortalSecurityContextRepository implements SecurityContextRepositor
         if (session == null) {
             return false;
         }
-        Portal explicitPortal = portalForRequest(request);
-        if (explicitPortal != null) {
-            return read(session, explicitPortal) != null;
+        Portal portal = portalForRequest(request);
+        if (portal == null) {
+            portal = Portal.PATIENT;
         }
-        Portal active = activePortal(session);
-        if (read(session, active) != null) {
-            return true;
-        }
-        return firstAvailable(session) != null;
+        return read(session, portal) != null;
     }
 
     /** Removes the active portal's context without touching the other portals. */
@@ -175,21 +179,31 @@ public class PortalSecurityContextRepository implements SecurityContextRepositor
             return Portal.ADMIN;
         }
 
-        String requested = request.getParameter("portal");
-        if (requested != null) {
-            String normalized = requested.trim().toUpperCase(Locale.ROOT);
-            if ("ADMIN".equals(normalized)) {
-                String staffRole = request.getParameter("staffRole");
-                return "DOCTOR".equalsIgnoreCase(staffRole) ? Portal.DOCTOR : Portal.ADMIN;
-            }
-            if ("DOCTOR".equals(normalized)) {
-                return Portal.DOCTOR;
-            }
-            if ("PATIENT".equals(normalized) || "USER".equals(normalized)) {
-                return Portal.PATIENT;
+        // The portal parameter is only trusted on authentication endpoints, so a
+        // public URL such as /about?portal=ADMIN can never load a staff context.
+        if (path.equals("/login") || path.equals("/logout")) {
+            String requested = request.getParameter("portal");
+            if (requested != null) {
+                String normalized = requested.trim().toUpperCase(Locale.ROOT);
+                if ("ADMIN".equals(normalized)) {
+                    String staffRole = request.getParameter("staffRole");
+                    return "DOCTOR".equalsIgnoreCase(staffRole) ? Portal.DOCTOR : Portal.ADMIN;
+                }
+                if ("DOCTOR".equals(normalized)) {
+                    return Portal.DOCTOR;
+                }
+                if ("PATIENT".equals(normalized) || "USER".equals(normalized)) {
+                    return Portal.PATIENT;
+                }
             }
         }
         return null;
+    }
+
+    private boolean isStaff(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority())
+                        || "ROLE_DOCTOR".equals(authority.getAuthority()));
     }
 
     private Portal portalForAuthentication(Authentication authentication) {

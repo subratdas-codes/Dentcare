@@ -13,37 +13,23 @@
             <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-sm btn-outline-primary me-lg-2 mb-2 mb-lg-0 mt-2 mt-lg-0">
                 <i class="fa fa-calendar-plus me-1"></i>Book Appointment
             </a>
-            <sec:authorize access="isAuthenticated()">
-                <c:choose>
-                    <c:when test="${hasAdminRole}">
-                        <a href="${pageContext.request.contextPath}/admin/dashboard" class="btn btn-sm btn-primary me-lg-2 mb-2 mb-lg-0 mt-2 mt-lg-0">
-                            <i class="fa fa-lock me-1"></i>Admin Dashboard
-                        </a>
-                    </c:when>
-                    <c:when test="${hasDoctorRole}">
-                        <a href="${pageContext.request.contextPath}/doctor/dashboard" class="btn btn-sm btn-primary me-lg-2 mb-2 mb-lg-0 mt-2 mt-lg-0">
-                            <i class="fa fa-user-md me-1"></i>Doctor Dashboard
-                        </a>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle fw-semibold" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle me-1"></i><sec:authentication property="name" />
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end shadow">
-                                <a href="${pageContext.request.contextPath}/profile" class="dropdown-item">Profile</a>
-                                <a href="${pageContext.request.contextPath}/my/appointments" class="dropdown-item">My Appointments</a>
-                                <a href="${pageContext.request.contextPath}/change-password" class="dropdown-item">Change Password</a>
-                                <div class="dropdown-divider"></div>
-                                <form action="${pageContext.request.contextPath}/logout" method="post" class="m-0">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                    <input type="hidden" name="portal" value="PATIENT" />
-                                    <button type="submit" class="dropdown-item text-danger">Logout</button>
-                                </form>
-                            </div>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
+            <sec:authorize access="hasRole('USER')">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle fw-semibold" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i><sec:authentication property="name" />
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end shadow">
+                        <a href="${pageContext.request.contextPath}/profile" class="dropdown-item">Profile</a>
+                        <a href="${pageContext.request.contextPath}/my/appointments" class="dropdown-item">My Appointments</a>
+                        <a href="${pageContext.request.contextPath}/change-password" class="dropdown-item">Change Password</a>
+                        <div class="dropdown-divider"></div>
+                        <form action="${pageContext.request.contextPath}/logout" method="post" class="m-0">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                            <input type="hidden" name="portal" value="PATIENT" />
+                            <button type="submit" class="dropdown-item text-danger">Logout</button>
+                        </form>
+                    </div>
+                </div>
             </sec:authorize>
             
         </div>

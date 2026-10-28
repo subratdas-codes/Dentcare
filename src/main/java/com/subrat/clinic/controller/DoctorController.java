@@ -26,10 +26,11 @@ import java.util.List;
 public class DoctorController {
 
     @GetMapping("/login")
-    public String adminLogin(Authentication authentication) {
+    public String adminLogin(Authentication authentication, Model model) {
         if (hasAdminRole(authentication)) {
             return "redirect:/admin/dashboard";
         }
+        model.addAttribute("selectedRole", "ADMIN");
         return "admin/login";
     }
 
@@ -152,6 +153,18 @@ public class DoctorController {
     @PostMapping("/doctors/save")
     public String saveDoctor(@ModelAttribute Doctor doctor) {
         Doctor existing = doctor.getId() != null ? doctorService.findById(doctor.getId()) : null;
+        String email = doctor.getEmail() == null ? "" : doctor.getEmail().trim().toLowerCase();
+        if (email.isEmpty()) {
+            return "redirect:/admin/doctors?error=email";
+        }
+        Doctor byEmail = doctorService.findByEmail(email);
+        if (byEmail != null && (existing == null || !byEmail.getId().equals(doctor.getId()))) {
+            return "redirect:/admin/doctors?error=duplicate";
+        }
+        if (patientService.findByEmail(email) != null) {
+            return "redirect:/admin/doctors?error=duplicatePatient";
+        }
+        doctor.setEmail(email);
         if (doctor.getPassword() == null || doctor.getPassword().isBlank()) {
             if (existing != null) {
                 doctor.setPassword(existing.getPassword());

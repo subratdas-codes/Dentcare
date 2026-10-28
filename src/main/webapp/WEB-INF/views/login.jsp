@@ -80,6 +80,7 @@
 
                     <form action="login" method="post" id="loginForm">
                       <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                      <input type="hidden" name="portal" value="PATIENT" />
 
                       <div class="mb-3">
                         <label class="form-label fw-semibold">Email or Mobile Number</label>
