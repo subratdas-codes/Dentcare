@@ -2,19 +2,19 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <title>DentCare - Dental Clinic Management System</title>
+    <title><c:out value="${site.siteName}" /> - Gentle Dental Care</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="Free HTML Templates" name="keywords">
-    <meta content="Free HTML Templates" name="description">
+    <meta content="Gentle dentistry, clear pricing and easy online booking." name="description">
 
     <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
+    <link href="${pageContext.request.contextPath}/img/favicon.ico" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -31,10 +31,10 @@
     <link href="lib/twentytwenty/twentytwenty.css" rel="stylesheet" />
 
     <!-- Customized Bootstrap Stylesheet -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="<c:url value='/css/bootstrap.min.css' />" rel="stylesheet">
 
     <!-- Template Stylesheet -->
-    <link href="css/style.css" rel="stylesheet">
+    <link href="<c:url value='/css/style.css' />" rel="stylesheet">
 </head>
 
 <body>
@@ -57,9 +57,9 @@
                             <h1 class="display-1 text-white mb-md-2 animated zoomIn"><c:out value="${site.homeHeading}" /></h1>
                             <p class="text-white mb-md-4 animated fadeIn"><c:out value="${site.homeText}" /></p>
                             <sec:authorize access="isAuthenticated()">
-                            <a href="/book_appointment" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Appointment</a>
+                            <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Appointment</a>
                             </sec:authorize>
-                            <a href="/contact" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Contact Us</a>
+                            <a href="${pageContext.request.contextPath}/contact" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Contact Us</a>
                         </div>
                     </div>
                 </div>
@@ -71,9 +71,9 @@
                             <h1 class="display-1 text-white mb-md-2 animated zoomIn"><c:out value="${site.homeHeading}" /></h1>
                             <p class="text-white mb-md-4 animated fadeIn"><c:out value="${site.homeText}" /></p>
                             <sec:authorize access="isAuthenticated()">
-                            <a href="/book_appointment" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Appointment</a>
+                            <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">Appointment</a>
                             </sec:authorize>
-                            <a href="/contact" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Contact Us</a>
+                            <a href="${pageContext.request.contextPath}/contact" class="btn btn-secondary py-md-3 px-md-5 animated slideInRight">Contact Us</a>
                         </div>
                     </div>
                 </div>
@@ -101,30 +101,27 @@
                     <div class="bg-primary d-flex flex-column p-5" style="height: 300px;">
                         <h3 class="text-white mb-3">Opening Hours</h3>
                         <div class="d-flex justify-content-between text-white mb-3">
-                            <h6 class="text-white mb-0">Mon - Fri</h6>
-                            <p class="mb-0"> 8:00am - 9:00pm</p>
+                            <p class="mb-0"><i class="far fa-clock me-2"></i><c:out value="${site.hoursWeekday}" /></p>
                         </div>
                         <div class="d-flex justify-content-between text-white mb-3">
-                            <h6 class="text-white mb-0">Saturday</h6>
-                            <p class="mb-0"> 8:00am - 7:00pm</p>
+                            <p class="mb-0"><c:out value="${site.hoursSaturday}" /></p>
                         </div>
                         <div class="d-flex justify-content-between text-white mb-3">
-                            <h6 class="text-white mb-0">Sunday</h6>
-                            <p class="mb-0"> 8:00am - 5:00pm</p>
+                            <p class="mb-0"><c:out value="${site.hoursSunday}" /></p>
                         </div>
                         <sec:authorize access="isAuthenticated()">
-                            <a class="btn btn-light" href="/book_appointment">Appointment</a>
+                            <a class="btn btn-light mt-auto" href="${pageContext.request.contextPath}/book_appointment">Appointment</a>
                         </sec:authorize>
                         <sec:authorize access="!isAuthenticated()">
-                            <a class="btn btn-light" href="/contact">Contact Us</a>
+                            <a class="btn btn-light mt-auto" href="${pageContext.request.contextPath}/contact">Contact Us</a>
                         </sec:authorize>
                     </div>
                 </div>
                 <div class="col-lg-4 wow zoomIn" data-wow-delay="0.3s">
                     <div class="bg-dark d-flex flex-column p-5" style="height: 300px;">
                         <h3 class="text-white mb-3">Our Services</h3>
-                        <p class="text-white mb-3">Trusted dental care for the whole family - cleaning, root canal, braces, whitening and implants.</p>
-                        <a class="btn btn-light mt-auto" href="/service">Explore Services</a>
+                        <p class="text-white mb-3"><c:out value="${site.serviceText}" /></p>
+                        <a class="btn btn-light mt-auto" href="${pageContext.request.contextPath}/service">Explore Services</a>
                     </div>
                 </div>
                 <div class="col-lg-4 wow zoomIn" data-wow-delay="0.6s">
@@ -132,13 +129,13 @@
                         <h3 class="text-white mb-3">Make Appointment</h3>
                         <sec:authorize access="isAuthenticated()">
                             <p class="text-white">Book your preferred time with our trusted and professional dentists.</p>
-                            <a href="tel:+919437123456" class="text-white text-decoration-none"><h2 class="text-white mb-0">+91 94371 23456</h2></a>
-                            <a class="btn btn-light mt-auto" href="/book_appointment">Book Now</a>
+                            <a href="tel:<c:out value='${site.footerPhone}' />" class="text-white text-decoration-none"><h2 class="text-white mb-0"><c:out value="${site.footerPhone}" /></h2></a>
+                            <a class="btn btn-light mt-auto" href="${pageContext.request.contextPath}/book_appointment">Book Now</a>
                         </sec:authorize>
                         <sec:authorize access="!isAuthenticated()">
                             <p class="text-white">Please login or register to book an appointment with our trusted dentists.</p>
-                            <a href="tel:+919437123456" class="text-white text-decoration-none"><h2 class="text-white mb-0">+91 94371 23456</h2></a>
-                            <a class="btn btn-light mt-auto" href="/login">Login to Book</a>
+                            <a href="tel:<c:out value='${site.footerPhone}' />" class="text-white text-decoration-none"><h2 class="text-white mb-0"><c:out value="${site.footerPhone}" /></h2></a>
+                            <a class="btn btn-light mt-auto" href="${pageContext.request.contextPath}/login">Login to Book</a>
                         </sec:authorize>
                     </div>
                 </div>
@@ -155,25 +152,25 @@
                 <div class="col-lg-7">
                     <div class="section-title mb-4">
                         <h5 class="position-relative d-inline-block text-primary text-uppercase">About Us</h5>
-                        <h1 class="display-5 mb-0">The World's Best Dental Clinic That You Can Trust</h1>
+                        <h1 class="display-5 mb-0"><c:out value="${site.aboutHeading}" /></h1>
                     </div>
-                    <h4 class="text-body fst-italic mb-4">Diam dolor diam ipsum sit. Clita erat ipsum et lorem stet no lorem sit clita duo justo magna dolore</h4>
-                    <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum et tempor sit. Aliqu diam amet diam et eos labore. Clita erat ipsum et lorem et sit, sed stet no labore lorem sit. Sanctus clita duo justo et tempor eirmod magna dolore erat amet</p>
+                    <h4 class="text-body fst-italic mb-4"><c:out value="${site.siteTagline}" /></h4>
+                    <p class="mb-4"><c:out value="${site.aboutText}" /></p>
                     <div class="row g-3">
                         <div class="col-sm-6 wow zoomIn" data-wow-delay="0.3s">
-                            <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>Award Winning</h5>
-                            <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>Professional Staff</h5>
+                            <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>Experienced Dentists</h5>
+                            <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>Gentle, Modern Care</h5>
                         </div>
                         <div class="col-sm-6 wow zoomIn" data-wow-delay="0.6s">
-                            <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>24/7 Opened</h5>
-                            <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>Fair Prices</h5>
+                            <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>Open 7 Days</h5>
+                            <h5 class="mb-3"><i class="fa fa-check-circle text-primary me-3"></i>Fair, Approved Prices</h5>
                         </div>
                     </div>
                     <sec:authorize access="isAuthenticated()">
-                    <a href="/book_appointment" class="btn btn-primary py-3 px-5 mt-4 wow zoomIn" data-wow-delay="0.6s">Make Appointment</a>
+                    <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-primary py-3 px-5 mt-4 wow zoomIn" data-wow-delay="0.6s">Make Appointment</a>
                     </sec:authorize>
                     <sec:authorize access="!isAuthenticated()">
-                    <a href="/contact" class="btn btn-primary py-3 px-5 mt-4 wow zoomIn" data-wow-delay="0.6s">Contact Us</a>
+                    <a href="${pageContext.request.contextPath}/contact" class="btn btn-primary py-3 px-5 mt-4 wow zoomIn" data-wow-delay="0.6s">Contact Us</a>
                     </sec:authorize>
                 </div>
                 <div class="col-lg-5" style="min-height: 500px;">
@@ -193,8 +190,8 @@
             <div class="row gx-5">
                 <div class="col-lg-6 py-5">
                     <div class="py-5">
-                        <h1 class="display-5 text-white mb-4">We Are A Certified and Award Winning Dental Clinic You Can Trust</h1>
-                        <p class="text-white mb-0">Eirmod sed tempor lorem ut dolores. Aliquyam sit sadipscing kasd ipsum. Dolor ea et dolore et at sea ea at dolor, justo ipsum duo rebum sea invidunt voluptua. Eos vero eos vero ea et dolore eirmod et. Dolores diam duo invidunt lorem. Elitr ut dolores magna sit. Sea dolore sanctus sed et. Takimata takimata sanctus sed.</p>
+                        <h1 class="display-5 text-white mb-4"><c:out value="${site.offerTitle}" /></h1>
+                        <p class="text-white mb-0"><c:out value="${site.offerText}" /></p>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -265,170 +262,92 @@
     <!-- Service Start -->
     <div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container">
-            <div class="row g-5 mb-5">
-                <div class="col-lg-5 wow zoomIn" data-wow-delay="0.3s" style="min-height: 400px;">
-                    <div class="twentytwenty-container position-relative h-100 rounded overflow-hidden">
-                        <img class="position-absolute w-100 h-100" src="img/before.jpg" style="object-fit: cover;">
-                        <img class="position-absolute w-100 h-100" src="img/after.jpg" style="object-fit: cover;">
+            <div class="text-center section-title mb-5">
+                <h5 class="position-relative d-inline-block text-primary text-uppercase">Our Services</h5>
+                <h1 class="display-5 mb-3"><c:out value="${site.serviceHeading}" /></h1>
+                <p class="mb-0 mx-auto" style="max-width:720px;"><c:out value="${site.serviceText}" /></p>
+            </div>
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5 wow zoomIn" data-wow-delay="0.3s">
+                    <div class="position-relative rounded overflow-hidden" style="min-height:420px;">
+                        <img class="position-absolute w-100 h-100" src="${pageContext.request.contextPath}/img/about.jpg" style="object-fit:cover;" alt="DentCare clinic">
                     </div>
                 </div>
                 <div class="col-lg-7">
-                    <div class="section-title mb-5">
-                        <h5 class="position-relative d-inline-block text-primary text-uppercase">Our Services</h5>
-                        <h1 class="display-5 mb-0">We Offer The Best Quality Dental Services</h1>
-                    </div>
-                    <div class="row g-5">
-                        <div class="col-md-6 service-item wow zoomIn" data-wow-delay="0.6s">
-                            <div class="rounded-top overflow-hidden">
-                                <img class="img-fluid" src="img/service-1.jpg" alt="">
+                    <div class="row g-4">
+                        <c:forEach var="sp" items="${servicePrices}" varStatus="s" end="3">
+                            <c:set var="imageIndex" value="${s.index % 4 + 1}" />
+                            <div class="col-sm-6 wow zoomIn" data-wow-delay="0.3s">
+                                <div class="service-item h-100 bg-light rounded overflow-hidden d-flex flex-column">
+                                    <img class="img-fluid" src="${pageContext.request.contextPath}/img/service-${imageIndex}.jpg" alt="<c:out value='${sp.serviceName}' />">
+                                    <div class="p-4 d-flex flex-column flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                            <h5 class="mb-0"><c:out value="${sp.serviceName}" /></h5>
+                                            <span class="badge text-white" style="background:#0f766e;">₹<fmt:formatNumber value="${sp.fee}" minFractionDigits="0" maxFractionDigits="0" /></span>
+                                        </div>
+                                        <p class="small mb-3" style="color:#52627a;"><c:out value="${empty sp.description ? 'Delivered by an experienced DentCare dentist with clear pricing.' : sp.description}" /></p>
+                                        <a class="btn btn-sm btn-primary mt-auto align-self-start" href="${pageContext.request.contextPath}/book_appointment">Book this treatment</a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="position-relative bg-light rounded-bottom text-center p-4">
-                                <h5 class="m-0">Cosmetic Dentistry</h5>
-                            </div>
-                        </div>
-                        <div class="col-md-6 service-item wow zoomIn" data-wow-delay="0.9s">
-                            <div class="rounded-top overflow-hidden">
-                                <img class="img-fluid" src="img/service-2.jpg" alt="">
-                            </div>
-                            <div class="position-relative bg-light rounded-bottom text-center p-4">
-                                <h5 class="m-0">Dental Implants</h5>
-                            </div>
-                        </div>
+                        </c:forEach>
+                        <c:if test="${empty servicePrices}">
+                            <div class="col-12"><div class="alert alert-info mb-0">Our treatment list is being updated. Please call the clinic or send us a message.</div></div>
+                        </c:if>
                     </div>
                 </div>
             </div>
-            <div class="row g-5 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="col-lg-7">
-                    <div class="row g-5">
-                        <div class="col-md-6 service-item wow zoomIn" data-wow-delay="0.3s">
-                            <div class="rounded-top overflow-hidden">
-                                <img class="img-fluid" src="img/service-3.jpg" alt="">
-                            </div>
-                            <div class="position-relative bg-light rounded-bottom text-center p-4">
-                                <h5 class="m-0">Dental Bridges</h5>
-                            </div>
-                        </div>
-                        <div class="col-md-6 service-item wow zoomIn" data-wow-delay="0.6s">
-                            <div class="rounded-top overflow-hidden">
-                                <img class="img-fluid" src="img/service-4.jpg" alt="">
-                            </div>
-                            <div class="position-relative bg-light rounded-bottom text-center p-4">
-                                <h5 class="m-0">Teeth Whitening</h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5 service-item wow zoomIn" data-wow-delay="0.9s">
-                    <div class="position-relative bg-primary rounded h-100 d-flex flex-column align-items-center justify-content-center text-center p-4">
-                        <h3 class="text-white mb-3">Make Appointment</h3>
-                        <p class="text-white mb-3">Clita ipsum magna kasd rebum at ipsum amet dolor justo dolor est magna stet eirmod</p>
-                        <a href="tel:+919437123456" class="text-white text-decoration-none"><h2 class="text-white mb-0">+91 94371 23456</h2></a>
-                    </div>
-                </div>
+            <div class="text-center mt-5">
+                <a href="${pageContext.request.contextPath}/service" class="btn btn-primary py-3 px-5">View all services</a>
             </div>
         </div>
     </div>
     <!-- Service End -->
 
 
-    <!-- Offer Start -->
-    <div class="container-fluid bg-offer my-5 py-5 wow fadeInUp" data-wow-delay="0.1s">
-        <div class="container py-5">
-            <div class="row justify-content-center">
-                <div class="col-lg-7 wow zoomIn" data-wow-delay="0.6s">
-                    <div class="offer-text text-center rounded p-5">
-                        <h1 class="display-5 text-white">Save 30% On Your First Dental Checkup</h1>
-                        <p class="text-white mb-4">Eirmod sed tempor lorem ut dolores sit kasd ipsum. Dolor ea et dolore et at sea ea at dolor justo ipsum duo rebum sea. Eos vero eos vero ea et dolore eirmod diam duo lorem magna sit dolore sed et.</p>
-                        <sec:authorize access="isAuthenticated()">
-                        <a href="/book_appointment" class="btn btn-dark py-3 px-5 me-3">Appointment</a>
-                        </sec:authorize>
-                        <a href="/service" class="btn btn-light py-3 px-5">Read More</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Offer End -->
+
 
 
     <!-- Pricing Start -->
     <div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container">
             <div class="row g-5">
-                <div class="col-lg-5">
+                <div class="col-lg-4">
                     <div class="section-title mb-4">
                         <h5 class="position-relative d-inline-block text-primary text-uppercase">Pricing Plan</h5>
-                        <h1 class="display-5 mb-0">We Offer Fair Prices for Dental Treatment</h1>
+                        <h1 class="display-5 mb-0"><c:out value="${site.pricingHeading}" /></h1>
                     </div>
-                    <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum et tempor sit. Aliqu diam amet diam et eos labore. Clita erat ipsum et lorem et sit, sed stet no labore lorem sit. Sanctus clita duo justo eirmod magna dolore erat amet</p>
-                    <h5 class="text-uppercase text-primary wow fadeInUp" data-wow-delay="0.3s">Call for Appointment</h5>
-                    <a href="tel:+919437123456" class="text-decoration-none" style="color: inherit;"><h1 class="wow fadeInUp" data-wow-delay="0.6s">+91 94371 23456</h1></a>
+                    <p class="mb-4"><c:out value="${site.pricingText}" /></p>
+                    <h5 class="text-uppercase" style="color:#0b5d57;">Call for Appointment</h5>
+                    <a href="tel:<c:out value='${site.footerPhone}' />" class="text-decoration-none" style="color:inherit;"><h1 class="wow fadeInUp" data-wow-delay="0.6s"><c:out value="${site.footerPhone}" /></h1></a>
+                    <a href="${pageContext.request.contextPath}/price" class="btn btn-primary py-3 px-5 mt-3">Compare all prices</a>
                 </div>
-                <div class="col-lg-7">
-                    <div class="owl-carousel price-carousel wow zoomIn" data-wow-delay="0.9s">
-                        <div class="price-item pb-4">
-                            <div class="position-relative">
-                                <img class="img-fluid rounded-top" src="img/price-1.jpg" alt="">
-                                <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">&#8377; 2999</h2>
+                <div class="col-lg-8">
+                    <div class="row g-4">
+                        <c:forEach var="sp" items="${servicePrices}" varStatus="s" end="5">
+                            <c:set var="priceImage" value="${s.index % 3 + 1}" />
+                            <div class="col-md-6 col-xl-4 wow zoomIn" data-wow-delay="0.3s">
+                                <div class="price-item pb-4 h-100">
+                                    <div class="position-relative">
+                                        <img class="img-fluid rounded-top w-100" src="${pageContext.request.contextPath}/img/price-${priceImage}.jpg" alt="<c:out value='${sp.serviceName}' />" style="height:150px;object-fit:cover;">
+                                        <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index:2;">
+                                            <h2 class="m-0" style="color:#0b5d57;">₹<fmt:formatNumber value="${sp.fee}" minFractionDigits="0" maxFractionDigits="0" /></h2>
+                                        </div>
+                                    </div>
+                                    <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4 d-flex flex-column h-100">
+                                        <h4><c:out value="${sp.serviceName}" /></h4>
+                                        <hr class="text-primary w-50 mx-auto mt-0">
+                                        <p class="small mb-3" style="color:#52627a;"><c:out value="${empty sp.description ? 'Clear pricing and a personalised treatment plan.' : sp.description}" /></p>
+                                        <div class="d-flex justify-content-between mb-2"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
+                                        <div class="d-flex justify-content-between mb-2"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
+                                        <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-primary py-2 px-4 mt-auto">Book now</a>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
-                                <h4>Teeth Whitening</h4>
-                                <hr class="text-primary w-50 mx-auto mt-0">
-                                <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <sec:authorize access="isAuthenticated()">
-                                <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
-                                </sec:authorize>
-                                <sec:authorize access="!isAuthenticated()">
-                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
-                                </sec:authorize>
-                            </div>
-                        </div>
-                        <div class="price-item pb-4">
-                            <div class="position-relative">
-                                <img class="img-fluid rounded-top" src="img/price-2.jpg" alt="">
-                                <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">&#8377; 4999</h2>
-                                </div>
-                            </div>
-                            <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
-                                <h4>Dental Implant</h4>
-                                <hr class="text-primary w-50 mx-auto mt-0">
-                                <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <sec:authorize access="isAuthenticated()">
-                                <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
-                                </sec:authorize>
-                                <sec:authorize access="!isAuthenticated()">
-                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
-                                </sec:authorize>
-                            </div>
-                        </div>
-                        <div class="price-item pb-4">
-                            <div class="position-relative">
-                                <img class="img-fluid rounded-top" src="img/price-3.jpg" alt="">
-                                <div class="d-flex align-items-center justify-content-center bg-light rounded pt-2 px-3 position-absolute top-100 start-50 translate-middle" style="z-index: 2;">
-                                    <h2 class="text-primary m-0">&#8377; 8999</h2>
-                                </div>
-                            </div>
-                            <div class="position-relative text-center bg-light border-bottom border-primary py-5 p-4">
-                                <h4>Root Canal</h4>
-                                <hr class="text-primary w-50 mx-auto mt-0">
-                                <div class="d-flex justify-content-between mb-3"><span>Modern Equipment</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-3"><span>Professional Dentist</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <div class="d-flex justify-content-between mb-2"><span>24/7 Call Support</span><i class="fa fa-check text-primary pt-1"></i></div>
-                                <sec:authorize access="isAuthenticated()">
-                                <a href="/book_appointment" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Appointment</a>
-                                </sec:authorize>
-                                <sec:authorize access="!isAuthenticated()">
-                                <a href="/contact" class="btn btn-primary py-2 px-4 position-absolute top-100 start-50 translate-middle">Contact Us</a>
-                                </sec:authorize>
-                            </div>
-                        </div>
+                        </c:forEach>
+                        <c:if test="${empty servicePrices}">
+                            <div class="col-12"><div class="alert alert-info mb-0">Prices are being updated. Please contact the clinic for a quote.</div></div>
+                        </c:if>
                     </div>
                 </div>
             </div>
@@ -438,25 +357,37 @@
 
 
     <!-- Testimonial Start -->
-    <div class="container-fluid bg-primary bg-testimonial py-5 my-5 wow fadeInUp" data-wow-delay="0.1s">
-        <div class="container py-5">
-            <div class="row justify-content-center">
-                <div class="col-lg-7">
-                    <div class="owl-carousel testimonial-carousel rounded p-5 wow zoomIn" data-wow-delay="0.6s">
-                        <div class="testimonial-item text-center text-white">
-                            <img class="img-fluid mx-auto rounded mb-4" src="img/testimonial-1.jpg" alt="">
-                            <p class="fs-5">Dolores sed duo clita justo dolor et stet lorem kasd dolore lorem ipsum. At lorem lorem magna ut et, nonumy labore diam erat. Erat dolor rebum sit ipsum.</p>
-                            <hr class="mx-auto w-25">
-                            <h4 class="text-white mb-0">Client Name</h4>
-                        </div>
-                        <div class="testimonial-item text-center text-white">
-                            <img class="img-fluid mx-auto rounded mb-4" src="img/testimonial-2.jpg" alt="">
-                            <p class="fs-5">Dolores sed duo clita justo dolor et stet lorem kasd dolore lorem ipsum. At lorem lorem magna ut et, nonumy labore diam erat. Erat dolor rebum sit ipsum.</p>
-                            <hr class="mx-auto w-25">
-                            <h4 class="text-white mb-0">Client Name</h4>
+    <div class="container-fluid py-5 my-5 wow fadeInUp" data-wow-delay="0.1s" style="background:#0b172a;">
+        <div class="container py-4">
+            <div class="text-center section-title mb-5">
+                <h5 class="position-relative d-inline-block text-uppercase" style="color:#a8eadf;">Patient Stories</h5>
+                <h1 class="display-5 text-white mb-3"><c:out value="${site.testimonialHeading}" /></h1>
+                <p class="mb-0 mx-auto" style="max-width:700px;color:#d8e5f2;"><c:out value="${site.testimonialText}" /></p>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <c:forEach var="t" items="${testimonials}" varStatus="s" end="5">
+                    <div class="col-md-6 col-xl-4 wow zoomIn" data-wow-delay="0.3s">
+                        <div class="bg-white rounded p-4 h-100 d-flex flex-column">
+                            <div class="mb-2" style="color:#92400e;">
+                                <c:forEach begin="1" end="${t.rating}"><i class="fa fa-star"></i></c:forEach>
+                            </div>
+                            <p class="mb-4" style="color:#33445c;">&ldquo;<c:out value="${t.message}" />&rdquo;</p>
+                            <div class="d-flex align-items-center gap-3 mt-auto">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#eaf7f4;color:#0b5d57;font-weight:800;"><c:out value="${t.initial}" /></div>
+                                <div>
+                                    <div class="fw-bold" style="color:#10243e;"><c:out value="${t.patientName}" /></div>
+                                    <div class="small" style="color:#5b6b82;"><c:out value="${empty t.treatment ? 'DentCare patient' : t.treatment}" /></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </c:forEach>
+                <c:if test="${empty testimonials}">
+                    <div class="col-lg-8"><div class="alert alert-light mb-0 text-center">Patient reviews will appear here soon.</div></div>
+                </c:if>
+            </div>
+            <div class="text-center mt-5">
+                <a href="${pageContext.request.contextPath}/testimonial" class="btn btn-light py-3 px-5">Read all reviews</a>
             </div>
         </div>
     </div>
@@ -466,124 +397,61 @@
     <!-- Team Start -->
     <div class="container-fluid py-5">
         <div class="container">
-            <div class="row g-5">
+            <div class="row g-4 align-items-stretch">
                 <div class="col-lg-4 wow slideInUp" data-wow-delay="0.1s">
-                    <div class="section-title bg-light rounded h-100 p-5">
-                        <h5 class="position-relative d-inline-block text-primary text-uppercase">Our Dentist</h5>
-                        <h1 class="display-6 mb-4">Meet Our Certified & Experienced Dentist</h1>
-                        <sec:authorize access="isAuthenticated()">
-                        <a href="/book_appointment" class="btn btn-primary py-3 px-5">Appointment</a>
-                        </sec:authorize>
-                        <sec:authorize access="!isAuthenticated()">
-                        <a href="/contact" class="btn btn-primary py-3 px-5">Contact Us</a>
-                        </sec:authorize>
+                    <div class="section-title bg-light rounded h-100 p-5 d-flex flex-column justify-content-center">
+                        <h5 class="position-relative d-inline-block text-primary text-uppercase">Our Dentists</h5>
+                        <h1 class="display-6 mb-3"><c:out value="${site.teamHeading}" /></h1>
+                        <p style="color:#52627a;"><c:out value="${site.teamText}" /></p>
+                        <a href="${pageContext.request.contextPath}/team" class="btn btn-primary py-3 px-5 align-self-start mt-2">Meet the team</a>
                     </div>
                 </div>
-                <div class="col-lg-4 wow slideInUp" data-wow-delay="0.3s">
-                    <div class="team-item">
-                        <div class="position-relative rounded-top" style="z-index: 1;">
-                            <img class="img-fluid rounded-top w-100" src="img/team-1.jpg" alt="">
-                            <div class="position-absolute top-100 start-50 translate-middle bg-light rounded p-2 d-flex">
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-twitter fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-facebook-f fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-linkedin-in fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-instagram fw-normal"></i></a>
+                <c:forEach var="doc" items="${doctors}" varStatus="s" end="2">
+                    <div class="col-md-6 col-lg-4 wow slideInUp" data-wow-delay="0.3s">
+                        <div class="team-item h-100 d-flex flex-column">
+                            <div class="position-relative rounded-top" style="z-index:1;">
+                                <c:choose>
+                                    <c:when test="${not empty doc.profileImagePath}">
+                                        <img class="img-fluid rounded-top w-100" src="${pageContext.request.contextPath}${doc.profileImagePath}" alt="<c:out value='${doc.name}' />" style="height:260px;object-fit:cover;">
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:set var="teamImage" value="${s.index % 3 + 1}" />
+                                        <img class="img-fluid rounded-top w-100" src="${pageContext.request.contextPath}/img/team-${teamImage}.jpg" alt="<c:out value='${doc.name}' />" style="height:260px;object-fit:cover;">
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                            <div class="team-text position-relative bg-light text-center rounded-bottom p-4 flex-grow-1">
+                                <h4 class="mb-1"><c:out value="${doc.name}" /></h4>
+                                <p class="mb-2" style="color:#0b5d57;font-weight:600;"><c:out value="${doc.specialization}" /></p>
+                                <p class="small mb-3" style="color:#52627a;"><c:out value="${empty doc.description ? 'Experienced DentCare dentist focused on gentle, clear care.' : doc.description}" /></p>
+                                <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-sm btn-primary">Book a visit</a>
                             </div>
                         </div>
-                        <div class="team-text position-relative bg-light text-center rounded-bottom p-4 pt-5">
-                            <h4 class="mb-2">Dr. John Doe</h4>
-                            <p class="text-primary mb-0">Implant Surgeon</p>
-                        </div>
                     </div>
-                </div>
-                <div class="col-lg-4 wow slideInUp" data-wow-delay="0.6s">
-                    <div class="team-item">
-                        <div class="position-relative rounded-top" style="z-index: 1;">
-                            <img class="img-fluid rounded-top w-100" src="img/team-2.jpg" alt="">
-                            <div class="position-absolute top-100 start-50 translate-middle bg-light rounded p-2 d-flex">
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-twitter fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-facebook-f fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-linkedin-in fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-instagram fw-normal"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-text position-relative bg-light text-center rounded-bottom p-4 pt-5">
-                            <h4 class="mb-2">Dr. John Doe</h4>
-                            <p class="text-primary mb-0">Implant Surgeon</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 wow slideInUp" data-wow-delay="0.1s">
-                    <div class="team-item">
-                        <div class="position-relative rounded-top" style="z-index: 1;">
-                            <img class="img-fluid rounded-top w-100" src="img/team-3.jpg" alt="">
-                            <div class="position-absolute top-100 start-50 translate-middle bg-light rounded p-2 d-flex">
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-twitter fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-facebook-f fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-linkedin-in fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-instagram fw-normal"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-text position-relative bg-light text-center rounded-bottom p-4 pt-5">
-                            <h4 class="mb-2">Dr. John Doe</h4>
-                            <p class="text-primary mb-0">Implant Surgeon</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 wow slideInUp" data-wow-delay="0.3s">
-                    <div class="team-item">
-                        <div class="position-relative rounded-top" style="z-index: 1;">
-                            <img class="img-fluid rounded-top w-100" src="img/team-4.jpg" alt="">
-                            <div class="position-absolute top-100 start-50 translate-middle bg-light rounded p-2 d-flex">
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-twitter fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-facebook-f fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-linkedin-in fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-instagram fw-normal"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-text position-relative bg-light text-center rounded-bottom p-4 pt-5">
-                            <h4 class="mb-2">Dr. John Doe</h4>
-                            <p class="text-primary mb-0">Implant Surgeon</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 wow slideInUp" data-wow-delay="0.6s">
-                    <div class="team-item">
-                        <div class="position-relative rounded-top" style="z-index: 1;">
-                            <img class="img-fluid rounded-top w-100" src="img/team-5.jpg" alt="">
-                            <div class="position-absolute top-100 start-50 translate-middle bg-light rounded p-2 d-flex">
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-twitter fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-facebook-f fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-linkedin-in fw-normal"></i></a>
-                                <a class="btn btn-primary btn-square m-1" href="#"><i class="fab fa-instagram fw-normal"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-text position-relative bg-light text-center rounded-bottom p-4 pt-5">
-                            <h4 class="mb-2">Dr. John Doe</h4>
-                            <p class="text-primary mb-0">Implant Surgeon</p>
-                        </div>
-                    </div>
-                </div>
+                </c:forEach>
+                <c:if test="${empty doctors}">
+                    <div class="col-lg-8"><div class="alert alert-info mb-0">Our dentist profiles are being updated. Please contact the clinic to book.</div></div>
+                </c:if>
             </div>
         </div>
     </div>
     <!-- Team End -->
 
 
-    <!-- Newsletter Start -->
-    <div class="container-fluid position-relative pt-5 wow fadeInUp" data-wow-delay="0.1s" style="z-index: 1;">
+    <!-- Booking CTA Start -->
+    <div class="container-fluid py-5 wow fadeInUp" data-wow-delay="0.1s">
         <div class="container">
-            <div class="bg-primary p-5">
-                <form class="mx-auto" style="max-width: 600px;">
-                    <div class="input-group">
-                        <input type="text" class="form-control border-white p-3" placeholder="Your Email">
-                        <button class="btn btn-dark px-4">Sign Up</button>
-                    </div>
-                </form>
+            <div class="rounded p-5 text-center" style="background:linear-gradient(120deg,#0b172a 0%,#0f4f4a 60%,#0f766e 100%);">
+                <h2 class="display-6 text-white mb-3">Ready for a calmer dental visit?</h2>
+                <p class="mb-4 mx-auto" style="max-width:620px;color:#d8e5f2;">Pick a dentist, choose a treatment and see the exact approved fee before you pay. Booking takes about two minutes.</p>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-light py-3 px-5">Book an appointment</a>
+                    <a href="${pageContext.request.contextPath}/contact" class="btn btn-outline-light py-3 px-5">Ask a question</a>
+                </div>
             </div>
         </div>
     </div>
-    <!-- Newsletter End -->
+    <!-- Booking CTA End -->
     
 
     <!-- Footer Start -->

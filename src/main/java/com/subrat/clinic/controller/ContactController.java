@@ -1,5 +1,7 @@
 package com.subrat.clinic.controller;
 
+import com.subrat.clinic.model.ContactMessage;
+import com.subrat.clinic.service.ContactMessageService;
 import com.subrat.clinic.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,15 +15,36 @@ public class ContactController {
     @Autowired
     private MailService mailService;
 
+    @Autowired
+    private ContactMessageService contactMessageService;
+
     @PostMapping("/contact")
     public String submitContact(@RequestParam String name,
                                 @RequestParam String email,
                                 @RequestParam String subject,
                                 @RequestParam String message,
                                 RedirectAttributes redirectAttributes) {
-        mailService.sendContactMessage(name, email, subject, message);
+        String cleanName = name == null ? "" : name.trim();
+        String cleanEmail = email == null ? "" : email.trim();
+        String cleanSubject = subject == null ? "" : subject.trim();
+        String cleanMessage = message == null ? "" : message.trim();
+        if (cleanName.length() < 2 || cleanEmail.isEmpty() || !cleanEmail.contains("@")
+                || cleanSubject.isEmpty() || cleanMessage.length() < 5) {
+            redirectAttributes.addFlashAttribute("error",
+                    "Please enter your name, a valid email, a subject and a message.");
+            return "redirect:/contact";
+        }
+
+        ContactMessage stored = new ContactMessage();
+        stored.setName(cleanName);
+        stored.setEmail(cleanEmail);
+        stored.setSubject(cleanSubject);
+        stored.setMessage(cleanMessage);
+        contactMessageService.save(stored);
+
+        mailService.sendContactMessage(cleanName, cleanEmail, cleanSubject, cleanMessage);
         redirectAttributes.addFlashAttribute("success",
-                "Thank you, " + name + "! Your message has been sent.");
+                "Thank you, " + cleanName + "! Your message has been sent. Our team will reply soon.");
         return "redirect:/contact";
     }
 }

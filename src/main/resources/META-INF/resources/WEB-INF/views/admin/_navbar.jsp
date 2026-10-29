@@ -1,8 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <nav class="navbar navbar-expand-xl navbar-dark shadow-sm px-4 py-2" style="background: linear-gradient(90deg, #0f1f3a 0%, #0b6f8f 100%);">
-    <sec:authorize access="hasRole('ADMIN')"><a href="${pageContext.request.contextPath}/admin/dashboard" class="navbar-brand fw-bold d-flex align-items-center gap-2"><i class="fa fa-tooth"></i><span>DentCare Admin</span></a></sec:authorize>
-    <sec:authorize access="hasRole('DOCTOR')"><a href="${pageContext.request.contextPath}/doctor/dashboard" class="navbar-brand fw-bold d-flex align-items-center gap-2"><i class="fa fa-tooth"></i><span>DentCare Doctor</span></a></sec:authorize>
+    <sec:authorize access="hasRole('ADMIN')"><a href="${pageContext.request.contextPath}/admin/dashboard" class="navbar-brand fw-bold d-flex align-items-center gap-2"><i class="bi bi-heart-pulse"></i><span>DentCare Admin</span></a></sec:authorize>
+    <sec:authorize access="hasRole('DOCTOR')"><a href="${pageContext.request.contextPath}/doctor/dashboard" class="navbar-brand fw-bold d-flex align-items-center gap-2"><i class="bi bi-heart-pulse"></i><span>DentCare Doctor</span></a></sec:authorize>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -25,7 +25,14 @@
                 <li class="nav-item">
                     <a class="nav-link px-3 ${activePage == 'doctorFees' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/doctor-fees">
                         <i class="bi bi-clipboard2-check me-1"></i>Doctor Fees
-                        <c:if test="${pendingFeeCount > 0}"><span class="badge bg-warning text-dark ms-1">${pendingFeeCount}</span></c:if>
+                        <c:if test="${pendingFeeCount > 0}"><span class="badge ms-1" style="background:#92400e;color:#fff;">${pendingFeeCount}</span></c:if>
+                    </a>
+                </li>
+                <li class="nav-item"><a class="nav-link px-3 ${activePage == 'testimonials' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/testimonials"><i class="bi bi-chat-quote me-1"></i>Reviews</a></li>
+                <li class="nav-item">
+                    <a class="nav-link px-3 ${activePage == 'messages' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/messages">
+                        <i class="bi bi-envelope me-1"></i>Inbox
+                        <c:if test="${unreadMessages > 0}"><span class="badge ms-1" style="background:#1d4ed8;color:#fff;">${unreadMessages}</span></c:if>
                     </a>
                 </li>
                 <li class="nav-item"><a class="nav-link px-3 ${activePage == 'invoices' ? 'active fw-semibold' : ''}" href="${pageContext.request.contextPath}/admin/invoices"><i class="bi bi-receipt me-1"></i>Invoices</a></li>

@@ -14,14 +14,14 @@
         body { background: #f5f8fc; color: #172b4d; }
         .panel { border: 1px solid #e4ebf3; border-radius: 1rem; background: #fff; overflow: hidden; }
         .panel-head { padding: 1rem 1.25rem; border-bottom: 1px solid #eef2f7; }
-        .table thead th { color: #7b8aa0; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+        .table thead th { color: #52627a; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
         .badge-soft { border-radius: 999px; padding: .2rem .55rem; font-size: .72rem; font-weight: 700; }
         .badge-soft-success { background: #e7f7ef; color: #15803d; }
-        .badge-soft-warning { background: #fff6e5; color: #b45309; }
+        .badge-soft-warning { background: #fff6e5; color: #92400e; }
         .badge-soft-info { background: #e6f7fa; color: #0e7490; }
         .stat-mini { border: 1px solid #e4ebf3; border-radius: .9rem; background: #fff; padding: .8rem 1rem; }
         .stat-mini .num { font-size: 1.3rem; font-weight: 800; line-height: 1.1; }
-        .stat-mini .lbl { color: #7b8aa0; font-size: .73rem; font-weight: 600; }
+        .stat-mini .lbl { color: #52627a; font-size: .73rem; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -64,7 +64,7 @@
                                         <c:otherwise>
                                             <div class="d-inline-flex gap-1">
                                                 <a class="btn btn-sm btn-outline-secondary" href="${pageContext.request.contextPath}/booking/confirmation/${a.paymentReference}" target="_blank" rel="noopener" title="Open"><i class="bi bi-box-arrow-up-right"></i></a>
-                                                <a class="btn btn-sm btn-outline-secondary" href="${pageContext.request.contextPath}/booking/receipt/${a.paymentReference}/download" title="Download"><i class="bi bi-download"></i></a>
+                                                <a class="btn btn-sm btn-outline-secondary" href="${pageContext.request.contextPath}/booking/receipt/${a.paymentReference}/download" title="Download PDF receipt"><i class="bi bi-file-earmark-pdf"></i></a>
                                             </div>
                                         </c:otherwise>
                                     </c:choose>

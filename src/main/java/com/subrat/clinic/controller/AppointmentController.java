@@ -13,8 +13,10 @@ import com.subrat.clinic.service.AppointmentService;
 import com.subrat.clinic.service.DoctorFeeService;
 import com.subrat.clinic.service.DoctorService;
 import com.subrat.clinic.service.PatientService;
+import com.subrat.clinic.service.ReceiptPdfService;
 import com.subrat.clinic.service.ServicePriceService;
 import com.subrat.clinic.service.SiteSettingService;
+import com.subrat.clinic.service.TestimonialService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,7 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,6 +72,12 @@ public class AppointmentController {
     private SiteSettingService siteSettingService;
 
     @Autowired
+    private TestimonialService testimonialService;
+
+    @Autowired
+    private ReceiptPdfService receiptPdfService;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     // Home page
@@ -78,7 +85,8 @@ public class AppointmentController {
     public String showHomePage(Model model) throws Exception {
         model.addAttribute("appointment", new Appointment());
         model.addAttribute("doctors", clinicians());
-        model.addAttribute("servicePrices", servicePriceService.findAll());
+        model.addAttribute("servicePrices", servicePriceService.findActive());
+        model.addAttribute("testimonials", testimonialService.findActive());
         model.addAttribute("doctorFeesJson", bookingFeeJson());
         model.addAttribute("consultationFee", siteSettingService.getConsultationFee());
         return "index";
@@ -89,7 +97,7 @@ public class AppointmentController {
     public String showBookAppointmentForm(Authentication authentication, Model model) throws Exception {
         model.addAttribute("appointment", new Appointment());
         model.addAttribute("doctors", clinicians());
-        model.addAttribute("servicePrices", servicePriceService.findAll());
+        model.addAttribute("servicePrices", servicePriceService.findActive());
         model.addAttribute("doctorFeesJson", bookingFeeJson());
         model.addAttribute("consultationFee", siteSettingService.getConsultationFee());
         model.addAttribute("booker", authentication == null ? null
@@ -143,7 +151,7 @@ public class AppointmentController {
                     siteSettingService.getConsultationFee());
         } else {
             ServicePrice price = servicePriceService.findByServiceName(service);
-            if (price == null || price.getFee() == null) {
+            if (price == null || !price.isActive() || price.getFee() == null) {
                 redirectAttributes.addFlashAttribute("error",
                         "The selected treatment is not available right now. Please choose another treatment.");
                 return "redirect:/book_appointment";
@@ -314,14 +322,32 @@ public class AppointmentController {
         if (appointment == null) {
             return ResponseEntity.notFound().build();
         }
-        String html = buildReceiptHtml(appointment);
+        byte[] pdf = receiptPdfService.generate(appointment);
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("text", "html", StandardCharsets.UTF_8));
+        headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDisposition(ContentDisposition.attachment()
-                .filename("DentCare-Receipt-" + appointment.getPaymentReference() + ".html")
+                .filename("DentCare-Receipt-" + appointment.getPaymentReference() + ".pdf")
                 .build());
-        return new ResponseEntity<>(html.getBytes(StandardCharsets.UTF_8), headers,
-                org.springframework.http.HttpStatus.OK);
+        headers.setContentLength(pdf.length);
+        return new ResponseEntity<>(pdf, headers, org.springframework.http.HttpStatus.OK);
+    }
+
+    // Live fee feed used by the booking form. It keeps an open booking page in
+    // sync with admin approvals without requiring a page reload or a restart.
+    @GetMapping(value = "/api/booking/fees", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, Object> bookingFees() {
+        Map<String, Object> payload = new java.util.LinkedHashMap<>();
+        payload.put("consultationFee", siteSettingService.getConsultationFee());
+        payload.put("doctorFees", doctorFeeService.approvedFeeMap());
+        payload.put("services", servicePriceService.findActive().stream().map(price -> {
+            Map<String, Object> item = new java.util.LinkedHashMap<>();
+            item.put("name", price.getServiceName());
+            item.put("fee", price.getFee());
+            item.put("description", price.getDescription());
+            return item;
+        }).toList());
+        return payload;
     }
 
     // Logged-in patient: upcoming, history and cancelled appointments.
@@ -420,17 +446,20 @@ public class AppointmentController {
     }
 
     @GetMapping("/about")
-    public String showAboutPage() {
+    public String showAboutPage(Model model) {
+        model.addAttribute("servicePrices", servicePriceService.findActive());
         return "about";
     }
 
     @GetMapping("/service")
-    public String showService() {
+    public String showService(Model model) {
+        model.addAttribute("servicePrices", servicePriceService.findActive());
         return "service";
     }
 
     @GetMapping("/testimonial")
-    public String showTestimonial() {
+    public String showTestimonial(Model model) {
+        model.addAttribute("testimonials", testimonialService.findActive());
         return "testimonial";
     }
 
@@ -442,7 +471,7 @@ public class AppointmentController {
 
     @GetMapping("/price")
     public String showPricingPage(Model model) {
-        model.addAttribute("servicePrices", servicePriceService.findAll());
+        model.addAttribute("servicePrices", servicePriceService.findActive());
         model.addAttribute("consultationFee", siteSettingService.getConsultationFee());
         return "price";
     }
@@ -483,86 +512,6 @@ public class AppointmentController {
         int month = Integer.parseInt(value.substring(0, 2));
         int year = 2000 + Integer.parseInt(value.substring(3));
         return !YearMonth.of(year, month).isBefore(YearMonth.now());
-    }
-
-    private String buildReceiptHtml(Appointment appointment) {
-        String siteName = escape(siteSettingService.get("siteName"));
-        String address = escape(siteSettingService.get("footerAddress"));
-        String phone = escape(siteSettingService.get("footerPhone"));
-        String email = escape(siteSettingService.get("footerEmail"));
-        String title = escape(siteSettingService.get("receiptTitle"));
-        String note = escape(siteSettingService.get("receiptNote"));
-        String footer = escape(siteSettingService.get("receiptFooter"));
-        String method = appointment.getPaymentMethod() == null
-                ? "—" : escape(appointment.getPaymentMethod().getLabel());
-        String amount = appointment.getAmount() == null ? "0.00"
-                : appointment.getAmount().setScale(2, java.math.RoundingMode.HALF_UP).toPlainString();
-
-        return """
-                <!DOCTYPE html>
-                <html lang="en"><head><meta charset="utf-8">
-                <title>%s · %s</title>
-                <style>
-                  body{font-family:Segoe UI,Arial,sans-serif;background:#f4f7fa;color:#172b4d;margin:0;padding:32px}
-                  .sheet{max-width:720px;margin:0 auto;background:#fff;border:1px solid #e3eaf2;border-radius:14px;overflow:hidden}
-                  .head{background:#0f766e;color:#fff;padding:26px 32px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-                  .head h1{margin:0;font-size:22px}.head p{margin:4px 0 0;color:#cdeee8;font-size:13px}
-                  .body{padding:28px 32px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;margin-bottom:22px}
-                  .label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#7a8aa0}
-                  .value{font-weight:600;margin-top:3px}
-                  table{width:100%%;border-collapse:collapse}td{padding:10px 0;border-bottom:1px dashed #e3eaf2}
-                  td:last-child{text-align:right;font-weight:600}.total td{border-bottom:0;font-size:18px;color:#0f766e}
-                  .note{background:#f1faf8;border:1px solid #d5eee9;border-radius:9px;padding:12px 14px;font-size:13px;color:#315b56;margin-top:18px}
-                  .foot{border-top:1px solid #e3eaf2;padding:16px 32px;color:#7a8aa0;font-size:12px}
-                  @media print{body{background:#fff;padding:0}.sheet{border:0;border-radius:0}}
-                </style></head><body><div class="sheet">
-                  <div class="head"><div><h1>%s</h1><p>%s · %s · %s</p></div><div style="text-align:right"><div style="font-size:12px;color:#cdeee8">REFERENCE</div><strong>%s</strong></div></div>
-                  <div class="body">
-                    <div class="grid">
-                      <div><div class="label">Patient</div><div class="value">%s</div></div>
-                      <div><div class="label">Doctor</div><div class="value">%s</div></div>
-                      <div><div class="label">Visit type</div><div class="value">%s</div></div>
-                      <div><div class="label">Service</div><div class="value">%s</div></div>
-                      <div><div class="label">Appointment</div><div class="value">%s at %s</div></div>
-                      <div><div class="label">Status</div><div class="value">%s</div></div>
-                    </div>
-                    <table>
-                      <tr><td>Payment method</td><td>%s</td></tr>
-                      <tr><td>Payment detail</td><td>%s</td></tr>
-                      <tr><td>Payment status</td><td>%s</td></tr>
-                      <tr><td>Booking reference</td><td>%s</td></tr>
-                      <tr><td>Paid on</td><td>%s</td></tr>
-                      <tr class="total"><td>Amount</td><td>₹%s</td></tr>
-                    </table>
-                    <div class="note">%s</div>
-                  </div>
-                  <div class="foot">%s<br>%s</div>
-                </div></body></html>
-                """.formatted(
-                title, siteName, siteName, address, phone, email,
-                escape(appointment.getPaymentReference()),
-                escape(appointment.getPatientName()),
-                escape(appointment.getDoctorName()),
-                appointment.getAppointmentType().getLabel(),
-                escape(appointment.getService()),
-                appointment.getAppointmentDate(), appointment.getAppointmentTime(),
-                appointment.getStatus().getLabel(),
-                method,
-                escape(appointment.getPaymentDetail()),
-                appointment.getPaymentStatus().getLabel(),
-                escape(appointment.getPaymentReference()),
-                escape(appointment.getPaidAtDisplay()),
-                amount, note, footer, title);
-    }
-
-    private String escape(String value) {
-        if (value == null || value.isBlank()) {
-            return "—";
-        }
-        return value.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;");
     }
 
     private boolean isBlank(String value) {

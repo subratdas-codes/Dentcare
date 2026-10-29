@@ -13,7 +13,7 @@
         body { background: #f5f8fc; color: #172b4d; }
         .panel { border: 1px solid #e4ebf3; border-radius: 1rem; background: #fff; overflow: hidden; }
         .panel-head { padding: 1rem 1.25rem; border-bottom: 1px solid #eef2f7; }
-        .table thead th { color: #7b8aa0; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+        .table thead th { color: #52627a; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
         .btn-teal { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 700; }
         .btn-teal:hover { background: #0b5d57; border-color: #0b5d57; color: #fff; }
         .avatar { width: 38px; height: 38px; border-radius: 50%; background: #eaf7f4; color: #0f766e; display: flex; align-items: center; justify-content: center; font-weight: 800; }

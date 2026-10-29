@@ -126,8 +126,8 @@
                     <div class="d-flex justify-content-between py-2" style="border-bottom:1px dashed #edf2f8;"><span class="text-muted small">Reference</span><span class="small font-monospace"><c:out value="${appointment.paymentReference}" /></span></div>
                     <div class="d-flex justify-content-between py-2"><span class="text-muted small">Paid on</span><span class="small"><c:out value="${appointment.paidAtDisplay}" /></span></div>
                     <c:if test="${not empty appointment.paymentReference}">
-                        <a href="${pageContext.request.contextPath}/booking/receipt/${appointment.paymentReference}/download" class="btn btn-outline-secondary btn-sm w-100 mt-2"><i class="bi bi-download me-1"></i>Download receipt</a>
-                        <a href="${pageContext.request.contextPath}/booking/confirmation/${appointment.paymentReference}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm w-100 mt-2"><i class="bi bi-box-arrow-up-right me-1"></i>Open printable receipt</a>
+                        <a href="${pageContext.request.contextPath}/booking/receipt/${appointment.paymentReference}/download" class="btn btn-outline-secondary btn-sm w-100 mt-2"><i class="bi bi-file-earmark-pdf me-1"></i>Download PDF receipt</a>
+                        <a href="${pageContext.request.contextPath}/booking/confirmation/${appointment.paymentReference}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm w-100 mt-2"><i class="bi bi-box-arrow-up-right me-1"></i>Open booking summary</a>
                     </c:if>
                 </div>
             </section>

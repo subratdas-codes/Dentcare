@@ -14,7 +14,7 @@
         body { background: #f5f8fb; color: #1d2b3f; }
         .dc-stat { border: 1px solid #e7ecf3; border-radius: .9rem; background: #fff; padding: 1rem 1.1rem; height: 100%; }
         .dc-stat .num { font-size: 1.45rem; font-weight: 800; color: #10243e; line-height: 1.1; }
-        .dc-stat .lbl { color: #7a8aa0; font-size: .78rem; font-weight: 600; }
+        .dc-stat .lbl { color: #52627a; font-size: .78rem; font-weight: 600; }
         .dc-tabs { border-bottom: 1px solid #e7ecf3; gap: .25rem; }
         .dc-tabs .nav-link { border: 0; border-bottom: 2px solid transparent; color: #64748b; font-weight: 600; padding: .75rem 1rem; border-radius: 0; }
         .dc-tabs .nav-link.active { color: #0f766e; border-bottom-color: #0f766e; background: transparent; }
@@ -28,7 +28,7 @@
         .badge-soft-primary { background: #e8f1ff; color: #1d4ed8; }
         .badge-soft-success { background: #e7f7ef; color: #15803d; }
         .badge-soft-danger { background: #fdecec; color: #b91c1c; }
-        .badge-soft-warning { background: #fff6e5; color: #b45309; }
+        .badge-soft-warning { background: #fff6e5; color: #92400e; }
         .badge-soft-info { background: #e6f7fa; color: #0e7490; }
         .dc-empty { border: 1px dashed #d8e2ee; border-radius: 1rem; padding: 3rem 1rem; text-align: center; background: #fff; }
         .dc-action { border-radius: .55rem; font-weight: 600; font-size: .8rem; }

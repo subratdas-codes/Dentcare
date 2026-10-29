@@ -19,13 +19,13 @@
         .dc-receipt { border: 1px solid #e7ecf3; border-radius: 1rem; background: #fff; }
         .dc-ref-box { background: #f1faf8; border: 2px dashed #9fd3cc; border-radius: .9rem; padding: 1rem 1.25rem; }
         .dc-ref { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.2rem; font-weight: 800; letter-spacing: .03em; }
-        .dc-label { color: #7a879b; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
+        .dc-label { color: #52627a; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
         .dc-value { font-weight: 600; }
         .dc-row { display: flex; justify-content: space-between; gap: 1rem; padding: .6rem 0; border-bottom: 1px dashed #e7ecf3; font-size: .9rem; }
         .dc-row:last-child { border-bottom: 0; }
         .badge-soft { border-radius: 999px; padding: .25rem .6rem; font-size: .74rem; font-weight: 700; }
         .badge-soft-success { background: #e7f7ef; color: #15803d; }
-        .badge-soft-warning { background: #fff6e5; color: #b45309; }
+        .badge-soft-warning { background: #fff6e5; color: #92400e; }
         .badge-soft-info { background: #e6f7fa; color: #0e7490; }
         .badge-soft-danger { background: #fdecec; color: #b91c1c; }
         .btn-teal { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 700; border-radius: .65rem; }
@@ -46,7 +46,7 @@
     <header class="dc-hero ${appointment.cancelled ? 'cancelled' : ''} p-4 p-md-5 text-center mb-4 no-print">
         <div class="dc-hero-icon"><i class="fas ${appointment.cancelled ? 'fa-times' : 'fa-check'}"></i></div>
         <h1 class="h3 fw-bold mb-1">${appointment.cancelled ? 'Appointment cancelled' : (appointment.cashPayment ? 'Appointment booked · pay at clinic' : 'Appointment confirmed')}</h1>
-        <p class="mb-0 text-white-50">${appointment.cancelled ? 'This visit is cancelled. The record stays in your account.' : 'Your booking is locked in. Keep the reference ID handy.'}</p>
+        <p class="mb-0" style="color:#cdeee8;">${appointment.cancelled ? 'This visit is cancelled. The record stays in your account.' : 'Your booking is locked in. Keep the reference ID handy.'}</p>
     </header>
 
     <div class="row justify-content-center">
@@ -60,7 +60,7 @@
             <article class="dc-receipt p-4 p-md-5" id="receiptCard">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
                     <div>
-                        <h2 class="h5 fw-bold mb-1"><i class="fas fa-tooth me-2" style="color:#0f766e;"></i><c:out value="${site.receiptTitle}" /></h2>
+                        <h2 class="h5 fw-bold mb-1"><i class="fas fa-tooth me-2" style="color:#0b5d57;"></i><c:out value="${site.receiptTitle}" /></h2>
                         <p class="text-muted small mb-0"><c:out value="${site.siteName}" /> · <c:out value="${site.footerAddress}" /></p>
                         <p class="text-muted small mb-0"><c:out value="${site.footerPhone}" /> · <c:out value="${site.footerEmail}" /></p>
                     </div>
@@ -86,7 +86,7 @@
                     <div class="dc-row"><span class="text-muted">Payment detail</span><span class="fw-semibold"><c:out value="${empty appointment.paymentDetail ? '—' : appointment.paymentDetail}" /></span></div>
                     <div class="dc-row"><span class="text-muted">Payment status</span><span class="fw-semibold">${appointment.paymentStatus.label}</span></div>
                     <c:if test="${not empty appointment.paidAtDisplay}"><div class="dc-row"><span class="text-muted">Paid on</span><span class="fw-semibold"><c:out value="${appointment.paidAtDisplay}" /></span></div></c:if>
-                    <div class="dc-row"><span class="text-muted">Amount</span><span class="fs-5 fw-bold" style="color:#0f766e;">₹<fmt:formatNumber value="${appointment.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" /></span></div>
+                    <div class="dc-row"><span class="text-muted">Amount</span><span class="fs-5 fw-bold" style="color:#0b5d57;">₹<fmt:formatNumber value="${appointment.amount}" type="number" minFractionDigits="2" maxFractionDigits="2" /></span></div>
                 </div>
 
                 <c:if test="${appointment.cashPayment and not appointment.cancelled}">
@@ -101,7 +101,7 @@
 
             <div class="d-flex flex-wrap gap-2 justify-content-center mt-4 no-print">
                 <a class="btn btn-teal" href="${pageContext.request.contextPath}/booking/receipt/${appointment.paymentReference}/download">
-                    <i class="bi bi-download me-1"></i>Download receipt
+                    <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF receipt
                 </a>
                 <button class="btn btn-outline-dark" type="button" onclick="window.print()"><i class="fas fa-print me-1"></i>Print receipt</button>
                 <sec:authorize access="hasRole('USER')">

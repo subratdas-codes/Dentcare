@@ -4,9 +4,11 @@ import com.subrat.clinic.model.Doctor;
 import com.subrat.clinic.model.DoctorFee;
 import com.subrat.clinic.model.DoctorFeeStatus;
 import com.subrat.clinic.model.ServicePrice;
+import com.subrat.clinic.model.Testimonial;
 import com.subrat.clinic.repository.DoctorFeeRepository;
 import com.subrat.clinic.repository.DoctorRepository;
 import com.subrat.clinic.repository.ServicePriceRepository;
+import com.subrat.clinic.repository.TestimonialRepository;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class DataInitializer {
 
     @Autowired
     private DoctorFeeRepository doctorFeeRepository;
+
+    @Autowired
+    private TestimonialRepository testimonialRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -55,11 +60,17 @@ public class DataInitializer {
         seedDoctor("Dr. Amit Verma", "Endodontist", "amit.verma@clinic.com", "9864002212", "doctor123", false);
         seedDoctor("Dr. Neha Gupta", "Cosmetic Dentist", "neha.gupta@clinic.com", "9864002213", "doctor123", false);
 
-        seedServicePrice("Teeth Cleaning", "999.00");
-        seedServicePrice("Root Canal", "8999.00");
-        seedServicePrice("Braces", "15000.00");
-        seedServicePrice("Tooth Whitening", "2999.00");
-        seedServicePrice("Dental Implants", "4999.00");
+        seedServicePrice("Teeth Cleaning", "999.00", "Gentle scaling and polishing to remove plaque, tartar and surface stains.");
+        seedServicePrice("Root Canal", "8999.00", "Save an infected tooth with comfortable, single-visit endodontic care.");
+        seedServicePrice("Braces", "15000.00", "Metal or ceramic braces planned around your bite and smile goals.");
+        seedServicePrice("Tooth Whitening", "2999.00", "Professional in-clinic whitening for a brighter, even smile.");
+        seedServicePrice("Dental Implants", "4999.00", "A permanent replacement for a missing tooth, including consultation.");
+
+        if (testimonialRepository.count() == 0) {
+            seedTestimonial("Ananya Mohapatra", "Teeth Cleaning", "The cleaning was painless and the clinic explained every step. Booking and payment took less than five minutes.", 5, 0);
+            seedTestimonial("Rahul Das", "Root Canal", "I was nervous about a root canal, but Dr. Amit made it completely comfortable. The fee shown online was exactly what I paid.", 5, 1);
+            seedTestimonial("Sneha Patnaik", "Braces", "Clear pricing, friendly staff and easy appointment reminders. My braces treatment is going really well.", 5, 2);
+        }
 
         if (doctorFeeRepository.count() == 0) {
             seedDoctorFee("priya.sharma@clinic.com", DoctorFee.CONSULTATION, "250.00");
@@ -86,14 +97,31 @@ public class DataInitializer {
         doctorFeeRepository.save(doctorFee);
     }
 
-    private void seedServicePrice(String name, String fee) {
-        if (servicePriceRepository.findByServiceNameIgnoreCase(name) == null) {
+    private void seedServicePrice(String name, String fee, String description) {
+        ServicePrice existing = servicePriceRepository.findByServiceNameIgnoreCase(name);
+        if (existing == null) {
             ServicePrice price = new ServicePrice();
             price.setServiceName(name);
             price.setFee(new BigDecimal(fee));
+            price.setDescription(description);
             servicePriceRepository.save(price);
             System.out.println(" Seeded service fee: " + name + " = " + fee);
+        } else if (existing.getDescription() == null || existing.getDescription().isBlank()) {
+            existing.setDescription(description);
+            servicePriceRepository.save(existing);
         }
+    }
+
+    private void seedTestimonial(String patientName, String treatment, String message,
+                                 int rating, int displayOrder) {
+        Testimonial testimonial = new Testimonial();
+        testimonial.setPatientName(patientName);
+        testimonial.setTreatment(treatment);
+        testimonial.setMessage(message);
+        testimonial.setRating(rating);
+        testimonial.setDisplayOrder(displayOrder);
+        testimonial.setActive(true);
+        testimonialRepository.save(testimonial);
     }
 
     private void seedDoctor(String name, String specialization, String email, String phone, String password, boolean admin) {

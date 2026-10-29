@@ -13,23 +13,23 @@
     <style>
         body { background: #f5f8fb; color: #1d2b3f; }
         .dc-page-head { background: #0b172a; color: #fff; padding: 2.4rem 0 2rem; }
-        .dc-page-head .eyebrow { color: #8fd8ce; text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; font-weight: 700; }
+        .dc-page-head .eyebrow { color: #a8eadf; text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; font-weight: 700; }
         .dc-card { background: #fff; border: 1px solid #e7ecf3; border-radius: 1rem; }
-        .dc-step { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: #7a8aa0; font-weight: 700; margin-bottom: .6rem; }
+        .dc-step { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: #52627a; font-weight: 700; margin-bottom: .6rem; }
         .dc-type-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .75rem; }
         .dc-type { border: 2px solid #e7ecf3; border-radius: .8rem; padding: .9rem 1rem; cursor: pointer; background: #fff; transition: border-color .12s ease, background .12s ease; }
         .dc-type input { position: absolute; opacity: 0; pointer-events: none; }
         .dc-type .title { font-weight: 700; color: #1d2b3f; display: flex; align-items: center; gap: .5rem; }
-        .dc-type .sub { color: #7a8aa0; font-size: .82rem; margin-top: .2rem; }
+        .dc-type .sub { color: #5b6b82; font-size: .82rem; margin-top: .2rem; }
         .dc-type.active { border-color: #0f766e; background: #f3faf8; }
         .dc-doctor-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .75rem; }
         @media (max-width: 767.98px) { .dc-doctor-grid { grid-template-columns: 1fr; } .dc-type-grid { grid-template-columns: 1fr; } }
         .dc-doctor { border: 2px solid #e7ecf3; border-radius: .85rem; padding: .9rem; cursor: pointer; background: #fff; transition: border-color .12s ease, background .12s ease; position: relative; }
         .dc-doctor input { position: absolute; opacity: 0; pointer-events: none; }
-        .dc-doctor .avatar { width: 42px; height: 42px; border-radius: 50%; background: #eef8f6; color: #0f766e; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+        .dc-doctor .avatar { width: 42px; height: 42px; border-radius: 50%; background: #eef8f6; color: #0b5d57; font-weight: 800; display: flex; align-items: center; justify-content: center; }
         .dc-doctor .name { font-weight: 700; color: #1d2b3f; font-size: .92rem; }
-        .dc-doctor .spec { color: #7a8aa0; font-size: .78rem; }
-        .dc-doctor .fee { color: #0f766e; font-weight: 700; font-size: .82rem; }
+        .dc-doctor .spec { color: #5b6b82; font-size: .78rem; }
+        .dc-doctor .fee { color: #0b5d57; font-weight: 700; font-size: .82rem; }
         .dc-doctor.active { border-color: #0f766e; background: #f3faf8; }
         .dc-label { font-weight: 600; color: #34445c; font-size: .9rem; }
         .form-control, .form-select { border-color: #dfe6ef; border-radius: .65rem; padding: .65rem .8rem; }
@@ -38,11 +38,13 @@
         .dc-summary-head { background: #0f766e; color: #fff; padding: 1.1rem 1.25rem; }
         .dc-summary-row { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px dashed #e7ecf3; font-size: .9rem; }
         .dc-summary-row:last-child { border-bottom: 0; }
-        .dc-fee-total { font-size: 1.8rem; font-weight: 800; color: #0f766e; }
-        .dc-pill { background: #eef8f6; color: #0f766e; border-radius: 999px; padding: .28rem .65rem; font-size: .75rem; font-weight: 700; }
+        .dc-fee-total { font-size: 1.8rem; font-weight: 800; color: #0b5d57; }
+        .dc-pill { background: #eef8f6; color: #0b5d57; border-radius: 999px; padding: .28rem .65rem; font-size: .75rem; font-weight: 700; }
         .dc-submit { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 700; border-radius: .7rem; padding: .85rem 1rem; }
         .dc-submit:hover { background: #0b5d57; border-color: #0b5d57; color: #fff; }
-        .dc-help { color: #7a8aa0; font-size: .8rem; }
+        .dc-help { color: #5b6b82; font-size: .8rem; }
+        .dc-live { display: inline-flex; align-items: center; gap: .35rem; color: #0b5d57; background: #e7f7ef; border: 1px solid #c6e9d8; border-radius: 999px; padding: .2rem .6rem; font-size: .72rem; font-weight: 700; }
+        .dc-live .dot { width: 7px; height: 7px; border-radius: 50%; background: #15803d; }
     </style>
 </head>
 <body>
@@ -51,12 +53,18 @@
 <header class="dc-page-head">
     <div class="container">
         <div class="eyebrow mb-2">Step 1 of 3 · Appointment</div>
-        <h1 class="h2 fw-bold mb-2">Book a visit with the right dentist</h1>
-        <p class="mb-0" style="color:#b9c6d8;max-width:680px;"><c:out value="${site.bookingNote}" /></p>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <h1 class="h2 fw-bold mb-0">Book a visit with the right dentist</h1>
+            <span class="dc-live"><span class="dot"></span>Live fees</span>
+        </div>
+        <p class="mb-0" style="color:#d8e5f2;max-width:680px;"><c:out value="${site.bookingNote}" /></p>
     </div>
 </header>
 
 <div class="container py-4 py-lg-5">
+    <div id="feeNotice" class="alert border-0 shadow-sm d-none" style="background:#eef8f6;color:#0b4f49;">
+        <i class="bi bi-arrow-repeat me-2"></i><span id="feeNoticeText">Fees were updated by the clinic. Your total has been refreshed.</span>
+    </div>
     <c:if test="${not empty error}">
         <div class="alert alert-danger border-0 shadow-sm"><c:out value="${error}" /></div>
     </c:if>
@@ -95,7 +103,7 @@
                                     <div class="spec text-truncate"><c:out value="${doc.specialization}" /></div>
                                 </div>
                             </div>
-                            <div class="fee" data-doctor-fee="${doc.id}">Consultation ₹<fmt:formatNumber value="${consultationFee}" minFractionDigits="0" maxFractionDigits="0" /></div>
+                            <div class="fee" data-doctor-fee="${doc.id}" id="doctorFee-${doc.id}">Consultation ₹<fmt:formatNumber value="${consultationFee}" minFractionDigits="0" maxFractionDigits="0" /></div>
                         </label>
                     </c:forEach>
                     <c:if test="${empty doctors}">
@@ -157,7 +165,7 @@
             <div class="dc-summary">
                 <div class="dc-summary-head">
                     <div class="fw-bold mb-1">Visit summary</div>
-                    <div class="small text-white-50">Clear pricing, no surprises</div>
+                    <div class="small" style="color:#cdeee8;">Clear pricing, no surprises</div>
                 </div>
                 <div class="p-4">
                     <div class="dc-summary-row"><span class="text-muted">Visit type</span><span class="fw-semibold" id="summaryType">Consultation</span></div>
@@ -182,6 +190,7 @@
 
 <%@ include file="_user_footer.jsp" %>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 (function () {
     var feesData = document.getElementById('doctorFeesData');
@@ -201,7 +210,11 @@
     var feePreview = document.getElementById('feePreview');
     var inlineFee = document.getElementById('inlineFee');
     var feeSource = document.getElementById('feeSource');
+    var feeNotice = document.getElementById('feeNotice');
+    var feeNoticeText = document.getElementById('feeNoticeText');
     var selectedType = 'CONSULTATION';
+    var feeUrl = '<c:url value="/api/booking/fees" />';
+    var pollTimer = null;
 
     function money(value) {
         return '₹' + Number(value || 0).toLocaleString('en-IN', {maximumFractionDigits: 2});
@@ -213,6 +226,19 @@
         var map = doctorFees[String(doctorId)] || doctorFees[doctorId];
         return map && map[key] != null ? Number(map[key]) : null;
     }
+    function selectedOption() {
+        var option = serviceSelect.options[serviceSelect.selectedIndex];
+        return option && option.value ? option : null;
+    }
+    function serviceFee(name) {
+        for (var i = 0; i < serviceSelect.options.length; i++) {
+            var option = serviceSelect.options[i];
+            if (option.value && option.value.toLowerCase() === String(name).toLowerCase()) {
+                return Number(option.dataset.fee || 0);
+            }
+        }
+        return 0;
+    }
     function computedFee() {
         var doctor = selectedDoctor();
         if (!doctor) return {fee: 0, source: 'Select a doctor to see the fee'};
@@ -220,18 +246,37 @@
             var cf = doctorFee(doctor.value, 'CONSULTATION');
             return {fee: cf != null ? cf : baseConsultation, source: cf != null ? 'Doctor consultation fee' : 'Standard consultation fee'};
         }
-        var option = serviceSelect.options[serviceSelect.selectedIndex];
-        if (!option || !option.value) return {fee: 0, source: 'Select a treatment to see the fee'};
+        var option = selectedOption();
+        if (!option) return {fee: 0, source: 'Select a treatment to see the fee'};
         var df = doctorFee(doctor.value, option.value);
         return {fee: df != null ? df : Number(option.dataset.fee || 0), source: df != null ? 'Doctor-specific treatment fee' : 'Standard treatment fee'};
+    }
+    function refreshDoctorCards() {
+        document.querySelectorAll('.dc-doctor').forEach(function (card) {
+            var input = card.querySelector('input');
+            var label = card.querySelector('.fee');
+            if (!input || !label) return;
+            if (selectedType === 'CONSULTATION') {
+                var cf = doctorFee(input.value, 'CONSULTATION');
+                label.textContent = 'Consultation ' + money(cf != null ? cf : baseConsultation);
+            } else {
+                var option = selectedOption();
+                if (!option) {
+                    label.textContent = 'Choose a treatment';
+                } else {
+                    var df = doctorFee(input.value, option.value);
+                    label.textContent = 'Treatment ' + money(df != null ? df : Number(option.dataset.fee || 0));
+                }
+            }
+        });
     }
     function refresh() {
         var doctor = selectedDoctor();
         summaryType.textContent = selectedType === 'CONSULTATION' ? 'Consultation' : 'Treatment';
         summaryDoctor.textContent = doctor ? doctor.closest('.dc-doctor').querySelector('.name').textContent.trim() : 'Not selected';
         if (selectedType === 'TREATMENT') {
-            var opt = serviceSelect.options[serviceSelect.selectedIndex];
-            summaryTreatment.textContent = opt && opt.value ? opt.textContent.split('·')[0].trim() : '—';
+            var opt = selectedOption();
+            summaryTreatment.textContent = opt ? opt.textContent.split('·')[0].trim() : '—';
             summaryTreatmentRow.style.display = '';
         } else {
             summaryTreatmentRow.style.display = 'none';
@@ -241,6 +286,7 @@
         feePreview.textContent = money(result.fee);
         inlineFee.textContent = money(result.fee);
         feeSource.textContent = result.source;
+        refreshDoctorCards();
         document.querySelectorAll('.dc-doctor').forEach(function (card) {
             var input = card.querySelector('input');
             card.classList.toggle('active', input.checked);
@@ -249,6 +295,67 @@
             tile.classList.toggle('active', tile.querySelector('input').checked);
         });
     }
+    function rebuildServices(services) {
+        if (!Array.isArray(services)) return false;
+        var current = serviceSelect.value;
+        var names = services.map(function (service) { return service.name; });
+        var existing = [];
+        for (var i = 1; i < serviceSelect.options.length; i++) existing.push(serviceSelect.options[i].value);
+        var same = existing.length === names.length && names.every(function (name, index) { return existing[index] === name; });
+        if (!same) {
+            serviceSelect.innerHTML = '';
+            var placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.disabled = true;
+            placeholder.textContent = names.length ? 'Select a treatment' : 'No treatments available right now';
+            serviceSelect.appendChild(placeholder);
+            services.forEach(function (service) {
+                var option = document.createElement('option');
+                option.value = service.name;
+                option.dataset.fee = service.fee;
+                option.textContent = service.name + ' · ' + money(service.fee);
+                serviceSelect.appendChild(option);
+            });
+            if (current && names.some(function (name) { return name === current; })) {
+                serviceSelect.value = current;
+            } else {
+                serviceSelect.value = '';
+            }
+        } else {
+            services.forEach(function (service, index) {
+                var option = serviceSelect.options[index + 1];
+                if (option) option.dataset.fee = service.fee;
+            });
+        }
+        var missing = current && !names.some(function (name) { return name === current; });
+        if (!names.length) {
+            serviceSelect.required = false;
+        }
+        return missing;
+    }
+    function applyFees(payload, initial) {
+        if (!payload) return;
+        var before = computedFee().fee;
+        if (payload.consultationFee != null) baseConsultation = Number(payload.consultationFee);
+        if (payload.doctorFees && typeof payload.doctorFees === 'object') doctorFees = payload.doctorFees;
+        var selectedRemoved = rebuildServices(payload.services);
+        refresh();
+        var after = computedFee().fee;
+        if (!initial && (selectedRemoved || after !== before)) {
+            feeNoticeText.textContent = selectedRemoved
+                ? 'The treatment you selected is no longer offered. Please choose another treatment; your total has been refreshed.'
+                : 'Fees were updated by the clinic. Your total is now ' + money(after) + '.';
+            feeNotice.classList.remove('d-none');
+        }
+    }
+    function pollFees() {
+        if (document.hidden) return;
+        fetch(feeUrl, {headers: {'Accept': 'application/json'}, cache: 'no-store'})
+            .then(function (response) { return response.ok ? response.json() : null; })
+            .then(function (payload) { if (payload) applyFees(payload, false); })
+            .catch(function () { /* keep the last known prices if the clinic is briefly offline */ });
+    }
+
     form.querySelectorAll('input[name="appointmentType"]').forEach(function (radio) {
         radio.addEventListener('change', function () {
             selectedType = this.value;
@@ -273,6 +380,11 @@
     dateInput.min = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
     if (!timeInput.value) timeInput.value = '10:00';
     refresh();
+    pollFees();
+    pollTimer = setInterval(pollFees, 15000);
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) pollFees();
+    });
 })();
 </script>
 </body>

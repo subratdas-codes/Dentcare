@@ -184,6 +184,7 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/price"),
                                 new AntPathRequestMatcher("/testimonial"),
                                 new AntPathRequestMatcher("/contact"),
+                                new AntPathRequestMatcher("/api/booking/**"),
                                 new AntPathRequestMatcher("/css/**"),
                                 new AntPathRequestMatcher("/js/**"),
                                 new AntPathRequestMatcher("/img/**"),

@@ -13,7 +13,7 @@
     <style>
         body { background: #f5f8fb; color: #1d2b3f; }
         .dc-summary { background: #0b172a; color: #fff; border-radius: 1rem; }
-        .dc-summary .label { color: #9fb0c5; font-size: .74rem; text-transform: uppercase; letter-spacing: .07em; }
+        .dc-summary .label { color: #c9d6e5; font-size: .74rem; text-transform: uppercase; letter-spacing: .07em; }
         .dc-summary .value { font-weight: 600; }
         .dc-row { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px dashed rgba(255,255,255,.16); font-size: .9rem; }
         .dc-row:last-child { border-bottom: 0; }
@@ -27,7 +27,7 @@
         .method-tile:hover { border-color: #9fd3cc; }
         .method-tile.active { border-color: #0f766e; background: #f1faf8; }
         .pay-section { background: #f8fbfc; border: 1px solid #e7ecf3; border-radius: .8rem; padding: 1rem; }
-        .qr-box { width: 160px; height: 160px; border-radius: .75rem; background: #fff; border: 2px dashed #b9c6d8; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+        .qr-box { width: 160px; height: 160px; border-radius: .75rem; background: #fff; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
         .qr-box i { font-size: 5.4rem; color: #0b172a; }
         .secure-note { font-size: .78rem; color: #7a879b; }
         .form-control, .form-select { border-color: #dfe6ef; border-radius: .65rem; padding: .65rem .8rem; }

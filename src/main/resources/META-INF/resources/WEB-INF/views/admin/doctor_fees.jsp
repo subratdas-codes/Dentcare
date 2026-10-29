@@ -26,7 +26,7 @@
         .pending-card { border: 1px solid #f1dfb6; background: #fffcf4; border-radius: .9rem; padding: 1rem 1.1rem; }
         .stat-pill { border: 1px solid #e4ebf3; background: #fff; border-radius: .85rem; padding: .8rem 1rem; }
         .stat-pill .num { font-size: 1.35rem; font-weight: 800; line-height: 1; }
-        .stat-pill .lbl { color: #7b8aa0; font-size: .76rem; font-weight: 600; }
+        .stat-pill .lbl { color: #52627a; font-size: .76rem; font-weight: 600; }
         .table-sm td, .table-sm th { font-size: .84rem; }
         .sticky-fee { position: sticky; top: 96px; }
     </style>
@@ -53,7 +53,7 @@
     <c:if test="${not empty error}"><div class="alert alert-danger shadow-sm"><i class="bi bi-exclamation-triangle me-2"></i><c:out value="${error}" /></div></c:if>
 
     <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3"><div class="stat-pill"><div class="num text-warning">${pendingFees.size()}</div><div class="lbl">Awaiting approval</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat-pill"><div class="num" style="color:#92400e;">${pendingFees.size()}</div><div class="lbl">Awaiting approval</div></div></div>
         <div class="col-6 col-md-3"><div class="stat-pill"><div class="num">${doctors.size()}</div><div class="lbl">Doctors</div></div></div>
         <div class="col-6 col-md-3"><div class="stat-pill"><div class="num" style="color:#0f766e;">₹<fmt:formatNumber value="${consultationFee}" minFractionDigits="0" maxFractionDigits="2" /></div><div class="lbl">Standard consultation</div></div></div>
         <div class="col-6 col-md-3"><div class="stat-pill"><div class="num" style="color:#0f766e;">${servicePrices.size()}</div><div class="lbl">Standard treatments</div></div></div>

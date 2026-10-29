@@ -7,9 +7,13 @@ public interface ServicePriceService {
 
     List<ServicePrice> findAll();
 
+    List<ServicePrice> findActive();
+
     ServicePrice findById(Long id);
 
     ServicePrice findByServiceName(String serviceName);
 
     ServicePrice save(ServicePrice servicePrice);
+
+    void delete(Long id);
 }

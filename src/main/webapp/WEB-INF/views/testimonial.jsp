@@ -1,271 +1,105 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <title>DentCare - Dental Clinic Website Template</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="Free HTML Templates" name="keywords">
-    <meta content="Free HTML Templates" name="description">
-
-    <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
-
-    <!-- Google Web Fonts -->
+    <title>Patient Stories - ${site.siteName}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"> 
-
-    <!-- Icon Font Stylesheet -->
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Libraries Stylesheet -->
-    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-    <link href="lib/animate/animate.min.css" rel="stylesheet">
-    <link href="lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
-    <link href="lib/twentytwenty/twentytwenty.css" rel="stylesheet" />
-
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Template Stylesheet -->
-    <link href="css/style.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="<c:url value='/css/bootstrap.min.css' />" rel="stylesheet">
+    <link href="<c:url value='/css/style.css' />" rel="stylesheet">
+    <style>
+        body { background: #f5f8fb; color: #1d2b3f; }
+        .dc-hero { background: linear-gradient(120deg, #0b172a 0%, #0f4f4a 60%, #0f766e 100%); color: #fff; padding: 3.2rem 0 2.6rem; }
+        .dc-hero .eyebrow { color: #a8eadf; text-transform: uppercase; letter-spacing: .09em; font-size: .74rem; font-weight: 700; }
+        .dc-hero p { color: #d8e5f2; }
+        .dc-review { background: #fff; border: 1px solid #e4ebf3; border-radius: 1rem; padding: 1.5rem; height: 100%; display: flex; flex-direction: column; }
+        .dc-stars { color: #b45309; font-size: .9rem; letter-spacing: .08em; }
+        .dc-avatar { width: 46px; height: 46px; border-radius: 50%; background: #eaf7f4; color: #0b5d57; display: flex; align-items: center; justify-content: center; font-weight: 800; flex: 0 0 46px; }
+        .dc-muted { color: #52627a; }
+        .dc-quote { color: #33445c; font-size: .95rem; flex-grow: 1; }
+        .dc-cta { background: linear-gradient(120deg, #0b172a 0%, #0f4f4a 60%, #0f766e 100%); border-radius: 1.1rem; color: #fff; }
+        .dc-cta p { color: #d8e5f2; }
+        .btn-teal { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 700; border-radius: .65rem; }
+        .btn-teal:hover { background: #0b5d57; border-color: #0b5d57; color: #fff; }
+        .dc-strip { background: #fff; border: 1px solid #e4ebf3; border-radius: 1rem; padding: 1.1rem 1.3rem; }
+    </style>
 </head>
-
 <body>
-    <!-- Spinner Start -->
-    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-        <div class="spinner-grow text-primary m-1" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-dark m-1" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-        <div class="spinner-grow text-secondary m-1" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    </div>
-    <!-- Spinner End -->
+<%@ include file="_user_navbar.jsp" %>
 
-
-    <!-- Topbar Start -->
-    <div class="container-fluid bg-light ps-5 pe-0 d-none d-lg-block">
-        <div class="row gx-0">
-            <div class="col-md-6 text-center text-lg-start mb-2 mb-lg-0">
-                <div class="d-inline-flex align-items-center">
-                    <small class="py-2"><i class="far fa-clock text-primary me-2"></i>Opening Hours: Mon - Tues : 6.00 am - 10.00 pm, Sunday Closed </small>
-                </div>
+<header class="dc-hero">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="eyebrow mb-2">Patient stories</div>
+                <h1 class="display-5 fw-bold mb-3"><c:out value="${site.testimonialHeading}" /></h1>
+                <p class="mb-0" style="max-width:720px;"><c:out value="${site.testimonialText}" /></p>
             </div>
-            <div class="col-md-6 text-center text-lg-end">
-                <div class="position-relative d-inline-flex align-items-center bg-primary text-white top-shape px-5">
-                    <div class="me-3 pe-3 border-end py-2">
-                        <p class="m-0"><i class="fa fa-envelope-open me-2"></i>dentcare.support@gmail.com</p>
-                    </div>
-                    <div class="py-2">
-                        <p class="m-0"><i class="fa fa-phone-alt me-2"></i>+91 94371 23456</p>
-                    </div>
-                </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-light fw-semibold px-4 py-3">
+                    <i class="bi bi-calendar2-check me-2"></i><c:out value="${site.bookButton}" />
+                </a>
             </div>
         </div>
     </div>
-    <!-- Topbar End -->
+</header>
 
-
-    <!-- Navbar Start -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow-sm px-5 py-3 py-lg-0">
-        <a href="/" class="navbar-brand p-0">
-            <h1 class="m-0 text-primary"><i class="fa fa-tooth me-2"></i>DentCare</h1>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            <div class="navbar-nav ms-auto py-0">
-                <a href="/" class="nav-item nav-link">Home</a>
-                <a href="about" class="nav-item nav-link">About</a>
-                <a href="service" class="nav-item nav-link">Service</a>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Pages</a>
-                    <div class="dropdown-menu m-0">
-                        <a href="price" class="dropdown-item">Pricing Plan</a>
-                        <a href="team" class="dropdown-item">Our Dentist</a>
-                        <a href="testimonial" class="dropdown-item active">Testimonial</a>
-                         <sec:authorize access="isAuthenticated()">
-                             <a href="book_appointment" class="dropdown-item">Appointment</a>
-                         </sec:authorize>
+<main class="container py-5">
+    <c:choose>
+        <c:when test="${not empty testimonials}">
+            <div class="row g-4">
+                <c:forEach var="t" items="${testimonials}">
+                    <div class="col-md-6 col-xl-4">
+                        <article class="dc-review">
+                            <div class="dc-stars mb-3">
+                                <c:forEach begin="1" end="${t.rating}"><i class="fa fa-star"></i></c:forEach>
+                                <c:forEach begin="${t.rating + 1}" end="5"><i class="far fa-star"></i></c:forEach>
+                            </div>
+                            <p class="dc-quote mb-4">&ldquo;<c:out value="${t.message}" />&rdquo;</p>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="dc-avatar"><c:out value="${t.initial}" /></div>
+                                <div>
+                                    <div class="fw-bold" style="color:#10243e;"><c:out value="${t.patientName}" /></div>
+                                    <div class="small dc-muted"><c:out value="${empty t.treatment ? 'DentCare patient' : t.treatment}" /></div>
+                                </div>
+                            </div>
+                        </article>
                     </div>
-                </div>
-                <a href="contact" class="nav-item nav-link">Contact</a>
+                </c:forEach>
             </div>
-            <sec:authorize access="hasRole('USER')">
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i> <sec:authentication property="name" />
-                    </a>
-                    <div class="dropdown-menu fade-up m-0">
-                        <a href="/profile" class="dropdown-item">Profile</a>
-                        <a href="/change-password" class="dropdown-item">Change Password</a>
-                        <a href="/my/appointments" class="dropdown-item">My Appointments</a>
-                        <div class="dropdown-divider"></div>
-                        <form action="/logout" method="post" class="m-0">
-                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                            <input type="hidden" name="portal" value="PATIENT" />
-                            <button type="submit" class="dropdown-item text-danger">Logout</button>
-                        </form>
-                    </div>
-                </div>
-            </sec:authorize>
-
-        </div>
-    </nav>
-    <!-- Navbar End -->
-
-
-
-
-    <!-- Hero Start -->
-    <div class="container-fluid bg-primary py-5 hero-header mb-5">
-        <div class="row py-3">
-            <div class="col-12 text-center">
-                <h1 class="display-3 text-white animated zoomIn">Testimonial</h1>
-                <a href="/" class="h4 text-white">Home</a>
-                <i class="far fa-circle text-white px-2"></i>
-                <a href="/testimonial" class="h4 text-white">Testimonial</a>
+        </c:when>
+        <c:otherwise>
+            <div class="alert alert-info border-0 shadow-sm">
+                <i class="bi bi-chat-quote me-2"></i>Patient reviews will appear here soon. You can be the first to share your experience.
             </div>
+        </c:otherwise>
+    </c:choose>
+
+    <section class="dc-strip mt-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h2 class="h6 fw-bold mb-1">Visited us recently?</h2>
+            <p class="small dc-muted mb-0">Tell us how your visit went. We read every message and publish reviews with permission.</p>
         </div>
-    </div>
-    <!-- Hero End -->
+        <a href="${pageContext.request.contextPath}/contact" class="btn btn-outline-success fw-semibold">Share your experience</a>
+    </section>
 
-
-    <!-- Testimonial Start -->
-    <div class="container-fluid bg-primary bg-testimonial py-5 mb-5 wow fadeInUp" data-wow-delay="0.1s" style="margin-top: 90px;">
-        <div class="container py-5">
-            <div class="row justify-content-center">
-                <div class="col-lg-7">
-                    <div class="owl-carousel testimonial-carousel rounded p-5 wow zoomIn" data-wow-delay="0.6s">
-                        <div class="testimonial-item text-center text-white">
-                            <img class="img-fluid mx-auto rounded mb-4" src="img/testimonial-1.jpg" alt="">
-                            <p class="fs-5">Dolores sed duo clita justo dolor et stet lorem kasd dolore lorem ipsum. At lorem lorem magna ut et, nonumy labore diam erat. Erat dolor rebum sit ipsum.</p>
-                            <hr class="mx-auto w-25">
-                            <h4 class="text-white mb-0">Client Name</h4>
-                        </div>
-                        <div class="testimonial-item text-center text-white">
-                            <img class="img-fluid mx-auto rounded mb-4" src="img/testimonial-2.jpg" alt="">
-                            <p class="fs-5">Dolores sed duo clita justo dolor et stet lorem kasd dolore lorem ipsum. At lorem lorem magna ut et, nonumy labore diam erat. Erat dolor rebum sit ipsum.</p>
-                            <hr class="mx-auto w-25">
-                            <h4 class="text-white mb-0">Client Name</h4>
-                        </div>
-                    </div>
-                </div>
+    <section class="dc-cta p-4 p-lg-5 mt-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+                <h2 class="h3 fw-bold mb-2">Ready to book your own visit?</h2>
+                <p class="mb-0">Pick a dentist and see the exact approved fee before you pay.</p>
             </div>
+            <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-light fw-semibold px-4 py-3">Book an appointment</a>
         </div>
-    </div>
-    <!-- Testimonial End -->
-    
+    </section>
+</main>
 
-    <!-- Newsletter Start -->
-    <div class="container-fluid position-relative pt-5 wow fadeInUp" data-wow-delay="0.1s" style="z-index: 1;">
-        <div class="container">
-            <div class="bg-primary p-5">
-                <div class="text-center mx-auto" style="max-width: 600px;">
-                    <a href="register" class="btn btn-dark text-uppercase py-3 px-5">Sign Up</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Newsletter End -->
-    
-
-    <!-- Footer Start -->
-    <div class="container-fluid bg-dark text-light py-5 wow fadeInUp" data-wow-delay="0.3s" style="margin-top: -75px;">
-        <div class="container pt-5">
-            <div class="row g-5 pt-4">
-                <div class="col-lg-3 col-md-6">
-                    <h3 class="text-white mb-4">Quick Links</h3>
-                    <div class="d-flex flex-column justify-content-start">
-                        <a class="text-light mb-2" href="/"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
-                        <a class="text-light mb-2" href="/about"><i class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
-                        <a class="text-light mb-2" href="/service"><i class="bi bi-arrow-right text-primary me-2"></i>Our Services</a>
-                        <sec:authorize access="isAuthenticated()">
-                            <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
-                        </sec:authorize>
-                        <sec:authorize access="!isAuthenticated()">
-                            <a class="text-light mb-2" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
-                        </sec:authorize>
-                        <a class="text-light" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h3 class="text-white mb-4">Popular Links</h3>
-                    <div class="d-flex flex-column justify-content-start">
-                        <a class="text-light mb-2" href="/"><i class="bi bi-arrow-right text-primary me-2"></i>Home</a>
-                        <a class="text-light mb-2" href="/about"><i class="bi bi-arrow-right text-primary me-2"></i>About Us</a>
-                        <a class="text-light mb-2" href="/service"><i class="bi bi-arrow-right text-primary me-2"></i>Our Services</a>
-                        <sec:authorize access="isAuthenticated()">
-                            <a class="text-light mb-2" href="/book_appointment"><i class="bi bi-arrow-right text-primary me-2"></i>Book Appointment</a>
-                        </sec:authorize>
-                        <sec:authorize access="!isAuthenticated()">
-                            <a class="text-light mb-2" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
-                        </sec:authorize>
-                        <a class="text-light" href="/contact"><i class="bi bi-arrow-right text-primary me-2"></i>Contact Us</a>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h3 class="text-white mb-4">Get In Touch</h3>
-                    <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>Patia, Bhubaneswar, Odisha, India - 751024</p>
-                    <p class="mb-2"><i class="bi bi-envelope-open text-primary me-2"></i>dentcare.support@gmail.com</p>
-                    <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>+91 94371 23456</p>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h3 class="text-white mb-4">Follow Us</h3>
-                    <div class="d-flex">
-                        <a class="btn btn-lg btn-primary btn-lg-square rounded me-2" href="#"><i class="fab fa-twitter fw-normal"></i></a>
-                        <a class="btn btn-lg btn-primary btn-lg-square rounded me-2" href="#"><i class="fab fa-facebook-f fw-normal"></i></a>
-                        <a class="btn btn-lg btn-primary btn-lg-square rounded me-2" href="#"><i class="fab fa-linkedin-in fw-normal"></i></a>
-                        <a class="btn btn-lg btn-primary btn-lg-square rounded" href="#"><i class="fab fa-instagram fw-normal"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="container-fluid text-light py-4" style="background: #051225;">
-        <div class="container">
-            <div class="row g-0">
-                <div class="col-md-6 text-center text-md-start">
-                    <p class="mb-md-0">&copy; Dentcare. All Rights Reserved.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <p class="mb-0">Designed by <a class="text-white border-bottom" href="https://github.com/subratdas-codes">Subrat Das</a></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Footer End -->
-
-
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded back-to-top"><i class="bi bi-arrow-up"></i></a>
-
-
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/wow/wow.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/tempusdominus/js/moment.min.js"></script>
-    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-    <script src="lib/twentytwenty/jquery.event.move.js"></script>
-    <script src="lib/twentytwenty/jquery.twentytwenty.js"></script>
-
-    <!-- Template Javascript -->
-    <script src="js/main.js"></script>
+<%@ include file="_user_footer.jsp" %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

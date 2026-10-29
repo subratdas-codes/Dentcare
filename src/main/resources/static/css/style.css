@@ -323,3 +323,157 @@ h6,
     width: 120px;
     height: 120px;
 }
+/********** DentCare brand + contrast overrides **********/
+:root {
+    --primary: #0f766e;
+    --secondary: #0b5d57;
+    --light: #f2f8f7;
+    --dark: #0b172a;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    color: #1d2b3f;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Jost', sans-serif;
+    color: #10243e;
+}
+
+.text-primary {
+    color: #0b5d57 !important;
+}
+
+.text-secondary {
+    color: #0b5d57 !important;
+}
+
+.bg-primary {
+    background-color: #0f766e !important;
+}
+
+.bg-secondary {
+    background-color: #0b5d57 !important;
+}
+
+.bg-dark {
+    background-color: #0b172a !important;
+}
+
+.btn-primary {
+    background-color: #0f766e;
+    border-color: #0f766e;
+    color: #ffffff;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #0b5d57;
+    border-color: #0b5d57;
+    color: #ffffff;
+}
+
+.btn-secondary {
+    background-color: #0b5d57;
+    border-color: #0b5d57;
+    color: #ffffff;
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+    background-color: #0f766e;
+    border-color: #0f766e;
+    color: #ffffff;
+}
+
+.btn-outline-primary {
+    color: #0b5d57;
+    border-color: #0b5d57;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0f766e;
+    border-color: #0f766e;
+    color: #ffffff;
+}
+
+.form-control::placeholder,
+.form-select::placeholder {
+    color: #6b7c93;
+    opacity: 1;
+}
+
+.section-title h5::before,
+.section-title h5::after {
+    background: #0f766e;
+}
+
+.service-item h5,
+.team-item h4 {
+    color: #10243e;
+}
+
+.team-text p {
+    color: #52627a;
+}
+
+.price-item h4 {
+    color: #10243e;
+}
+
+.price-item .text-body,
+.price-item p {
+    color: #52627a;
+}
+
+.text-white-50 {
+    color: #d8e5f2 !important;
+}
+
+.text-muted {
+    color: #52627a !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before,
+.breadcrumb-item.active {
+    color: #c9d6e5;
+}
+
+.alert-info {
+    background-color: #eef6ff;
+    border-color: #cfe2ff;
+    color: #123c69;
+}
+
+.alert-success {
+    background-color: #e7f7ef;
+    border-color: #c6e9d8;
+    color: #14532d;
+}
+
+.alert-warning {
+    background-color: #fff6e5;
+    border-color: #f1dfb6;
+    color: #5c3d00;
+}
+
+.alert-danger {
+    background-color: #fdecec;
+    border-color: #f5c2c2;
+    color: #7f1d1d;
+}
+
+.text-warning {
+    color: #92400e !important;
+}
+
+.text-info {
+    color: #0e7490 !important;
+}
+
+.text-success {
+    color: #15803d !important;
+}
+
+.text-danger {
+    color: #b91c1c !important;
+}

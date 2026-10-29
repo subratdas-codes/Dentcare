@@ -3,12 +3,15 @@ package com.subrat.clinic.controller;
 import com.subrat.clinic.model.Appointment;
 import com.subrat.clinic.model.AppointmentStatus;
 import com.subrat.clinic.model.AppointmentType;
+import com.subrat.clinic.model.ContactMessage;
 import com.subrat.clinic.model.Doctor;
 import com.subrat.clinic.model.DoctorFee;
 import com.subrat.clinic.model.Patient;
 import com.subrat.clinic.model.PaymentStatus;
 import com.subrat.clinic.model.ServicePrice;
+import com.subrat.clinic.model.Testimonial;
 import com.subrat.clinic.service.AppointmentService;
+import com.subrat.clinic.service.ContactMessageService;
 import com.subrat.clinic.service.DoctorFeeService;
 import com.subrat.clinic.service.DoctorPhotoStorage;
 import com.subrat.clinic.service.DoctorService;
@@ -16,6 +19,7 @@ import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
 import com.subrat.clinic.service.ServicePriceService;
 import com.subrat.clinic.service.SiteSettingService;
+import com.subrat.clinic.service.TestimonialService;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -38,8 +42,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -122,6 +124,12 @@ public class DoctorController {
     @Autowired
     private SiteSettingService siteSettingService;
 
+    @Autowired
+    private TestimonialService testimonialService;
+
+    @Autowired
+    private ContactMessageService contactMessageService;
+
     @GetMapping("/register")
     public String doctorRegisterForm() {
         return "redirect:/doctor/register";
@@ -172,6 +180,17 @@ public class DoctorController {
         model.addAttribute("todayCount", todayCount);
         model.addAttribute("revenue", revenue);
         model.addAttribute("pendingPayments", pendingPayments);
+        model.addAttribute("pendingFeeCount", doctorFeeService.pendingCount());
+        model.addAttribute("unreadMessages", contactMessageService.unreadCount());
+        model.addAttribute("activeServiceCount", servicePriceService.findActive().size());
+        model.addAttribute("activeTestimonialCount", testimonialService.findActive().size());
+        model.addAttribute("todayAppointments", appointments.stream()
+                .filter(a -> today.equals(a.getAppointmentDate()))
+                .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
+                .limit(6)
+                .toList());
+        model.addAttribute("recentAppointments", appointments.stream().limit(6).toList());
+        model.addAttribute("recentMessages", contactMessageService.findAll().stream().limit(4).toList());
         model.addAttribute("doctors", doctorService.findAll());
         model.addAttribute("appointments", appointments);
         model.addAttribute("patients", patientService.getAll());
@@ -368,6 +387,8 @@ public class DoctorController {
 
     @GetMapping("/appointments")
     public String listAppointments(@RequestParam(required = false) String status,
+                                   @RequestParam(required = false) String payment,
+                                   @RequestParam(required = false) String date,
                                    @RequestParam(required = false) String q,
                                    Model model) {
         List<Appointment> all = appointmentService.getAll().stream()
@@ -378,9 +399,14 @@ public class DoctorController {
                         .reversed())
                 .toList();
         String selected = status == null ? "" : status.trim().toUpperCase(Locale.ROOT);
+        String selectedPayment = payment == null ? "" : payment.trim().toUpperCase(Locale.ROOT);
+        String selectedDate = date == null ? "" : date.trim();
         String query = q == null ? "" : q.trim().toLowerCase(Locale.ROOT);
+        LocalDate today = LocalDate.now();
         List<Appointment> filtered = all.stream()
                 .filter(a -> selected.isEmpty() || a.getStatus().name().equals(selected))
+                .filter(a -> selectedPayment.isEmpty() || a.getPaymentStatus().name().equals(selectedPayment))
+                .filter(a -> !"today".equalsIgnoreCase(selectedDate) || today.equals(a.getAppointmentDate()))
                 .filter(a -> query.isEmpty()
                         || contains(a.getPatientName(), query)
                         || contains(a.getEmail(), query)
@@ -391,10 +417,23 @@ public class DoctorController {
 
         model.addAttribute("appointments", filtered);
         model.addAttribute("selectedStatus", selected);
+        model.addAttribute("selectedPayment", selectedPayment);
+        model.addAttribute("selectedDate", selectedDate);
         model.addAttribute("q", q == null ? "" : q.trim());
         model.addAttribute("bookedCount", all.stream().filter(a -> a.getStatus() == AppointmentStatus.BOOKED).count());
         model.addAttribute("completedCount", all.stream().filter(a -> a.getStatus() == AppointmentStatus.COMPLETED).count());
         model.addAttribute("cancelledCount", all.stream().filter(a -> a.getStatus() == AppointmentStatus.CANCELLED).count());
+        model.addAttribute("pendingPaymentCount", all.stream()
+                .filter(a -> a.getPaymentStatus() == PaymentStatus.PENDING)
+                .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
+                .count());
+        model.addAttribute("paidCount", all.stream()
+                .filter(a -> a.getPaymentStatus() == PaymentStatus.PAID)
+                .count());
+        model.addAttribute("todayCount", all.stream()
+                .filter(a -> today.equals(a.getAppointmentDate()))
+                .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
+                .count());
         model.addAttribute("revenue", all.stream()
                 .filter(a -> a.getPaymentStatus() == PaymentStatus.PAID)
                 .map(Appointment::getAmount)
@@ -529,28 +568,78 @@ public class DoctorController {
     public String pricing(Model model) {
         model.addAttribute("servicePrices", servicePriceService.findAll());
         model.addAttribute("consultationFee", siteSettingService.getConsultationFee());
+        model.addAttribute("activeServiceCount", servicePriceService.findActive().size());
         return "admin/pricing";
     }
 
-    @PostMapping("/pricing/update")
-    public String updatePricing(@RequestParam(required = false) Long id,
-                                @RequestParam(required = false) BigDecimal fee,
-                                RedirectAttributes redirectAttributes) {
-        ServicePrice price = servicePriceService.findById(id);
+    @PostMapping("/pricing/save")
+    public String savePricing(@RequestParam(required = false) Long id,
+                              @RequestParam String serviceName,
+                              @RequestParam(required = false) BigDecimal fee,
+                              @RequestParam(required = false) String description,
+                              @RequestParam(required = false, defaultValue = "false") boolean active,
+                              RedirectAttributes redirectAttributes) {
+        String name = serviceName == null ? "" : serviceName.trim();
+        if (name.length() < 2 || name.length() > 120) {
+            redirectAttributes.addFlashAttribute("error", "Enter a treatment name between 2 and 120 characters.");
+            return "redirect:/admin/pricing";
+        }
+        ServicePrice existing = servicePriceService.findByServiceName(name);
+        if (existing != null && (id == null || !existing.getId().equals(id))) {
+            redirectAttributes.addFlashAttribute("error", "A treatment with that name already exists.");
+            return "redirect:/admin/pricing";
+        }
+        ServicePrice price = id == null ? new ServicePrice() : servicePriceService.findById(id);
         if (price == null) {
-            redirectAttributes.addFlashAttribute("error", "That service could not be found.");
+            redirectAttributes.addFlashAttribute("error", "That treatment could not be found.");
             return "redirect:/admin/pricing";
         }
-        if (fee == null || fee.compareTo(BigDecimal.ZERO) < 0
-                || fee.compareTo(new BigDecimal("1000000")) > 0) {
-            redirectAttributes.addFlashAttribute("error",
-                    "Enter a fee between ₹0 and ₹10,00,000.");
+        if (fee == null || fee.signum() < 0 || fee.compareTo(new BigDecimal("1000000")) > 0) {
+            redirectAttributes.addFlashAttribute("error", "Enter a fee between ₹0 and ₹10,00,000.");
             return "redirect:/admin/pricing";
         }
+        price.setServiceName(name);
         price.setFee(fee.setScale(2, RoundingMode.HALF_UP));
+        price.setDescription(description == null ? null : description.trim());
+        price.setActive(active);
         servicePriceService.save(price);
         redirectAttributes.addFlashAttribute("success",
-                price.getServiceName() + " fee updated to ₹" + price.getFee() + ".");
+                id == null ? name + " added to the treatment catalogue." : name + " updated.");
+        return "redirect:/admin/pricing";
+    }
+
+    @PostMapping("/pricing/toggle")
+    public String togglePricing(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        ServicePrice price = servicePriceService.findById(id);
+        if (price != null) {
+            price.setActive(!price.isActive());
+            servicePriceService.save(price);
+            redirectAttributes.addFlashAttribute("success",
+                    price.getServiceName() + (price.isActive() ? " is now visible to patients." : " is now hidden from patients."));
+        }
+        return "redirect:/admin/pricing";
+    }
+
+    @PostMapping("/pricing/delete")
+    public String deletePricing(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        ServicePrice price = servicePriceService.findById(id);
+        if (price != null) {
+            servicePriceService.delete(id);
+            redirectAttributes.addFlashAttribute("success", price.getServiceName() + " removed from the catalogue.");
+        }
+        return "redirect:/admin/pricing";
+    }
+
+    @PostMapping("/pricing/consultation")
+    public String updateConsultationFee(@RequestParam BigDecimal consultationFee,
+                                        RedirectAttributes redirectAttributes) {
+        if (consultationFee == null || consultationFee.signum() < 0
+                || consultationFee.compareTo(new BigDecimal("1000000")) > 0) {
+            redirectAttributes.addFlashAttribute("error", "Enter a consultation fee between ₹0 and ₹10,00,000.");
+            return "redirect:/admin/pricing";
+        }
+        siteSettingService.update(Map.of("consultationFee", consultationFee.setScale(2, RoundingMode.HALF_UP).toPlainString()));
+        redirectAttributes.addFlashAttribute("success", "Standard consultation fee updated. It is live now.");
         return "redirect:/admin/pricing";
     }
 
@@ -578,7 +667,15 @@ public class DoctorController {
                                RedirectAttributes redirectAttributes) {
         try {
             doctorFeeService.adminSetFee(doctorId, serviceName, fee);
-            redirectAttributes.addFlashAttribute("success", "Doctor fee saved.");
+            Doctor doctor = doctorService.findById(doctorId);
+            if (doctor != null) {
+                doctorFeeService.findByDoctor(doctor).stream()
+                        .filter(item -> item.getServiceName() != null
+                                && item.getServiceName().equalsIgnoreCase(serviceName))
+                        .findFirst()
+                        .ifPresent(this::syncPendingAppointmentFees);
+            }
+            redirectAttributes.addFlashAttribute("success", "Doctor fee saved and applied to new bookings.");
         } catch (IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("error", exception.getMessage());
         }
@@ -587,7 +684,10 @@ public class DoctorController {
 
     @PostMapping("/doctor-fees/approve")
     public String approveDoctorFee(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        DoctorFee fee = doctorFeeService.findById(id);
         doctorFeeService.approve(id);
+        DoctorFee approved = doctorFeeService.findById(id);
+        syncPendingAppointmentFees(approved == null ? fee : approved);
         redirectAttributes.addFlashAttribute("success", "Fee request approved and live on the booking page.");
         return "redirect:/admin/doctor-fees";
     }
@@ -604,6 +704,135 @@ public class DoctorController {
         doctorFeeService.deleteFee(id);
         redirectAttributes.addFlashAttribute("success", "Doctor fee override removed. The standard price now applies.");
         return "redirect:/admin/doctor-fees";
+    }
+
+    /**
+     * Keeps unpaid bookings in step with an approved doctor fee. Called right
+     * after an approval or an admin-set fee so patients never see a stale
+     * amount, even on a booking that was started before the approval.
+     */
+    private void syncPendingAppointmentFees(DoctorFee fee) {
+        if (fee == null || fee.getDoctor() == null || fee.getDoctor().getId() == null
+                || fee.getFee() == null || fee.getFee().signum() < 0) {
+            return;
+        }
+        boolean consultation = DoctorFee.CONSULTATION.equalsIgnoreCase(fee.getServiceName());
+        for (Appointment appointment : appointmentService.getAll()) {
+            if (appointment.getPaymentStatus() != PaymentStatus.PENDING
+                    || appointment.getStatus() == AppointmentStatus.CANCELLED
+                    || appointment.getDoctorId() == null
+                    || !appointment.getDoctorId().equals(fee.getDoctor().getId())) {
+                continue;
+            }
+            boolean matches = consultation
+                    ? appointment.isConsultation()
+                    : appointment.getService() != null
+                    && appointment.getService().equalsIgnoreCase(fee.getServiceName());
+            if (matches) {
+                appointment.setAmount(fee.getFee());
+                appointmentService.save(appointment);
+            }
+        }
+    }
+
+    // ---------------- TESTIMONIAL CRUD ---------------- //
+
+    @GetMapping("/testimonials")
+    public String testimonials(Model model) {
+        model.addAttribute("testimonials", testimonialService.findAll());
+        model.addAttribute("activeTestimonialCount", testimonialService.findActive().size());
+        return "admin/testimonials";
+    }
+
+    @PostMapping("/testimonials/save")
+    public String saveTestimonial(@RequestParam(required = false) Long id,
+                                  @RequestParam String patientName,
+                                  @RequestParam(required = false) String treatment,
+                                  @RequestParam String message,
+                                  @RequestParam(required = false, defaultValue = "5") int rating,
+                                  @RequestParam(required = false, defaultValue = "0") int displayOrder,
+                                  @RequestParam(required = false, defaultValue = "false") boolean active,
+                                  RedirectAttributes redirectAttributes) {
+        String name = patientName == null ? "" : patientName.trim();
+        String body = message == null ? "" : message.trim();
+        if (name.length() < 2 || name.length() > 90) {
+            redirectAttributes.addFlashAttribute("error", "Enter a patient name between 2 and 90 characters.");
+            return "redirect:/admin/testimonials";
+        }
+        if (body.length() < 5 || body.length() > 1000) {
+            redirectAttributes.addFlashAttribute("error", "Enter a testimonial between 5 and 1000 characters.");
+            return "redirect:/admin/testimonials";
+        }
+        Testimonial testimonial = id == null ? new Testimonial() : testimonialService.findById(id);
+        if (testimonial == null) {
+            redirectAttributes.addFlashAttribute("error", "That testimonial could not be found.");
+            return "redirect:/admin/testimonials";
+        }
+        testimonial.setPatientName(name);
+        testimonial.setTreatment(treatment == null ? null : treatment.trim());
+        testimonial.setMessage(body);
+        testimonial.setRating(Math.max(1, Math.min(5, rating)));
+        testimonial.setDisplayOrder(Math.max(0, Math.min(999, displayOrder)));
+        testimonial.setActive(active);
+        testimonialService.save(testimonial);
+        redirectAttributes.addFlashAttribute("success",
+                id == null ? "Testimonial published." : "Testimonial updated.");
+        return "redirect:/admin/testimonials";
+    }
+
+    @PostMapping("/testimonials/toggle")
+    public String toggleTestimonial(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        Testimonial testimonial = testimonialService.findById(id);
+        if (testimonial != null) {
+            testimonialService.toggle(id);
+            redirectAttributes.addFlashAttribute("success",
+                    testimonial.getPatientName() + (testimonial.isActive()
+                            ? " is now hidden from the public site."
+                            : " is now visible on the public site."));
+        }
+        return "redirect:/admin/testimonials";
+    }
+
+    @PostMapping("/testimonials/delete")
+    public String deleteTestimonial(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        testimonialService.delete(id);
+        redirectAttributes.addFlashAttribute("success", "Testimonial deleted.");
+        return "redirect:/admin/testimonials";
+    }
+
+    // ---------------- CONTACT INBOX ---------------- //
+
+    @GetMapping("/messages")
+    public String messages(@RequestParam(required = false, defaultValue = "all") String view, Model model) {
+        List<ContactMessage> all = contactMessageService.findAll();
+        List<ContactMessage> shown = "unread".equalsIgnoreCase(view)
+                ? all.stream().filter(item -> !item.isRead()).toList()
+                : all;
+        model.addAttribute("messages", shown);
+        model.addAttribute("selectedView", "unread".equalsIgnoreCase(view) ? "unread" : "all");
+        model.addAttribute("unreadMessages", contactMessageService.unreadCount());
+        model.addAttribute("messageCount", all.size());
+        return "admin/messages";
+    }
+
+    @PostMapping("/messages/toggle")
+    public String toggleMessage(@RequestParam Long id,
+                                @RequestParam(required = false) String view,
+                                RedirectAttributes redirectAttributes) {
+        ContactMessage message = contactMessageService.findById(id);
+        if (message != null) {
+            contactMessageService.markRead(id, !message.isRead());
+            redirectAttributes.addFlashAttribute("success",
+                    message.isRead() ? "Message moved back to unread." : "Message marked as read.");
+        }
+        return "redirect:/admin/messages" + ("unread".equalsIgnoreCase(view) ? "?view=unread" : "");
+    }
+
+    @PostMapping("/messages/delete")
+    public String deleteMessage(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        contactMessageService.delete(id);
+        redirectAttributes.addFlashAttribute("success", "Message deleted from the inbox.");
+        return "redirect:/admin/messages";
     }
 
     @GetMapping("/settings")

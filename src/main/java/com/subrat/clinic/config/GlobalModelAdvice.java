@@ -1,6 +1,7 @@
 package com.subrat.clinic.config;
 
 import com.subrat.clinic.model.Patient;
+import com.subrat.clinic.service.ContactMessageService;
 import com.subrat.clinic.service.DoctorFeeService;
 import com.subrat.clinic.service.PatientService;
 import com.subrat.clinic.service.SiteSettingService;
@@ -17,13 +18,16 @@ public class GlobalModelAdvice {
     private final SiteSettingService siteSettingService;
     private final PatientService patientService;
     private final DoctorFeeService doctorFeeService;
+    private final ContactMessageService contactMessageService;
 
     public GlobalModelAdvice(SiteSettingService siteSettingService,
                              PatientService patientService,
-                             DoctorFeeService doctorFeeService) {
+                             DoctorFeeService doctorFeeService,
+                             ContactMessageService contactMessageService) {
         this.siteSettingService = siteSettingService;
         this.patientService = patientService;
         this.doctorFeeService = doctorFeeService;
+        this.contactMessageService = contactMessageService;
     }
 
     @ModelAttribute("hasAdminRole")
@@ -81,6 +85,11 @@ public class GlobalModelAdvice {
     @ModelAttribute("pendingFeeCount")
     public long pendingFeeCount(Authentication authentication) {
         return hasRole(authentication, "ROLE_ADMIN") ? doctorFeeService.pendingCount() : 0L;
+    }
+
+    @ModelAttribute("unreadMessages")
+    public long unreadMessages(Authentication authentication) {
+        return hasRole(authentication, "ROLE_ADMIN") ? contactMessageService.unreadCount() : 0L;
     }
 
     private boolean hasRole(Authentication authentication, String role) {

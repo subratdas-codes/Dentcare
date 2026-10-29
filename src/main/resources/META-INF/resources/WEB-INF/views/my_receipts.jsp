@@ -17,7 +17,7 @@
         .dc-receipt + .dc-receipt { margin-top: .8rem; }
         .dc-ref { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; color: #64748b; }
         .badge-soft-success { background: #e7f7ef; color: #15803d; }
-        .badge-soft-warning { background: #fff6e5; color: #b45309; }
+        .badge-soft-warning { background: #fff6e5; color: #92400e; }
         .badge-soft-info { background: #e6f7fa; color: #0e7490; }
         .badge-soft-danger { background: #fdecec; color: #b91c1c; }
         .dc-account-wrap { position: sticky; top: 110px; }
@@ -31,7 +31,7 @@
     <div class="mb-4">
         <div class="text-uppercase small fw-bold mb-1" style="color:#0f766e;letter-spacing:.07em;">Patient account</div>
         <h1 class="h3 fw-bold mb-1">Receipts &amp; payments</h1>
-        <p class="text-muted mb-0">Every confirmed booking, its reference ID and printable receipt.</p>
+        <p class="text-muted mb-0">Every confirmed booking, its reference ID and branded PDF receipt.</p>
     </div>
 
     <div class="row g-4">
@@ -70,10 +70,10 @@
                             <div class="text-sm-end">
                                 <div class="fw-bold fs-5 mb-2">₹<fmt:formatNumber value="${a.amount}" minFractionDigits="2" maxFractionDigits="2" /></div>
                                 <a class="btn btn-sm btn-outline-dark" href="${pageContext.request.contextPath}/booking/confirmation/${a.paymentReference}">
-                                    <i class="bi bi-receipt me-1"></i>Open / print
+                                    <i class="bi bi-receipt me-1"></i>Booking details
                                 </a>
                                 <a class="btn btn-sm btn-outline-secondary mt-1" href="${pageContext.request.contextPath}/booking/receipt/${a.paymentReference}/download">
-                                    <i class="bi bi-download me-1"></i>Download
+                                    <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
                                 </a>
                             </div>
                         </div>

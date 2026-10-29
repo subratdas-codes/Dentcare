@@ -33,9 +33,9 @@
         .preview-link { color: #53657d; font-size: .78rem; font-weight: 600; }
         .preview-book { background: #0f766e; color: #fff; font-size: .72rem; font-weight: 700; border-radius: .45rem; padding: .28rem .55rem; }
         .preview-head { background: #0b172a; color: #fff; border-radius: .5rem; padding: 1rem; margin-top: .75rem; }
-        .preview-head .eyebrow { color: #8fd8ce; font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+        .preview-head .eyebrow { color: #a8eadf; font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
         .preview-head h6 { font-size: .9rem; margin: .25rem 0; }
-        .preview-head p { color: #b9c6d8; font-size: .7rem; margin: 0; }
+        .preview-head p { color: #d8e5f2; font-size: .7rem; margin: 0; }
     </style>
 </head>
 <body>
@@ -45,9 +45,9 @@
     <section class="page-head p-4 p-lg-5 mb-4">
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
             <div>
-                <div class="small text-white-50 mb-1">ADMIN CONTROL CENTRE</div>
+                <div class="small mb-1" style="color:#cdeee8;">ADMIN CONTROL CENTRE</div>
                 <h1 class="h3 fw-bold mb-2">Website, labels &amp; receipt settings</h1>
-                <p class="mb-0 text-white-50">Change every public label, fee, footer line and receipt message. Updates are live immediately.</p>
+                <p class="mb-0" style="color:#cdeee8;">Change every public label, fee, footer line, social link and receipt message. Updates are live immediately.</p>
             </div>
             <button type="submit" form="settingsForm" class="btn btn-light fw-semibold px-4">
                 <i class="bi bi-check2-circle me-1"></i>Save all changes
@@ -62,6 +62,7 @@
         <div class="col-lg-3 col-xl-2">
             <nav class="settings-nav" aria-label="Settings sections">
                 <a href="#brand"><i class="bi bi-shop me-2"></i>Brand &amp; homepage</a>
+                <a href="#pages"><i class="bi bi-file-earmark-text me-2"></i>Page copy</a>
                 <a href="#navigation"><i class="bi bi-list-nested me-2"></i>Navigation labels</a>
                 <a href="#booking"><i class="bi bi-calendar2-check me-2"></i>Booking &amp; fees</a>
                 <a href="#footer"><i class="bi bi-layout-text-window-reverse me-2"></i>Footer &amp; contact</a>
@@ -101,6 +102,26 @@
                             <label class="form-label" for="homeText">Homepage supporting line</label>
                             <textarea id="homeText" name="homeText" class="form-control" rows="2" maxlength="220"><c:out value="${siteSettings['homeText']}" /></textarea>
                         </div>
+                    </div>
+                </section>
+
+                <section id="pages" class="settings-card mb-4">
+                    <div class="card-head"><h2 class="h6 fw-bold mb-1">Page copy</h2><p class="text-muted small mb-0">Headings and intros for every public page. Leave a field blank to use the built-in default text.</p></div>
+                    <div class="p-4 row g-3">
+                        <div class="col-md-6"><label class="form-label" for="aboutHeading">About page heading</label><input id="aboutHeading" name="aboutHeading" class="form-control" maxlength="140" value="${fn:escapeXml(siteSettings['aboutHeading'])}"></div>
+                        <div class="col-md-6"><label class="form-label" for="offerTitle">Homepage offer title</label><input id="offerTitle" name="offerTitle" class="form-control" maxlength="140" value="${fn:escapeXml(siteSettings['offerTitle'])}"></div>
+                        <div class="col-12"><label class="form-label" for="aboutText">About page intro</label><textarea id="aboutText" name="aboutText" class="form-control" rows="3" maxlength="600"><c:out value="${siteSettings['aboutText']}" /></textarea></div>
+                        <div class="col-12"><label class="form-label" for="offerText">Homepage offer text</label><textarea id="offerText" name="offerText" class="form-control" rows="2" maxlength="400"><c:out value="${siteSettings['offerText']}" /></textarea></div>
+                        <div class="col-md-6"><label class="form-label" for="serviceHeading">Services heading</label><input id="serviceHeading" name="serviceHeading" class="form-control" maxlength="140" value="${fn:escapeXml(siteSettings['serviceHeading'])}"></div>
+                        <div class="col-md-6"><label class="form-label" for="teamHeading">Doctors heading</label><input id="teamHeading" name="teamHeading" class="form-control" maxlength="140" value="${fn:escapeXml(siteSettings['teamHeading'])}"></div>
+                        <div class="col-md-6"><label class="form-label" for="serviceText">Services intro</label><textarea id="serviceText" name="serviceText" class="form-control" rows="2" maxlength="400"><c:out value="${siteSettings['serviceText']}" /></textarea></div>
+                        <div class="col-md-6"><label class="form-label" for="teamText">Doctors intro</label><textarea id="teamText" name="teamText" class="form-control" rows="2" maxlength="400"><c:out value="${siteSettings['teamText']}" /></textarea></div>
+                        <div class="col-md-6"><label class="form-label" for="pricingHeading">Pricing heading</label><input id="pricingHeading" name="pricingHeading" class="form-control" maxlength="140" value="${fn:escapeXml(siteSettings['pricingHeading'])}"></div>
+                        <div class="col-md-6"><label class="form-label" for="testimonialHeading">Testimonials heading</label><input id="testimonialHeading" name="testimonialHeading" class="form-control" maxlength="140" value="${fn:escapeXml(siteSettings['testimonialHeading'])}"></div>
+                        <div class="col-md-6"><label class="form-label" for="pricingText">Pricing intro</label><textarea id="pricingText" name="pricingText" class="form-control" rows="2" maxlength="400"><c:out value="${siteSettings['pricingText']}" /></textarea></div>
+                        <div class="col-md-6"><label class="form-label" for="testimonialText">Testimonials intro</label><textarea id="testimonialText" name="testimonialText" class="form-control" rows="2" maxlength="400"><c:out value="${siteSettings['testimonialText']}" /></textarea></div>
+                        <div class="col-md-6"><label class="form-label" for="contactHeading">Contact heading</label><input id="contactHeading" name="contactHeading" class="form-control" maxlength="140" value="${fn:escapeXml(siteSettings['contactHeading'])}"></div>
+                        <div class="col-md-6"><label class="form-label" for="contactText">Contact intro</label><textarea id="contactText" name="contactText" class="form-control" rows="2" maxlength="400"><c:out value="${siteSettings['contactText']}" /></textarea></div>
                     </div>
                 </section>
 
@@ -144,11 +165,19 @@
                         <div class="col-md-6"><label class="form-label" for="footerPhone">Phone</label><input id="footerPhone" name="footerPhone" class="form-control" maxlength="60" value="${fn:escapeXml(siteSettings['footerPhone'])}"></div>
                         <div class="col-md-6"><label class="form-label" for="footerEmail">Email</label><input id="footerEmail" name="footerEmail" type="email" class="form-control" maxlength="120" value="${fn:escapeXml(siteSettings['footerEmail'])}"></div>
                         <div class="col-12"><label class="form-label" for="footerCopyright">Copyright line</label><input id="footerCopyright" name="footerCopyright" class="form-control" maxlength="160" value="${fn:escapeXml(siteSettings['footerCopyright'])}"></div>
+                        <div class="col-md-4"><label class="form-label" for="hoursWeekday">Weekday hours</label><input id="hoursWeekday" name="hoursWeekday" class="form-control" maxlength="100" value="${fn:escapeXml(siteSettings['hoursWeekday'])}"></div>
+                        <div class="col-md-4"><label class="form-label" for="hoursSaturday">Saturday hours</label><input id="hoursSaturday" name="hoursSaturday" class="form-control" maxlength="100" value="${fn:escapeXml(siteSettings['hoursSaturday'])}"></div>
+                        <div class="col-md-4"><label class="form-label" for="hoursSunday">Sunday hours</label><input id="hoursSunday" name="hoursSunday" class="form-control" maxlength="100" value="${fn:escapeXml(siteSettings['hoursSunday'])}"></div>
+                        <div class="col-md-3"><label class="form-label" for="socialFacebook">Facebook URL</label><input id="socialFacebook" name="socialFacebook" class="form-control" maxlength="200" value="${fn:escapeXml(siteSettings['socialFacebook'])}" placeholder="https://facebook.com/..."></div>
+                        <div class="col-md-3"><label class="form-label" for="socialInstagram">Instagram URL</label><input id="socialInstagram" name="socialInstagram" class="form-control" maxlength="200" value="${fn:escapeXml(siteSettings['socialInstagram'])}" placeholder="https://instagram.com/..."></div>
+                        <div class="col-md-3"><label class="form-label" for="socialTwitter">X / Twitter URL</label><input id="socialTwitter" name="socialTwitter" class="form-control" maxlength="200" value="${fn:escapeXml(siteSettings['socialTwitter'])}" placeholder="https://x.com/..."></div>
+                        <div class="col-md-3"><label class="form-label" for="socialLinkedin">LinkedIn URL</label><input id="socialLinkedin" name="socialLinkedin" class="form-control" maxlength="200" value="${fn:escapeXml(siteSettings['socialLinkedin'])}" placeholder="https://linkedin.com/..."></div>
+                        <div class="col-12"><label class="form-label" for="mapQuery">Map location query</label><input id="mapQuery" name="mapQuery" class="form-control" maxlength="200" value="${fn:escapeXml(siteSettings['mapQuery'])}"><div class="form-text">Used to build the Google Maps embed on the contact page. Leave social links blank to hide their icons.</div></div>
                     </div>
                 </section>
 
                 <section id="receipts" class="settings-card mb-4">
-                    <div class="card-head"><h2 class="h6 fw-bold mb-1">Receipts</h2><p class="text-muted small mb-0">Text used on the printable and downloadable receipt.</p></div>
+                    <div class="card-head"><h2 class="h6 fw-bold mb-1">Receipts</h2><p class="text-muted small mb-0">Text used on the branded PDF receipt that patients download.</p></div>
                     <div class="p-4 row g-3">
                         <div class="col-md-6"><label class="form-label" for="receiptTitle">Receipt title</label><input id="receiptTitle" name="receiptTitle" class="form-control" maxlength="80" value="${fn:escapeXml(siteSettings['receiptTitle'])}"></div>
                         <div class="col-md-6"><label class="form-label" for="receiptNote">Receipt note</label><input id="receiptNote" name="receiptNote" class="form-control" maxlength="220" value="${fn:escapeXml(siteSettings['receiptNote'])}"></div>

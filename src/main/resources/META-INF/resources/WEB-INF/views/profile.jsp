@@ -128,7 +128,7 @@
                         <div class="col-md-6">
                             <a href="${pageContext.request.contextPath}/my/receipts" class="dc-card d-block p-3 text-decoration-none text-dark h-100">
                                 <div class="fw-bold mb-1"><i class="bi bi-receipt me-1" style="color:#0f766e;"></i>Receipts</div>
-                                <div class="small text-muted">Print or download past payment receipts.</div>
+                                <div class="small text-muted">Download branded PDF receipts for past payments.</div>
                             </a>
                         </div>
                     </div>

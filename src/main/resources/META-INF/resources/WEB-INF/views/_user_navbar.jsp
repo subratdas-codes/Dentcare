@@ -14,8 +14,8 @@
     .dc-dropdown { border: 1px solid #e7ecf3; border-radius: .8rem; box-shadow: 0 18px 40px -24px rgba(16, 36, 62, .55); padding: .45rem; min-width: 230px; }
     .dc-dropdown .dropdown-item { border-radius: .55rem; padding: .55rem .75rem; font-weight: 500; color: #34445c; }
     .dc-dropdown .dropdown-item:hover { background: #f2f8f7; color: #0f766e; }
-    .dc-dropdown .dropdown-header { color: #7a8aa0; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
-    .dc-announce { background: #0f766e; color: #eafffb; font-size: .82rem; text-align: center; padding: .35rem .75rem; }
+    .dc-dropdown .dropdown-header { color: #52627a; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
+    .dc-announce { background: #0f766e; color: #ffffff; font-size: .82rem; text-align: center; padding: .35rem .75rem; }
 </style>
 <c:if test="${not empty site.announcement}">
     <div class="dc-announce"><c:out value="${site.announcement}" /></div>
