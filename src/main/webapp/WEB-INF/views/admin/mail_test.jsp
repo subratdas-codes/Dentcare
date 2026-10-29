@@ -31,7 +31,7 @@
                 <h5 class="fw-bold mb-3">Configuration Status</h5>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between">
-                        <span>SMTP configured</span>
+                        <span>Mail configured</span>
                         <c:choose>
                             <c:when test="${configured}">
                                 <span class="badge bg-success">YES</span>
@@ -51,12 +51,12 @@
                     </li>
                 </ul>
                 <p class="text-muted small mt-3 mb-0">
-                    If <strong>SMTP configured = NO</strong>, add these to the Render environment and re-deploy:
-                    <code>MAIL_USERNAME</code>, <code>MAIL_PASSWORD</code> (and optionally <code>SMTP_HOST</code>,
-                    <code>SMTP_PORT</code>).
-                    <br>SendGrid: host <code>smtp.sendgrid.net</code>, username <code>apikey</code>, password = your
-                    API key. Brevo: host <code>smtp-relay.brevo.com</code>, username = your login email, password = SMTP key.
-                    <br>Note: Gmail SMTP (smtp.gmail.com) is blocked from Render - use the Connectivity Check to see what is reachable.
+                    If <strong>Mail configured = NO</strong>, add these to the Render environment and re-deploy:
+                    <code>BREVO_API_KEY</code> (recommended, uses HTTPS and works on Render free) or
+                    <code>MAIL_USERNAME</code>, <code>MAIL_PASSWORD</code>, <code>SMTP_HOST=smtp-relay.brevo.com</code>,
+                    <code>SMTP_PORT=2525</code>.
+                    <br>Brevo SMTP ports 25/465/587 are blocked on Render free, so the app tries 2525 first.
+                    <br>Gmail SMTP (smtp.gmail.com) is blocked from Render - use the Connectivity Check to see what is reachable.
                 </p>
             </div>
         </div>
@@ -67,10 +67,10 @@
                 <c:if test="${not empty sendResult}">
                     <div class="alert ${sendResult.startsWith('Sent OK') ? 'alert-success' : 'alert-danger'} p-3">
                         <i class="bi ${sendResult.startsWith('Sent OK') ? 'bi-check-circle' : 'bi-exclamation-triangle'} me-1"></i>
-                        ${sendResult}
+                        <c:out value="${sendResult}" />
                     </div>
                 </c:if>
-                <p class="text-muted">Sends a test mail to dentcare.support@gmail.com so you can confirm Gmail SMTP works from Render.</p>
+                <p class="text-muted">Sends a test mail to dentcare.support@gmail.com so you can confirm mail delivery works from Render.</p>
                 <form action="${pageContext.request.contextPath}/admin/mail-test/send" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                     <button type="submit" class="btn btn-primary">
@@ -84,7 +84,7 @@
                 <p class="text-muted small mb-2">Probes which email hosts/servers this server can actually reach. Helps if emails never arrive.</p>
                 <c:if test="${not empty connectResult}">
                     <div class="bg-dark text-light small p-3 rounded mb-3" style="white-space: pre-wrap; word-break: break-all;">
-                        ${connectResult}
+                        <c:out value="${connectResult}" />
                     </div>
                 </c:if>
                 <form action="${pageContext.request.contextPath}/admin/mail-test/connect" method="post">

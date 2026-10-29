@@ -530,11 +530,11 @@ public class DoctorController {
 
     @PostMapping("/mail-test/send")
     public String mailTestSend(Model model) {
-        String error = mailService.sendTest();
-        model.addAttribute("sendResult",
-                error == null
-                        ? "Sent OK - check dentcare.support@gmail.com inbox (and spam) now."
-                        : "FAILED: " + error);
+        String result = mailService.sendTest();
+        boolean ok = result != null && !result.startsWith("FAILED:");
+        model.addAttribute("sendResult", ok
+                ? "Sent OK via " + result + " - check dentcare.support@gmail.com inbox (and spam) now."
+                : (result == null ? "FAILED: no response from the mail service." : result));
         model.addAttribute("configured", mailService.isConfigured());
         model.addAttribute("mailUsername", mailService.getMailUsername());
         return "admin/mail_test";
