@@ -61,17 +61,8 @@
                 </li>
             </sec:authorize>
             <sec:authorize access="!isAuthenticated()">
-                <li class="nav-item dropdown ms-lg-2 mt-2 mt-lg-0">
-                    <a href="${pageContext.request.contextPath}/portal" class="nav-link dropdown-toggle" id="loginMenu" data-bs-toggle="dropdown" aria-expanded="false">Login</a>
-                    <div class="dropdown-menu dropdown-menu-end dc-dropdown" aria-labelledby="loginMenu">
-                        <div class="dropdown-header">Choose your portal</div>
-                        <a href="${pageContext.request.contextPath}/login" class="dropdown-item"><i class="fas fa-user me-2"></i>Patient Login</a>
-                        <a href="${pageContext.request.contextPath}/doctor/login" class="dropdown-item"><i class="fas fa-user-md me-2"></i>Doctor Login</a>
-                        <a href="${pageContext.request.contextPath}/admin/login" class="dropdown-item"><i class="fas fa-user-shield me-2"></i>Admin Login</a>
-                        <div class="dropdown-divider"></div>
-                        <a href="${pageContext.request.contextPath}/portal" class="dropdown-item">All login options</a>
-                    </div>
-                </li>
+                <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><a href="${pageContext.request.contextPath}/login" class="nav-link">Login</a></li>
+                <li class="nav-item mt-2 mt-lg-0"><a href="${pageContext.request.contextPath}/portal" class="nav-link">Staff Login</a></li>
                 <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><a href="${pageContext.request.contextPath}/register" class="btn btn-outline-secondary btn-sm px-3 py-2" style="border-radius:.65rem;font-weight:600;">Register</a></li>
             </sec:authorize>
         </ul>
