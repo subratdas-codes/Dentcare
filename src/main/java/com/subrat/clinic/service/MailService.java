@@ -58,6 +58,13 @@ public class MailService {
 
     @PostConstruct
     public void init() {
+        // The Render free tier blocks SMTP ports 25/465/587. If the configured
+        // MAIL_PASSWORD is actually a Brevo API key, use the HTTPS API instead.
+        if ((brevoApiKey == null || brevoApiKey.isBlank())
+                && mailPassword != null && mailPassword.trim().startsWith("xkeysib-")) {
+            brevoApiKey = mailPassword.trim();
+            LOGGER.info("[MAIL] Detected a Brevo API key in MAIL_PASSWORD; using the HTTPS API.");
+        }
         if (brevoApiKey != null && !brevoApiKey.isBlank()) {
             LOGGER.info("[MAIL] Provider=BREVO-HTTP configured=true (api.brevo.com:443 - reaches Render where SMTP is blocked)");
             return;
@@ -72,11 +79,16 @@ public class MailService {
         } catch (NumberFormatException ex) {
             basePort = 587;
         }
-        Set<Integer> ports = new LinkedHashSet<>();
-        ports.add(basePort);
-        ports.add(465);
-        ports.add(587);
         String host = mailHost.trim();
+        Set<Integer> ports = new LinkedHashSet<>();
+        // Brevo and SendGrid both accept port 2525, which is not blocked on
+        // Render's free plan. Try it before the standard SMTP ports.
+        if (host.toLowerCase().contains("brevo") || host.toLowerCase().contains("sendgrid")) {
+            ports.add(2525);
+        }
+        ports.add(basePort);
+        ports.add(587);
+        ports.add(465);
         for (int p : ports) {
             smtpSenders.add(build(host, p, p == 465));
         }
@@ -91,9 +103,9 @@ public class MailService {
         sender.setPassword(mailPassword);
         Properties props = sender.getJavaMailProperties();
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.connectiontimeout", "15000");
-        props.put("mail.smtp.timeout", "15000");
-        props.put("mail.smtp.writetimeout", "15000");
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "10000");
+        props.put("mail.smtp.writetimeout", "10000");
         if (ssl) {
             props.put("mail.smtp.ssl.enable", "true");
             props.put("mail.smtp.socketFactory.port", String.valueOf(port));
@@ -120,8 +132,8 @@ public class MailService {
 
     public String runConnectivityCheck() {
         String[] targets = {
-                "smtp-relay.brevo.com:587", "smtp-relay.brevo.com:465",
-                "smtp.gmail.com:587", "smtp.gmail.com:465",
+                "smtp-relay.brevo.com:2525", "smtp-relay.brevo.com:587",
+                "smtp.sendgrid.net:2525", "smtp.sendgrid.net:587",
                 "api.brevo.com:443", "example.com:443"
         };
         StringBuilder sb = new StringBuilder();

@@ -109,25 +109,6 @@ public class DoctorPortalController {
         return "redirect:/doctor/login?registered=true";
     }
 
-    @GetMapping("/forgot-password")
-    public String forgotPassword(Model model) {
-        model.addAttribute("selectedRole", "DOCTOR");
-        return "admin/forgot_password";
-    }
-
-    @PostMapping("/forgot-password")
-    public String forgotPasswordPost(@RequestParam String email, Model model) {
-        model.addAttribute("selectedRole", "DOCTOR");
-        model.addAttribute("success", "If an account exists for that email, a password reset link has been sent.");
-        return "admin/forgot_password";
-    }
-
-    @GetMapping("/reset-password")
-    public String resetPassword(Model model) {
-        model.addAttribute("selectedRole", "DOCTOR");
-        return "admin/reset_password";
-    }
-
     @GetMapping("/dashboard")
     public String dashboard(Authentication authentication, Model model) {
         return populateDashboard(authentication, model);

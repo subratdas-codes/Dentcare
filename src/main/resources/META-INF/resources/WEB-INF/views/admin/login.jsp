@@ -41,6 +41,7 @@
                 <div class="alert alert-danger" role="alert">Invalid credentials or this account does not belong to the selected staff portal.</div>
             </c:if>
             <c:if test="${param.logout != null}"><div class="alert alert-success" role="status">Logged out of this portal successfully.</div></c:if>
+            <c:if test="${param.reset == 'true'}"><div class="alert alert-success" role="status">Password reset successfully! Sign in with your new password.</div></c:if>
             <c:if test="${param.registered == 'true'}"><div class="alert alert-success" role="status">Doctor account created. Sign in to continue.</div></c:if>
             <form action="<c:url value='/login' />" method="post">
                 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />

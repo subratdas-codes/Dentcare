@@ -1,5 +1,6 @@
 package com.subrat.clinic.controller;
 
+import com.subrat.clinic.model.Doctor;
 import com.subrat.clinic.model.Patient;
 import com.subrat.clinic.model.PasswordResetToken;
 import com.subrat.clinic.repository.DoctorRepository;
@@ -8,6 +9,7 @@ import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -37,6 +39,9 @@ public class AuthenticationController {
 
     @Autowired
     private MailService mailService;
+
+    @Value("${app.reset-link-base:}")
+    private String resetLinkBase;
 
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
@@ -183,18 +188,19 @@ public class AuthenticationController {
         return "redirect:/profile?tab=security";
     }
 
-    @GetMapping("/forgot-password")
-    public String showForgotPasswordForm() {
+    @GetMapping({"/forgot-password", "/admin/forgot-password", "/doctor/forgot-password"})
+    public String showForgotPasswordForm(HttpServletRequest request, Model model) {
+        model.addAttribute("portal", portalFromRequest(request));
         return "forgot_password";
     }
 
-    @PostMapping("/forgot-password")
+    @PostMapping({"/forgot-password", "/admin/forgot-password", "/doctor/forgot-password"})
     public String processForgotPassword(@RequestParam String email,
                                         HttpServletRequest request,
                                         Model model) {
         String normalized = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
-        Patient patient = patientService.findByEmail(normalized);
-        if (patient != null) {
+        String accountType = findAccountType(normalized);
+        if (accountType != null) {
             PasswordResetToken existing = tokenRepository.findByEmail(normalized);
             if (existing != null) {
                 tokenRepository.delete(existing);
@@ -203,61 +209,129 @@ public class AuthenticationController {
             PasswordResetToken resetToken = new PasswordResetToken();
             resetToken.setToken(UUID.randomUUID().toString());
             resetToken.setEmail(normalized);
+            resetToken.setAccountType(accountType);
             resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(30));
             tokenRepository.save(resetToken);
 
-            String link = ServletUriComponentsBuilder.fromContextPath(request)
-                    .path("/reset-password")
-                    .queryParam("token", resetToken.getToken())
-                    .build()
-                    .toUriString();
-            mailService.sendPasswordReset(normalized, link);
+            mailService.sendPasswordReset(normalized, buildResetLink(request, resetToken.getToken()));
         }
+        model.addAttribute("portal", portalFromRequest(request));
         model.addAttribute("success",
                 "If an account exists for that email, a password reset link has been sent. The link is valid for 30 minutes.");
         return "forgot_password";
     }
 
-    @GetMapping("/reset-password")
-    public String showResetPasswordForm(@RequestParam String token, Model model) {
-        PasswordResetToken resetToken = tokenRepository.findByToken(token);
+    @GetMapping({"/reset-password", "/admin/reset-password", "/doctor/reset-password"})
+    public String showResetPasswordForm(@RequestParam(required = false) String token,
+                                        HttpServletRequest request,
+                                        Model model) {
+        model.addAttribute("portal", portalFromRequest(request));
+        if (token == null || token.isBlank()) {
+            model.addAttribute("error", "The reset link is invalid or has expired. Request a new link.");
+            return "reset_password";
+        }
+        PasswordResetToken resetToken = tokenRepository.findByToken(token.trim());
         if (resetToken == null || resetToken.isExpired()) {
             model.addAttribute("error", "The reset link is invalid or has expired. Request a new link.");
             return "reset_password";
         }
-        model.addAttribute("token", token);
+        model.addAttribute("token", token.trim());
+        model.addAttribute("portal", portalForAccountType(resetToken.getAccountType()));
         return "reset_password";
     }
 
-    @PostMapping("/reset-password")
-    public String processResetPassword(@RequestParam String token,
-                                       @RequestParam String newPassword,
-                                       @RequestParam String confirmPassword,
+    @PostMapping({"/reset-password", "/admin/reset-password", "/doctor/reset-password"})
+    public String processResetPassword(@RequestParam(required = false) String token,
+                                       @RequestParam(required = false) String newPassword,
+                                       @RequestParam(required = false) String confirmPassword,
+                                       HttpServletRequest request,
                                        Model model) {
-        PasswordResetToken resetToken = tokenRepository.findByToken(token);
+        model.addAttribute("portal", portalFromRequest(request));
+        PasswordResetToken resetToken = token == null || token.isBlank()
+                ? null
+                : tokenRepository.findByToken(token.trim());
         if (resetToken == null || resetToken.isExpired()) {
             model.addAttribute("error", "The reset link is invalid or has expired. Request a new link.");
             return "reset_password";
         }
+        String accountType = resetToken.getAccountType();
+        model.addAttribute("portal", portalForAccountType(accountType));
+        model.addAttribute("token", token.trim());
         if (newPassword == null || newPassword.length() < 8) {
             model.addAttribute("error", "Use a password with at least 8 characters.");
-            model.addAttribute("token", token);
             return "reset_password";
         }
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("error", "Passwords do not match.");
-            model.addAttribute("token", token);
             return "reset_password";
         }
-        Patient patient = patientService.findByEmail(resetToken.getEmail());
-        if (patient == null) {
-            model.addAttribute("error", "No account found for this request.");
-            return "reset_password";
+        if ("PATIENT".equals(accountType)) {
+            Patient patient = patientService.findByEmail(resetToken.getEmail());
+            if (patient == null) {
+                model.addAttribute("error", "No account found for this request.");
+                return "reset_password";
+            }
+            patient.setPassword(passwordEncoder.encode(newPassword));
+            patientService.save(patient);
+        } else {
+            Doctor doctor = doctorRepository.findByEmail(resetToken.getEmail());
+            if (doctor == null) {
+                model.addAttribute("error", "No account found for this request.");
+                return "reset_password";
+            }
+            doctor.setPassword(passwordEncoder.encode(newPassword));
+            doctorRepository.save(doctor);
         }
-        patient.setPassword(passwordEncoder.encode(newPassword));
-        patientService.save(patient);
         tokenRepository.delete(resetToken);
-        return "redirect:/login?reset=true";
+        return switch (accountType) {
+            case "ADMIN" -> "redirect:/admin/login?reset=true";
+            case "DOCTOR" -> "redirect:/doctor/login?reset=true";
+            default -> "redirect:/login?reset=true";
+        };
+    }
+
+    private String findAccountType(String email) {
+        if (patientService.findByEmail(email) != null) {
+            return "PATIENT";
+        }
+        Doctor doctor = doctorRepository.findByEmail(email);
+        if (doctor != null) {
+            return doctor.isAdmin() ? "ADMIN" : "DOCTOR";
+        }
+        return null;
+    }
+
+    private String portalFromRequest(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        if (uri.contains("/admin/")) {
+            return "ADMIN";
+        }
+        if (uri.contains("/doctor/")) {
+            return "DOCTOR";
+        }
+        return "PATIENT";
+    }
+
+    private String portalForAccountType(String accountType) {
+        return switch (accountType == null ? "PATIENT" : accountType) {
+            case "ADMIN" -> "ADMIN";
+            case "DOCTOR" -> "DOCTOR";
+            default -> "PATIENT";
+        };
+    }
+
+    private String buildResetLink(HttpServletRequest request, String token) {
+        String configuredBase = resetLinkBase == null ? "" : resetLinkBase.trim();
+        if (!configuredBase.isEmpty()
+                && !configuredBase.contains("localhost")
+                && !configuredBase.contains("127.0.0.1")) {
+            return configuredBase.replaceAll("/+$", "") + "/reset-password?token=" + token;
+        }
+        return ServletUriComponentsBuilder.fromContextPath(request)
+                .path("/reset-password")
+                .queryParam("token", token)
+                .build()
+                .toUriString();
     }
 
     private Patient currentPatient(Authentication authentication) {

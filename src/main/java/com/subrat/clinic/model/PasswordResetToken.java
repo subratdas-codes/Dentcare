@@ -24,6 +24,13 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
+    /**
+     * PATIENT, DOCTOR or ADMIN. Nullable for tokens created before staff
+     * password resets were supported; those are treated as patient tokens.
+     */
+    @Column(length = 20)
+    private String accountType = "PATIENT";
+
     public boolean isExpired() {
         return expiryDate == null || LocalDateTime.now().isAfter(expiryDate);
     }
@@ -39,4 +46,7 @@ public class PasswordResetToken {
 
     public LocalDateTime getExpiryDate() { return expiryDate; }
     public void setExpiryDate(LocalDateTime expiryDate) { this.expiryDate = expiryDate; }
+
+    public String getAccountType() { return accountType == null ? "PATIENT" : accountType; }
+    public void setAccountType(String accountType) { this.accountType = accountType; }
 }

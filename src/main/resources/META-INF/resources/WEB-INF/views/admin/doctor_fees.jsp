@@ -18,6 +18,10 @@
         .fee-row { display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .65rem 0; border-bottom: 1px dashed #e9eef5; font-size: .88rem; }
         .fee-row:last-child { border-bottom: 0; }
         .fee-badge { font-weight: 700; color: #0f766e; background: #eaf7f4; border-radius: 999px; padding: .2rem .55rem; font-size: .78rem; }
+        .status-pill { display: inline-block; border-radius: 999px; padding: .22rem .6rem; font-size: .72rem; font-weight: 700; border: 1px solid transparent; line-height: 1.25; }
+        .status-success { background: #dcfce7; color: #14532d; border-color: #86efac; }
+        .status-warning { background: #fef3c7; color: #78350f; border-color: #fcd34d; }
+        .status-danger { background: #fee2e2; color: #7f1d1d; border-color: #fca5a5; }
         .btn-teal { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 700; }
         .btn-teal:hover { background: #0b5d57; border-color: #0b5d57; color: #fff; }
         .form-control, .form-select { border-color: #dde5ee; border-radius: .6rem; padding: .5rem .65rem; font-size: .88rem; }
@@ -135,7 +139,7 @@
                                             <div>
                                                 <div class="fw-semibold"><c:out value="${fee.label}" /></div>
                                                 <div class="small text-muted">
-                                                    <span class="badge bg-${fee.status.badgeClass} bg-opacity-10 text-${fee.status.badgeClass}">${fee.status.label}</span>
+                                                    <span class="status-pill status-${fee.status.badgeClass}">${fee.status.label}</span>
                                                     <c:if test="${fee.pending and not empty fee.requestedFee}">
                                                         · requested ₹<fmt:formatNumber value="${fee.requestedFee}" minFractionDigits="2" maxFractionDigits="2" />
                                                     </c:if>

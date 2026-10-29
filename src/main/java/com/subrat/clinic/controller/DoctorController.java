@@ -70,22 +70,6 @@ public class DoctorController {
         return "redirect:/doctor/login";
     }
 
-    @GetMapping("/forgot-password")
-    public String adminForgotPassword() {
-        return "admin/forgot_password";
-    }
-
-    @PostMapping("/forgot-password")
-    public String adminForgotPasswordPost(@RequestParam String email, Model model) {
-        model.addAttribute("success", "If an account exists for that email, a password reset link has been sent.");
-        return "admin/forgot_password";
-    }
-
-    @GetMapping("/reset-password")
-    public String adminResetPassword() {
-        return "admin/reset_password";
-    }
-
     @GetMapping("/debug")
     @org.springframework.web.bind.annotation.ResponseBody
     public String debug() {

@@ -31,12 +31,12 @@
                     <c:when test="${not empty doctor.profileImagePath}">
                         <img id="photoPreview" class="avatar" src="<c:out value='${pageContext.request.contextPath}${doctor.profileImagePath}' />" alt="Profile photo of ${doctor.name}" />
                     </c:when>
-                    <c:otherwise><div id="photoPlaceholder" class="avatar bg-primary bg-opacity-10 text-primary d-grid place-items-center"><i class="bi bi-person-fill fs-1 m-auto"></i></div></c:otherwise>
+                    <c:otherwise><div id="photoPlaceholder" class="avatar d-flex align-items-center justify-content-center" style="background:#e8f1ff;color:#1d4ed8;"><i class="bi bi-person-fill fs-1"></i></div></c:otherwise>
                 </c:choose>
                 <div class="text-center text-sm-start">
                     <h1 class="h3 fw-bold mb-1"><c:out value="${doctor.name}" /></h1>
                     <div class="text-muted"><c:out value="${doctor.email}" /></div>
-                    <span class="badge bg-primary bg-opacity-10 text-primary mt-2"><c:out value="${doctor.admin ? 'Administrator' : 'Doctor'}" /></span>
+                    <span class="badge mt-2" style="background:#e8f1ff;color:#1d4ed8;border:1px solid #bfdbfe;"><c:out value="${doctor.admin ? 'Administrator' : 'Doctor'}" /></span>
                 </div>
             </div>
 

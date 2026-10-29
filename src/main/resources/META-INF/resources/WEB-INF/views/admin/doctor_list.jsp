@@ -74,7 +74,7 @@
                             <td class="text-muted">${doctor.id}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width:42px;height:42px;">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:42px;height:42px;background:#e8f1ff;">
                                         <i class="bi bi-person-badge text-primary"></i>
                                     </div>
                                     <div class="fw-semibold">${doctor.name}</div>

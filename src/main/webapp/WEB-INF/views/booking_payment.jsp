@@ -59,7 +59,7 @@
             <div class="dc-summary p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="h5 fw-bold mb-0"><i class="fas fa-tooth me-2"></i>Visit summary</h2>
-                    <span class="badge bg-white bg-opacity-10 text-white">${appointment.appointmentType.label}</span>
+                    <span class="badge" style="background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.4);">${appointment.appointmentType.label}</span>
                 </div>
                 <div class="dc-row"><span class="label">Patient</span><span class="value"><c:out value="${appointment.patientName}" /></span></div>
                 <div class="dc-row"><span class="label">Doctor</span><span class="value"><c:out value="${appointment.doctorName}" /></span></div>
