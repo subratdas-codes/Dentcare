@@ -1,27 +1,56 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-<nav class="navbar navbar-expand-lg bg-white navbar-light shadow-sm px-4 px-lg-5 py-2">
-    <a href="${pageContext.request.contextPath}/" class="navbar-brand p-0">
-        <h1 class="m-0 text-primary fs-3 fw-bold"><i class="fa fa-tooth me-2"></i>DentCare</h1>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+<style>
+    .dc-nav { background: #ffffff; border-bottom: 1px solid #e7ecf3; position: sticky; top: 0; z-index: 1030; }
+    .dc-nav .navbar-brand { color: #10243e; font-weight: 800; letter-spacing: -0.02em; }
+    .dc-nav .navbar-brand span { color: #0f766e; }
+    .dc-nav .nav-link { color: #44546a; font-weight: 600; font-size: .95rem; }
+    .dc-nav .nav-link:hover, .dc-nav .nav-link:focus { color: #0f766e; }
+    .dc-nav .btn-book { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 600; border-radius: .65rem; }
+    .dc-nav .btn-book:hover { background: #0b5d57; border-color: #0b5d57; color: #fff; }
+    .dc-avatar { width: 34px; height: 34px; border-radius: 50%; background: #e6f4f1; color: #0f766e; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: .9rem; }
+    .dc-user-name { color: #10243e; font-weight: 700; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dc-dropdown { border: 1px solid #e7ecf3; border-radius: .8rem; box-shadow: 0 18px 40px -24px rgba(16, 36, 62, .55); padding: .45rem; min-width: 230px; }
+    .dc-dropdown .dropdown-item { border-radius: .55rem; padding: .55rem .75rem; font-weight: 500; color: #34445c; }
+    .dc-dropdown .dropdown-item:hover { background: #f2f8f7; color: #0f766e; }
+    .dc-dropdown .dropdown-header { color: #7a8aa0; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
+    .dc-announce { background: #0f766e; color: #eafffb; font-size: .82rem; text-align: center; padding: .35rem .75rem; }
+</style>
+<c:if test="${not empty site.announcement}">
+    <div class="dc-announce"><c:out value="${site.announcement}" /></div>
+</c:if>
+<nav class="navbar navbar-expand-lg dc-nav px-3 px-lg-4 py-2">
+    <a href="${pageContext.request.contextPath}/" class="navbar-brand p-0 fs-4">
+        <i class="fa fa-tooth me-1"></i><span><c:out value="${site.siteName}" /></span>
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#userNav">
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#userNav" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="userNav">
-        <div class="navbar-nav ms-auto align-items-lg-center">
-            <a href="${pageContext.request.contextPath}/" class="nav-link me-lg-2 fw-semibold">Home</a>
-            <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-sm btn-outline-primary me-lg-2 mb-2 mb-lg-0 mt-2 mt-lg-0">
-                <i class="fa fa-calendar-plus me-1"></i>Book Appointment
-            </a>
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/" class="nav-link"><c:out value="${site.navHome}" /></a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/service" class="nav-link"><c:out value="${site.navServices}" /></a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/team" class="nav-link"><c:out value="${site.navDoctors}" /></a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/price" class="nav-link"><c:out value="${site.navPricing}" /></a></li>
+            <li class="nav-item"><a href="${pageContext.request.contextPath}/contact" class="nav-link"><c:out value="${site.navContact}" /></a></li>
             <sec:authorize access="hasRole('USER')">
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle fw-semibold" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i><sec:authentication property="name" />
+                <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                    <a href="${pageContext.request.contextPath}/book_appointment" class="btn btn-book btn-sm px-3 py-2">
+                        <c:out value="${site.bookButton}" />
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end shadow">
-                        <a href="${pageContext.request.contextPath}/profile" class="dropdown-item">Profile</a>
+                </li>
+                <li class="nav-item dropdown ms-lg-2 mt-2 mt-lg-0">
+                    <a href="#" class="nav-link dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="dc-avatar">${currentPatientInitial}</span>
+                        <span class="dc-user-name"><c:out value="${currentPatientName}" /></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end dc-dropdown">
+                        <div class="dropdown-header"><c:out value="${site.accountLabel}" /></div>
                         <a href="${pageContext.request.contextPath}/my/appointments" class="dropdown-item">My Appointments</a>
-                        <a href="${pageContext.request.contextPath}/change-password" class="dropdown-item">Change Password</a>
+                        <a href="${pageContext.request.contextPath}/my/receipts" class="dropdown-item">Receipts &amp; Payments</a>
+                        <a href="${pageContext.request.contextPath}/profile" class="dropdown-item">Personal Details</a>
+                        <a href="${pageContext.request.contextPath}/profile?tab=security" class="dropdown-item">Change Password</a>
                         <div class="dropdown-divider"></div>
                         <form action="${pageContext.request.contextPath}/logout" method="post" class="m-0">
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
@@ -29,9 +58,12 @@
                             <button type="submit" class="dropdown-item text-danger">Logout</button>
                         </form>
                     </div>
-                </div>
+                </li>
             </sec:authorize>
-            
-        </div>
+            <sec:authorize access="!isAuthenticated()">
+                <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><a href="${pageContext.request.contextPath}/login" class="nav-link">Login</a></li>
+                <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><a href="${pageContext.request.contextPath}/register" class="btn btn-outline-secondary btn-sm px-3 py-2" style="border-radius:.65rem;font-weight:600;">Register</a></li>
+            </sec:authorize>
+        </ul>
     </div>
 </nav>

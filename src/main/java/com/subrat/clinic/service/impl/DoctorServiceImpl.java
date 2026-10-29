@@ -43,4 +43,12 @@ public class DoctorServiceImpl implements DoctorService {
     public Doctor findByEmail(String email) {
         return doctorRepository.findByEmail(email);
     }
+
+    @Override
+    public Doctor findByName(String name) {
+        if (name == null || name.isBlank()) {
+            return null;
+        }
+        return doctorRepository.findFirstByNameIgnoreCase(name.trim());
+    }
 }

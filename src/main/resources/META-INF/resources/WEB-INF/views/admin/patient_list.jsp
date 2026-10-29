@@ -1,114 +1,92 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <c:set var="activePage" value="patients" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management - DentCare Admin</title>
+    <title>Patient Management - DentCare Admin</title>
     <link href="<c:url value='/css/bootstrap.min.css' />" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f6f8fc; }
-        .card-table { border: none; border-radius: 1rem; overflow: hidden; box-shadow: 0 40px 70px -50px rgba(15, 31, 58, 0.9); }
-        .table-hover tbody tr { transition: all 0.2s ease; }
-        .table-hover tbody tr:hover { background-color: rgba(6, 163, 218, 0.05); }
+        body { background: #f5f8fc; color: #172b4d; }
+        .panel { border: 1px solid #e4ebf3; border-radius: 1rem; background: #fff; overflow: hidden; }
+        .panel-head { padding: 1rem 1.25rem; border-bottom: 1px solid #eef2f7; }
+        .table thead th { color: #7b8aa0; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+        .btn-teal { background: #0f766e; border-color: #0f766e; color: #fff; font-weight: 700; }
+        .btn-teal:hover { background: #0b5d57; border-color: #0b5d57; color: #fff; }
+        .avatar { width: 38px; height: 38px; border-radius: 50%; background: #eaf7f4; color: #0f766e; display: flex; align-items: center; justify-content: center; font-weight: 800; }
     </style>
 </head>
 <body>
 <%@ include file="_navbar.jsp" %>
 
-<div class="container-fluid py-4 px-4">
+<div class="container-fluid py-4 px-3 px-lg-4">
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
         <div>
-            <h4 class="fw-bold mb-1">User Management</h4>
-            <p class="text-muted mb-0">View, search and manage all registered patients.</p>
+            <h1 class="h4 fw-bold mb-1">Patient accounts</h1>
+            <p class="text-muted mb-0">Search, edit, reset passwords or remove patient accounts.</p>
         </div>
-        <form action="<c:url value='/admin/patients' />" method="get" class="d-flex flex-wrap gap-2">
-            <div class="input-group" style="min-width: 280px;">
-                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                <input type="text" class="form-control border-start-0" name="q" value="${q}" placeholder="Search by name, email or phone">
-            </div>
-            <button class="btn btn-primary" type="submit">Search</button>
-            <a class="btn btn-outline-secondary" href="<c:url value='/admin/patients' />">Reset</a>
-        </form>
+        <div class="d-flex flex-wrap gap-2">
+            <form action="<c:url value='/admin/patients' />" method="get" class="d-flex gap-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" class="form-control" name="q" value="${q}" placeholder="Name, email or phone">
+                </div>
+                <button class="btn btn-teal" type="submit">Search</button>
+            </form>
+            <a href="<c:url value='/admin/patients/add' />" class="btn btn-outline-secondary"><i class="bi bi-person-plus me-1"></i>Add patient</a>
+        </div>
     </div>
 
-    <div class="card card-table">
-        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
-            <div class="d-flex align-items-center gap-2">
-                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width:40px;height:40px;">
-                    <i class="bi bi-people text-primary"></i>
-                </div>
-                <div>
-                    <div class="fw-semibold">Registered Patients</div>
-                    <small class="text-muted">${patients.size()} user(s) found</small>
-                </div>
-            </div>
-            <div class="text-muted small">Live updates</div>
+    <c:if test="${not empty success}"><div class="alert alert-success"><i class="bi bi-check-circle me-2"></i><c:out value="${success}" /></div></c:if>
+    <c:if test="${not empty error}"><div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i><c:out value="${error}" /></div></c:if>
+
+    <section class="panel">
+        <div class="panel-head d-flex justify-content-between align-items-center">
+            <div class="fw-semibold">Registered patients</div>
+            <span class="text-muted small">${patients.size()} account(s)</span>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                <tr>
-                    <th class="text-uppercase small text-muted">#</th>
-                    <th class="text-uppercase small text-muted">Patient</th>
-                    <th class="text-uppercase small text-muted">Contact</th>
-                    <th class="text-uppercase small text-muted">Age</th>
-                    <th class="text-uppercase small text-muted text-center">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach var="p" items="${patients}" varStatus="loop">
-                    <tr>
-                        <td class="text-muted">${loop.index + 1}</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center" style="width:42px;height:42px;">
-                                    <i class="fas fa-user text-primary"></i>
-                                </div>
-                                <div>
-                                    <div class="fw-semibold">${p.name}</div>
-                                    <div class="text-muted small">${p.email}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div><i class="bi bi-telephone me-1 text-muted"></i>${p.phone}</div>
-                            <div class="text-muted small"><i class="bi bi-envelope me-1"></i>${p.email}</div>
-                        </td>
-                        <td>
-                            <span class="badge bg-light text-dark border">${p.age} yrs</span>
-                        </td>
-                        <td class="text-center">
-                            <sec:authorize access="hasRole('ADMIN')">
-                                <a href="${pageContext.request.contextPath}/admin/patients/edit/${p.id}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a href="${pageContext.request.contextPath}/admin/patients/delete/${p.id}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this patient?');">
-                                    <i class="bi bi-trash"></i>
-                                </a>
-                            </sec:authorize>
-                        </td>
-                    </tr>
-                </c:forEach>
-                <c:if test="${empty patients}">
-                    <tr>
-                        <td colspan="5" class="text-center py-5">
-                            <div class="text-muted">
-                                <i class="fas fa-users fa-2x mb-3"></i>
-                                <div>No patients found for this search.</div>
-                            </div>
-                        </td>
-                    </tr>
-                </c:if>
-                </tbody>
-            </table>
-        </div>
-    </div>
+        <c:choose>
+            <c:when test="${not empty patients}">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead><tr><th class="ps-4">Patient</th><th>Contact</th><th>Age</th><th class="text-end pe-4">Actions</th></tr></thead>
+                        <tbody>
+                        <c:forEach var="p" items="${patients}">
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar">${p.name.substring(0,1)}</div>
+                                        <div><div class="fw-semibold"><c:out value="${p.name}" /></div><div class="small text-muted"><c:out value="${p.email}" /></div></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="small"><i class="bi bi-telephone me-1 text-muted"></i><c:out value="${p.phone}" /></div>
+                                    <div class="small text-muted"><i class="bi bi-envelope me-1"></i><c:out value="${p.email}" /></div>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">${p.age} yrs</span></td>
+                                <td class="text-end pe-4">
+                                    <a href="${pageContext.request.contextPath}/admin/patients/edit/${p.id}" class="btn btn-sm btn-outline-secondary" title="Edit / reset password"><i class="bi bi-pencil"></i></a>
+                                    <form action="${pageContext.request.contextPath}/admin/patients/delete/${p.id}" method="post" class="d-inline" onsubmit="return confirm('Delete this patient account? Their appointments will also be removed.');">
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="text-center text-muted py-5"><i class="bi bi-people fs-1 d-block mb-2"></i>No patients found for this search.</div>
+            </c:otherwise>
+        </c:choose>
+    </section>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

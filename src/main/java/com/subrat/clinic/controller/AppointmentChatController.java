@@ -108,6 +108,10 @@ public class AppointmentChatController {
     }
 
     private void requireAssignedDoctor(Doctor doctor, Appointment appointment) {
+        if (doctor != null && doctor.getId() != null && appointment.getDoctorId() != null
+                && doctor.getId().equals(appointment.getDoctorId())) {
+            return;
+        }
         if (doctor.getName() == null || appointment.getDoctorName() == null
                 || !doctor.getName().trim().equalsIgnoreCase(appointment.getDoctorName().trim())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

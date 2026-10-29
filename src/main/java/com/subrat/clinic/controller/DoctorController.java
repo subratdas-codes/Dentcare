@@ -1,18 +1,34 @@
 package com.subrat.clinic.controller;
 
 import com.subrat.clinic.model.Appointment;
+import com.subrat.clinic.model.AppointmentStatus;
+import com.subrat.clinic.model.AppointmentType;
 import com.subrat.clinic.model.Doctor;
+import com.subrat.clinic.model.DoctorFee;
+import com.subrat.clinic.model.Patient;
+import com.subrat.clinic.model.PaymentStatus;
 import com.subrat.clinic.model.ServicePrice;
 import com.subrat.clinic.service.AppointmentService;
+import com.subrat.clinic.service.DoctorFeeService;
 import com.subrat.clinic.service.DoctorPhotoStorage;
 import com.subrat.clinic.service.DoctorService;
 import com.subrat.clinic.service.MailService;
 import com.subrat.clinic.service.PatientService;
 import com.subrat.clinic.service.ServicePriceService;
+import com.subrat.clinic.service.SiteSettingService;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -100,6 +116,12 @@ public class DoctorController {
     @Autowired
     private ServicePriceService servicePriceService;
 
+    @Autowired
+    private DoctorFeeService doctorFeeService;
+
+    @Autowired
+    private SiteSettingService siteSettingService;
+
     @GetMapping("/register")
     public String doctorRegisterForm() {
         return "redirect:/doctor/register";
@@ -122,10 +144,34 @@ public class DoctorController {
         if (!hasAdminRole(authentication)) {
             return "redirect:/admin/login";
         }
-        List<Appointment> appointments = appointmentService.getAll();
+        List<Appointment> appointments = appointmentService.getAll().stream()
+                .sorted(Comparator.comparing(Appointment::getAppointmentDate,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(Appointment::getAppointmentTime,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .reversed())
+                .toList();
+        LocalDate today = LocalDate.now();
+        BigDecimal revenue = appointments.stream()
+                .filter(a -> a.getPaymentStatus() == PaymentStatus.PAID)
+                .map(Appointment::getAmount)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        long todayCount = appointments.stream()
+                .filter(a -> today.equals(a.getAppointmentDate()))
+                .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
+                .count();
+        long pendingPayments = appointments.stream()
+                .filter(a -> a.getPaymentStatus() == PaymentStatus.PENDING)
+                .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
+                .count();
+
         model.addAttribute("doctorCount", doctorService.findAll().size());
         model.addAttribute("patientCount", patientService.getAll().size());
         model.addAttribute("appointmentCount", appointments.size());
+        model.addAttribute("todayCount", todayCount);
+        model.addAttribute("revenue", revenue);
+        model.addAttribute("pendingPayments", pendingPayments);
         model.addAttribute("doctors", doctorService.findAll());
         model.addAttribute("appointments", appointments);
         model.addAttribute("patients", patientService.getAll());
@@ -135,6 +181,10 @@ public class DoctorController {
     private boolean hasAdminRole(Authentication authentication) {
         return authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+    }
+
+    private boolean contains(String value, String query) {
+        return value != null && value.toLowerCase(Locale.ROOT).contains(query);
     }
 
     // ---------------- DOCTOR CRUD ---------------- //
@@ -158,24 +208,39 @@ public class DoctorController {
     }
 
     @PostMapping("/doctors/save")
-    public String saveDoctor(@ModelAttribute Doctor doctor) {
+    public String saveDoctor(@ModelAttribute Doctor doctor, RedirectAttributes redirectAttributes) {
         Doctor existing = doctor.getId() != null ? doctorService.findById(doctor.getId()) : null;
-        String email = doctor.getEmail() == null ? "" : doctor.getEmail().trim().toLowerCase();
+        String email = doctor.getEmail() == null ? "" : doctor.getEmail().trim().toLowerCase(Locale.ROOT);
         if (email.isEmpty()) {
-            return "redirect:/admin/doctors?error=email";
+            redirectAttributes.addFlashAttribute("error", "Email address is required.");
+            return "redirect:/admin/doctors";
         }
         Doctor byEmail = doctorService.findByEmail(email);
         if (byEmail != null && (existing == null || !byEmail.getId().equals(doctor.getId()))) {
-            return "redirect:/admin/doctors?error=duplicate";
+            redirectAttributes.addFlashAttribute("error", "A staff account with this email already exists.");
+            return "redirect:/admin/doctors";
         }
         if (patientService.findByEmail(email) != null) {
-            return "redirect:/admin/doctors?error=duplicatePatient";
+            redirectAttributes.addFlashAttribute("error", "A patient account already uses this email.");
+            return "redirect:/admin/doctors";
+        }
+        if (doctor.getName() == null || doctor.getName().trim().length() < 2) {
+            redirectAttributes.addFlashAttribute("error", "Enter the doctor's full name.");
+            return "redirect:/admin/doctors";
+        }
+        if (doctor.getSpecialization() == null || doctor.getSpecialization().isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Enter a specialization.");
+            return "redirect:/admin/doctors";
+        }
+        if (existing == null && (doctor.getPassword() == null || doctor.getPassword().length() < 8)) {
+            redirectAttributes.addFlashAttribute("error", "Set a login password of at least 8 characters for the new doctor.");
+            return "redirect:/admin/doctors";
         }
         doctor.setEmail(email);
+        doctor.setName(doctor.getName().trim());
+        doctor.setSpecialization(doctor.getSpecialization().trim());
         if (doctor.getPassword() == null || doctor.getPassword().isBlank()) {
-            if (existing != null) {
-                doctor.setPassword(existing.getPassword());
-            }
+            doctor.setPassword(existing.getPassword());
         } else {
             doctor.setPassword(passwordEncoder.encode(doctor.getPassword()));
         }
@@ -184,12 +249,23 @@ public class DoctorController {
             if (doctor.getProfileImagePath() == null) doctor.setProfileImagePath(existing.getProfileImagePath());
         }
         doctorService.save(doctor);
+        redirectAttributes.addFlashAttribute("success",
+                existing == null ? "Doctor account created." : "Doctor account updated.");
         return "redirect:/admin/doctors";
     }
 
     @PostMapping("/doctors/delete/{id}")
-    public String deleteDoctor(@PathVariable Long id) {
+    public String deleteDoctor(@PathVariable Long id,
+                               Authentication authentication,
+                               RedirectAttributes redirectAttributes) {
+        Doctor current = doctorService.findByEmail(authentication.getName());
+        if (current != null && id.equals(current.getId())) {
+            redirectAttributes.addFlashAttribute("error", "You cannot delete your own admin account.");
+            return "redirect:/admin/doctors";
+        }
+        doctorFeeService.deleteForDoctor(id);
         doctorService.deleteById(id);
+        redirectAttributes.addFlashAttribute("success", "Doctor account deleted.");
         return "redirect:/admin/doctors";
     }
 
@@ -212,6 +288,12 @@ public class DoctorController {
         return "admin/patient_list";
     }
 
+    @GetMapping("/patients/add")
+    public String addPatientForm(Model model) {
+        model.addAttribute("patient", new Patient());
+        return "admin/patient_form";
+    }
+
     @GetMapping("/patients/edit/{id}")
     public String editPatient(@PathVariable Long id, Model model) {
         model.addAttribute("patient", patientService.getById(id));
@@ -219,45 +301,192 @@ public class DoctorController {
     }
 
     @PostMapping("/patients/save")
-    public String savePatient(@ModelAttribute com.subrat.clinic.model.Patient patient) {
-        com.subrat.clinic.model.Patient existing = patient.getId() != null ? patientService.getById(patient.getId()) : null;
+    public String savePatient(@ModelAttribute Patient patient, RedirectAttributes redirectAttributes) {
+        Patient existing = patient.getId() != null ? patientService.getById(patient.getId()) : null;
+        String email = patient.getEmail() == null ? "" : patient.getEmail().trim().toLowerCase(Locale.ROOT);
+        if (email.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Email address is required.");
+            return existing == null ? "redirect:/admin/patients/add" : "redirect:/admin/patients/edit/" + patient.getId();
+        }
+        Patient byEmail = patientService.findByEmail(email);
+        if (byEmail != null && (existing == null || !byEmail.getId().equals(patient.getId()))) {
+            redirectAttributes.addFlashAttribute("error", "A patient with this email already exists.");
+            return existing == null ? "redirect:/admin/patients/add" : "redirect:/admin/patients/edit/" + patient.getId();
+        }
+        if (doctorService.findByEmail(email) != null) {
+            redirectAttributes.addFlashAttribute("error", "A staff account already uses this email.");
+            return existing == null ? "redirect:/admin/patients/add" : "redirect:/admin/patients/edit/" + patient.getId();
+        }
+        if (patient.getName() == null || patient.getName().trim().length() < 2) {
+            redirectAttributes.addFlashAttribute("error", "Enter the patient's full name.");
+            return existing == null ? "redirect:/admin/patients/add" : "redirect:/admin/patients/edit/" + patient.getId();
+        }
+        if (existing == null && (patient.getPassword() == null || patient.getPassword().length() < 8)) {
+            redirectAttributes.addFlashAttribute("error", "Set a password of at least 8 characters for the new patient.");
+            return "redirect:/admin/patients/add";
+        }
+        patient.setEmail(email);
+        patient.setName(patient.getName().trim());
         if (patient.getPassword() == null || patient.getPassword().isBlank()) {
-            if (existing != null) {
-                patient.setPassword(existing.getPassword());
-            }
+            patient.setPassword(existing.getPassword());
         } else {
             patient.setPassword(passwordEncoder.encode(patient.getPassword()));
         }
-        if (existing != null && (patient.getPassword() == null || patient.getPassword().isBlank())) {
-            patient.setPassword(existing.getPassword());
-        }
         patientService.save(patient);
+        redirectAttributes.addFlashAttribute("success",
+                existing == null ? "Patient account created." : "Patient account updated.");
         return "redirect:/admin/patients";
     }
 
-    @GetMapping("/patients/delete/{id}")
-    public String deletePatient(@PathVariable Long id) {
+    @PostMapping("/patients/delete/{id}")
+    public String deletePatient(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         patientService.deleteById(id);
+        redirectAttributes.addFlashAttribute("success", "Patient account deleted.");
         return "redirect:/admin/patients";
+    }
+
+    @PostMapping("/patients/reset-password/{id}")
+    public String resetPatientPassword(@PathVariable Long id,
+                                       @RequestParam String newPassword,
+                                       RedirectAttributes redirectAttributes) {
+        Patient patient = patientService.getById(id);
+        if (patient == null) {
+            redirectAttributes.addFlashAttribute("error", "That patient could not be found.");
+            return "redirect:/admin/patients";
+        }
+        if (newPassword == null || newPassword.length() < 8) {
+            redirectAttributes.addFlashAttribute("error", "Use a password with at least 8 characters.");
+            return "redirect:/admin/patients/edit/" + id;
+        }
+        patient.setPassword(passwordEncoder.encode(newPassword));
+        patientService.save(patient);
+        redirectAttributes.addFlashAttribute("success", "Password reset for " + patient.getName() + ".");
+        return "redirect:/admin/patients/edit/" + id;
     }
 
     // ---------------- APPOINTMENT CRUD ---------------- //
 
     @GetMapping("/appointments")
-    public String listAppointments(Model model) {
-        model.addAttribute("appointments", appointmentService.getAll());
+    public String listAppointments(@RequestParam(required = false) String status,
+                                   @RequestParam(required = false) String q,
+                                   Model model) {
+        List<Appointment> all = appointmentService.getAll().stream()
+                .sorted(Comparator.comparing(Appointment::getAppointmentDate,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(Appointment::getAppointmentTime,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .reversed())
+                .toList();
+        String selected = status == null ? "" : status.trim().toUpperCase(Locale.ROOT);
+        String query = q == null ? "" : q.trim().toLowerCase(Locale.ROOT);
+        List<Appointment> filtered = all.stream()
+                .filter(a -> selected.isEmpty() || a.getStatus().name().equals(selected))
+                .filter(a -> query.isEmpty()
+                        || contains(a.getPatientName(), query)
+                        || contains(a.getEmail(), query)
+                        || contains(a.getPhone(), query)
+                        || contains(a.getDoctorName(), query)
+                        || contains(a.getPaymentReference(), query))
+                .toList();
+
+        model.addAttribute("appointments", filtered);
+        model.addAttribute("selectedStatus", selected);
+        model.addAttribute("q", q == null ? "" : q.trim());
+        model.addAttribute("bookedCount", all.stream().filter(a -> a.getStatus() == AppointmentStatus.BOOKED).count());
+        model.addAttribute("completedCount", all.stream().filter(a -> a.getStatus() == AppointmentStatus.COMPLETED).count());
+        model.addAttribute("cancelledCount", all.stream().filter(a -> a.getStatus() == AppointmentStatus.CANCELLED).count());
+        model.addAttribute("revenue", all.stream()
+                .filter(a -> a.getPaymentStatus() == PaymentStatus.PAID)
+                .map(Appointment::getAmount)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
         return "admin/appointment_list";
     }
 
     @GetMapping("/appointments/edit/{id}")
     public String editAppointment(@PathVariable Long id, Model model) {
         model.addAttribute("appointment", appointmentService.getById(id));
-        return "admin/edit_appointment";  // JSP: edit_appointment.jsp
+        model.addAttribute("doctors", doctorService.findAll().stream()
+                .filter(doctor -> !doctor.isAdmin()).toList());
+        model.addAttribute("servicePrices", servicePriceService.findAll());
+        return "admin/edit_appointment";
     }
 
     @PostMapping("/appointments/update")
-    public String updateAppointment(@ModelAttribute Appointment appointment) {
-        appointmentService.save(appointment);  // save() works for both create/update
+    public String updateAppointment(@RequestParam Long id,
+                                    @RequestParam String patientName,
+                                    @RequestParam String email,
+                                    @RequestParam String phone,
+                                    @RequestParam(required = false) Long doctorId,
+                                    @RequestParam(required = false) String doctorName,
+                                    @RequestParam(required = false) String appointmentType,
+                                    @RequestParam(required = false) String service,
+                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appointmentDate,
+                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime appointmentTime,
+                                    @RequestParam(required = false) BigDecimal amount,
+                                    @RequestParam(required = false) String status,
+                                    RedirectAttributes redirectAttributes) {
+        Appointment appointment = appointmentService.getById(id);
+        if (appointment == null) {
+            redirectAttributes.addFlashAttribute("error", "That appointment could not be found.");
+            return "redirect:/admin/appointments";
+        }
+        Doctor doctor = doctorId != null ? doctorService.findById(doctorId) : doctorService.findByName(doctorName);
+        if (doctor != null && !doctor.isAdmin()) {
+            appointment.setDoctorId(doctor.getId());
+            appointment.setDoctorName(doctor.getName());
+        } else if (doctorName != null && !doctorName.isBlank()) {
+            appointment.setDoctorName(doctorName.trim());
+        }
+        appointment.setPatientName(patientName.trim());
+        appointment.setEmail(email.trim().toLowerCase(Locale.ROOT));
+        appointment.setPhone(phone.trim());
+        appointment.setAppointmentType("CONSULTATION".equalsIgnoreCase(appointmentType)
+                ? AppointmentType.CONSULTATION : AppointmentType.TREATMENT);
+        appointment.setService(appointment.isConsultation() ? "General Consultation"
+                : (service == null ? appointment.getService() : service.trim()));
+        appointment.setAppointmentDate(appointmentDate);
+        appointment.setAppointmentTime(appointmentTime);
+        if (amount != null && amount.signum() >= 0) {
+            appointment.setAmount(amount.setScale(2, RoundingMode.HALF_UP));
+        }
+        try {
+            AppointmentStatus newStatus = AppointmentStatus.valueOf(
+                    status == null ? "" : status.trim().toUpperCase(Locale.ROOT));
+            appointment.setStatus(newStatus);
+            if (newStatus == AppointmentStatus.CANCELLED && appointment.getCancelledAt() == null) {
+                appointment.setCancelledAt(java.time.LocalDateTime.now());
+            } else if (newStatus != AppointmentStatus.CANCELLED) {
+                appointment.setCancelledAt(null);
+            }
+        } catch (IllegalArgumentException ignored) {
+            // Keep the current status if no valid value was submitted.
+        }
+        appointmentService.save(appointment);
+        redirectAttributes.addFlashAttribute("success", "Appointment #" + id + " updated.");
+        return "redirect:/admin/appointments";
+    }
+
+    @PostMapping("/appointments/status")
+    public String updateAppointmentStatus(@RequestParam Long id,
+                                          @RequestParam String status,
+                                          RedirectAttributes redirectAttributes) {
+        Appointment appointment = appointmentService.getById(id);
+        if (appointment != null) {
+            try {
+                AppointmentStatus newStatus = AppointmentStatus.valueOf(status.trim().toUpperCase(Locale.ROOT));
+                appointment.setStatus(newStatus);
+                if (newStatus == AppointmentStatus.CANCELLED) {
+                    appointment.setCancelledAt(java.time.LocalDateTime.now());
+                } else {
+                    appointment.setCancelledAt(null);
+                }
+                appointmentService.save(appointment);
+                redirectAttributes.addFlashAttribute("success", "Appointment marked " + newStatus.getLabel().toLowerCase(Locale.ROOT) + ".");
+            } catch (IllegalArgumentException exception) {
+                redirectAttributes.addFlashAttribute("error", "Invalid appointment status.");
+            }
+        }
         return "redirect:/admin/appointments";
     }
 
@@ -299,6 +528,7 @@ public class DoctorController {
     @GetMapping("/pricing")
     public String pricing(Model model) {
         model.addAttribute("servicePrices", servicePriceService.findAll());
+        model.addAttribute("consultationFee", siteSettingService.getConsultationFee());
         return "admin/pricing";
     }
 
@@ -324,9 +554,108 @@ public class DoctorController {
         return "redirect:/admin/pricing";
     }
 
+    @GetMapping("/doctor-fees")
+    public String doctorFees(Model model) {
+        List<Doctor> doctors = doctorService.findAll().stream()
+                .filter(doctor -> !doctor.isAdmin())
+                .toList();
+        Map<Long, List<DoctorFee>> feesByDoctor = new LinkedHashMap<>();
+        for (Doctor doctor : doctors) {
+            feesByDoctor.put(doctor.getId(), doctorFeeService.findByDoctor(doctor));
+        }
+        model.addAttribute("doctors", doctors);
+        model.addAttribute("feesByDoctor", feesByDoctor);
+        model.addAttribute("pendingFees", doctorFeeService.pendingFees());
+        model.addAttribute("servicePrices", servicePriceService.findAll());
+        model.addAttribute("consultationFee", siteSettingService.getConsultationFee());
+        return "admin/doctor_fees";
+    }
+
+    @PostMapping("/doctor-fees/set")
+    public String setDoctorFee(@RequestParam Long doctorId,
+                               @RequestParam String serviceName,
+                               @RequestParam BigDecimal fee,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            doctorFeeService.adminSetFee(doctorId, serviceName, fee);
+            redirectAttributes.addFlashAttribute("success", "Doctor fee saved.");
+        } catch (IllegalArgumentException exception) {
+            redirectAttributes.addFlashAttribute("error", exception.getMessage());
+        }
+        return "redirect:/admin/doctor-fees";
+    }
+
+    @PostMapping("/doctor-fees/approve")
+    public String approveDoctorFee(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        doctorFeeService.approve(id);
+        redirectAttributes.addFlashAttribute("success", "Fee request approved and live on the booking page.");
+        return "redirect:/admin/doctor-fees";
+    }
+
+    @PostMapping("/doctor-fees/reject")
+    public String rejectDoctorFee(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        doctorFeeService.reject(id);
+        redirectAttributes.addFlashAttribute("success", "Fee request rejected.");
+        return "redirect:/admin/doctor-fees";
+    }
+
+    @PostMapping("/doctor-fees/delete")
+    public String deleteDoctorFee(@RequestParam Long id, RedirectAttributes redirectAttributes) {
+        doctorFeeService.deleteFee(id);
+        redirectAttributes.addFlashAttribute("success", "Doctor fee override removed. The standard price now applies.");
+        return "redirect:/admin/doctor-fees";
+    }
+
+    @GetMapping("/settings")
+    public String settings(Model model) {
+        model.addAttribute("siteSettings", siteSettingService.getSite());
+        return "admin/settings";
+    }
+
+    @PostMapping("/settings")
+    public String saveSettings(@RequestParam Map<String, String> values,
+                               RedirectAttributes redirectAttributes) {
+        String siteName = values.get("siteName");
+        if (siteName == null || siteName.isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Clinic name is required.");
+            return "redirect:/admin/settings";
+        }
+        String consultation = values.get("consultationFee");
+        if (consultation == null || consultation.isBlank()) {
+            redirectAttributes.addFlashAttribute("error", "Consultation fee is required.");
+            return "redirect:/admin/settings";
+        }
+        try {
+            BigDecimal fee = new BigDecimal(consultation.trim());
+            if (fee.signum() < 0 || fee.compareTo(new BigDecimal("1000000")) > 0) {
+                redirectAttributes.addFlashAttribute("error", "Consultation fee must be between ₹0 and ₹10,00,000.");
+                return "redirect:/admin/settings";
+            }
+        } catch (NumberFormatException exception) {
+            redirectAttributes.addFlashAttribute("error", "Enter a valid consultation fee.");
+            return "redirect:/admin/settings";
+        }
+        siteSettingService.update(values);
+        redirectAttributes.addFlashAttribute("success", "Website content and fees updated. Changes are live now.");
+        return "redirect:/admin/settings";
+    }
+
     @GetMapping("/invoices")
     public String invoices(Model model) {
-        model.addAttribute("appointments", appointmentService.getAll());
+        List<Appointment> appointments = appointmentService.getAll().stream()
+                .sorted(Comparator.comparing(Appointment::getAppointmentDate,
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .reversed())
+                .toList();
+        BigDecimal revenue = appointments.stream()
+                .filter(a -> a.getPaymentStatus() == PaymentStatus.PAID)
+                .map(Appointment::getAmount)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        model.addAttribute("appointments", appointments);
+        model.addAttribute("revenue", revenue);
+        model.addAttribute("paidCount", appointments.stream()
+                .filter(a -> a.getPaymentStatus() != PaymentStatus.PENDING).count());
         return "admin/invoices";
     }
 

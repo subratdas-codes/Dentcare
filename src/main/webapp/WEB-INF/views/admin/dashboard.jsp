@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <c:set var="activePage" value="dashboard" />
 <!DOCTYPE html>
@@ -7,177 +8,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - DentCare Portal</title>
+    <title>Admin Dashboard - DentCare</title>
     <link href="<c:url value='/css/bootstrap.min.css' />" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f6f8fc; }
-        .stat-card { border: none; border-radius: 1rem; box-shadow: 0 30px 60px -40px rgba(15, 31, 58, 0.8); transition: all 0.2s ease; overflow: hidden; }
-        .stat-card:hover { transform: translateY(-6px); box-shadow: 0 40px 70px -35px rgba(6, 163, 218, 0.4); }
-        .stat-icon { width: 60px; height: 60px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-        .quick-card { border: none; border-radius: 1rem; transition: all 0.2s ease; }
-        .quick-card:hover { transform: translateY(-4px); box-shadow: 0 30px 60px -40px rgba(15, 31, 58, 0.9); }
-        .table-card { border: none; border-radius: 1rem; box-shadow: 0 40px 70px -50px rgba(15, 31, 58, 0.9); overflow: hidden; }
+        body { background: #f5f8fc; color: #172b4d; }
+        .hero { background: linear-gradient(120deg, #0b172a 0%, #0f4f4a 60%, #0f766e 100%); color: #fff; border-radius: 1.2rem; }
+        .metric { border: 1px solid #e4ebf3; border-radius: 1rem; background: #fff; padding: 1rem 1.1rem; height: 100%; transition: transform .16s ease, box-shadow .16s ease; }
+        .metric:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -24px rgba(15,31,58,.45); }
+        .metric .icon { width: 40px; height: 40px; border-radius: .75rem; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .metric .num { font-size: 1.45rem; font-weight: 800; line-height: 1.1; }
+        .metric .lbl { color: #7b8aa0; font-size: .76rem; font-weight: 600; }
+        .panel { border: 1px solid #e4ebf3; border-radius: 1rem; background: #fff; overflow: hidden; }
+        .panel-head { padding: 1rem 1.25rem; border-bottom: 1px solid #eef2f7; }
+        .table thead th { color: #7b8aa0; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
+        .badge-soft { border-radius: 999px; padding: .2rem .55rem; font-size: .72rem; font-weight: 700; }
+        .badge-soft-primary { background: #e8f1ff; color: #1d4ed8; }
+        .badge-soft-success { background: #e7f7ef; color: #15803d; }
+        .badge-soft-danger { background: #fdecec; color: #b91c1c; }
+        .badge-soft-warning { background: #fff6e5; color: #b45309; }
+        .badge-soft-info { background: #e6f7fa; color: #0e7490; }
+        .quick { display: flex; align-items: center; justify-content: space-between; padding: .8rem .9rem; border: 1px solid #e4ebf3; border-radius: .75rem; color: #24433f; text-decoration: none; font-weight: 600; font-size: .88rem; background: #fff; }
+        .quick:hover { border-color: #0f766e; color: #0f766e; background: #f7fcfb; }
+        .fee-alert { border: 1px solid #f1dfb6; background: #fffcf4; border-radius: .9rem; padding: 1rem 1.1rem; }
     </style>
 </head>
 <body>
 <%@ include file="_navbar.jsp" %>
 
-<div class="container-fluid py-4 px-4">
-    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 gap-3">
-        <div>
-            <h4 class="fw-bold mb-1">Dashboard Overview</h4>
-            <p class="text-muted mb-0">Welcome to DentCare Portal - Manage appointments and clinic operations.</p>
+<div class="container-fluid py-4 px-3 px-lg-4">
+    <section class="hero p-4 p-lg-5 mb-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div>
+                <div class="small text-white-50 text-uppercase mb-1" style="letter-spacing:.08em;">Clinic control centre</div>
+                <h1 class="h3 fw-bold mb-2">Everything in one place</h1>
+                <p class="mb-0 text-white-50">Appointments, patients, doctors, fees, website labels and receipts — fully admin-controlled.</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="${pageContext.request.contextPath}/admin/appointments" class="btn btn-light fw-semibold"><i class="bi bi-calendar-check me-1"></i>Appointments</a>
+                <a href="${pageContext.request.contextPath}/admin/settings" class="btn btn-outline-light fw-semibold"><i class="bi bi-sliders me-1"></i>Website settings</a>
+            </div>
         </div>
-        <div class="d-flex gap-2">
-            <a href="${pageContext.request.contextPath}/admin/appointments" class="btn btn-primary">
-                <i class="bi bi-calendar-plus me-1"></i>View Appointments
-            </a>
-            <sec:authorize access="hasRole('ADMIN')">
-                <a href="${pageContext.request.contextPath}/admin/doctors/add" class="btn btn-outline-primary">
-                    <i class="bi bi-person-plus me-1"></i>Add Doctor
-                </a>
-            </sec:authorize>
-        </div>
-    </div>
+    </section>
 
-    <div class="row g-4 mb-4">
-        <sec:authorize access="hasRole('ADMIN')">
-            <div class="col-md-4">
-                <div class="card stat-card h-100">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <p class="text-muted mb-1">Total Doctors</p>
-                            <h2 class="fw-bold mb-0">${doctorCount}</h2>
-                            <small class="text-primary">Manage staff</small>
-                        </div>
-                        <div class="stat-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-person-badge"></i></div>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/admin/doctors" class="card-footer bg-transparent border-0 text-decoration-none text-primary fw-semibold d-flex justify-content-between align-items-center">
-                        <span>Go to Doctors</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card stat-card h-100">
-                    <div class="card-body d-flex align-items-center justify-content-between">
-                        <div>
-                            <p class="text-muted mb-1">Total Patients</p>
-                            <h2 class="fw-bold mb-0">${patientCount}</h2>
-                            <small class="text-success">Registered users</small>
-                        </div>
-                        <div class="stat-icon bg-success bg-opacity-10 text-success"><i class="bi bi-people"></i></div>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/admin/patients" class="card-footer bg-transparent border-0 text-decoration-none text-success fw-semibold d-flex justify-content-between align-items-center">
-                        <span>Go to Patients</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-        </sec:authorize>
-        <div class="col-md-4">
-            <div class="card stat-card h-100">
-                <div class="card-body d-flex align-items-center justify-content-between">
-                    <div>
-                        <p class="text-muted mb-1">Total Appointments</p>
-                        <h2 class="fw-bold mb-0">${appointmentCount}</h2>
-                        <small class="text-warning">All bookings</small>
-                    </div>
-                    <div class="stat-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-calendar-check"></i></div>
-                </div>
-                <a href="${pageContext.request.contextPath}/admin/appointments" class="card-footer bg-transparent border-0 text-decoration-none text-warning fw-semibold d-flex justify-content-between align-items-center">
-                    <span>Go to Appointments</span>
-                    <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
+    <c:if test="${pendingFeeCount > 0}">
+        <div class="fee-alert d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+            <div><i class="bi bi-hourglass-split me-2" style="color:#b45309;"></i><strong>${pendingFeeCount}</strong> doctor fee request(s) waiting for your approval.</div>
+            <a href="${pageContext.request.contextPath}/admin/doctor-fees" class="btn btn-sm btn-teal" style="background:#0f766e;color:#fff;border-color:#0f766e;font-weight:700;">Review fees</a>
         </div>
-    </div>
+    </c:if>
+
+    <section class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="metric"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Doctors</div><div class="num">${doctorCount}</div></div><div class="icon" style="background:#eaf7f4;color:#0f766e;"><i class="bi bi-person-badge"></i></div></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="metric"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Patients</div><div class="num">${patientCount}</div></div><div class="icon" style="background:#e8f1ff;color:#1d4ed8;"><i class="bi bi-people"></i></div></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="metric"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Appointments</div><div class="num">${appointmentCount}</div></div><div class="icon" style="background:#f1ecff;color:#6d28d9;"><i class="bi bi-calendar2-check"></i></div></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="metric"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Today</div><div class="num">${todayCount}</div></div><div class="icon" style="background:#e7f7ef;color:#15803d;"><i class="bi bi-sun"></i></div></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="metric"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Revenue</div><div class="num">₹<fmt:formatNumber value="${revenue}" minFractionDigits="0" maxFractionDigits="0" /></div></div><div class="icon" style="background:#fff6e5;color:#b45309;"><i class="bi bi-wallet2"></i></div></div></div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="metric"><div class="d-flex justify-content-between align-items-start"><div><div class="lbl">Pending pay</div><div class="num">${pendingPayments}</div></div><div class="icon" style="background:#fdecec;color:#b91c1c;"><i class="bi bi-hourglass"></i></div></div></div>
+        </div>
+    </section>
 
     <div class="row g-4">
-        <div class="col-lg-8">
-            <div class="card table-card h-100">
-                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
-                    <div>
-                        <h6 class="fw-bold mb-1">Recent Appointments</h6>
-                        <small class="text-muted">Latest bookings in the clinic</small>
-                    </div>
-                    <a href="${pageContext.request.contextPath}/admin/appointments" class="btn btn-sm btn-outline-primary">View All</a>
+        <div class="col-xl-8">
+            <section class="panel mb-4">
+                <div class="panel-head d-flex flex-column flex-sm-row justify-content-between gap-2">
+                    <div><h2 class="h6 fw-bold mb-1">Recent appointments</h2><p class="small text-muted mb-0">Latest bookings in the clinic.</p></div>
+                    <a href="${pageContext.request.contextPath}/admin/appointments" class="btn btn-sm btn-outline-success align-self-sm-center">Manage all</a>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
-                        <tr>
-                            <th class="text-uppercase small text-muted">Patient</th>
-                            <th class="text-uppercase small text-muted">Doctor</th>
-                            <th class="text-uppercase small text-muted">Service</th>
-                            <th class="text-uppercase small text-muted">Date</th>
-                            <th class="text-uppercase small text-muted">Time</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <c:forEach var="a" items="${appointments}" varStatus="s">
-                            <c:if test="${s.index < 6}">
-                                <tr>
-                                    <td>
-                                        <div class="fw-semibold">${a.patientName}</div>
-                                        <small class="text-muted">${a.phone}</small>
-                                    </td>
-                                    <td><span class="badge bg-primary bg-opacity-10 text-primary">${a.doctorName}</span></td>
-                                    <td>${a.service}</td>
-                                    <td>${a.appointmentDate}</td>
-                                    <td>${a.appointmentTime}</td>
-                                </tr>
-                            </c:if>
-                        </c:forEach>
-                        <c:if test="${empty appointments}">
-                            <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">No appointments yet.</td>
-                            </tr>
-                        </c:if>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                <c:choose>
+                    <c:when test="${not empty appointments}">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead><tr><th class="ps-4">Patient</th><th>Doctor</th><th>Visit</th><th>Date</th><th>Status</th><th class="text-end pe-4">Fee</th></tr></thead>
+                                <tbody>
+                                <c:forEach var="a" items="${appointments}" varStatus="s">
+                                    <c:if test="${s.index < 8}">
+                                        <tr>
+                                            <td class="ps-4"><div class="fw-semibold"><c:out value="${a.patientName}" /></div><small class="text-muted"><c:out value="${a.email}" /></small></td>
+                                            <td class="small"><c:out value="${a.doctorName}" /></td>
+                                            <td><div class="small"><c:out value="${a.service}" /></div><span class="badge-soft badge-soft-primary">${a.appointmentType.label}</span></td>
+                                            <td class="small text-muted"><c:out value="${a.appointmentDate}" /><br><c:out value="${a.appointmentTime}" /></td>
+                                            <td><span class="badge-soft badge-soft-${a.statusBadgeClass}">${a.status.label}</span></td>
+                                            <td class="text-end pe-4 fw-semibold">₹<fmt:formatNumber value="${a.amount}" minFractionDigits="2" maxFractionDigits="2" /></td>
+                                        </tr>
+                                    </c:if>
+                                </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+                    </c:when>
+                    <c:otherwise><div class="text-center text-muted py-5"><i class="bi bi-calendar2-x fs-1 d-block mb-2"></i>No appointments yet.</div></c:otherwise>
+                </c:choose>
+            </section>
         </div>
-        <div class="col-lg-4">
-            <div class="card table-card h-100">
-                <div class="card-header bg-white border-0 py-3">
-                    <h6 class="fw-bold mb-1">Quick Actions</h6>
-                    <small class="text-muted">Jump to key management areas</small>
+
+        <div class="col-xl-4">
+            <section class="panel mb-4">
+                <div class="panel-head"><h2 class="h6 fw-bold mb-1">Quick actions</h2><p class="small text-muted mb-0">Full admin control, one click away.</p></div>
+                <div class="p-3 d-grid gap-2">
+                    <a class="quick" href="${pageContext.request.contextPath}/admin/appointments"><span><i class="bi bi-calendar3 me-2"></i>Appointments</span><i class="bi bi-chevron-right"></i></a>
+                    <a class="quick" href="${pageContext.request.contextPath}/admin/patients"><span><i class="bi bi-people me-2"></i>Patients</span><i class="bi bi-chevron-right"></i></a>
+                    <a class="quick" href="${pageContext.request.contextPath}/admin/doctors"><span><i class="bi bi-person-badge me-2"></i>Doctors</span><i class="bi bi-chevron-right"></i></a>
+                    <a class="quick" href="${pageContext.request.contextPath}/admin/doctor-fees"><span><i class="bi bi-currency-rupee me-2"></i>Doctor fees</span><c:if test="${pendingFeeCount > 0}"><span class="badge bg-warning text-dark">${pendingFeeCount}</span></c:if><c:if test="${pendingFeeCount == 0}"><i class="bi bi-chevron-right"></i></c:if></a>
+                    <a class="quick" href="${pageContext.request.contextPath}/admin/settings"><span><i class="bi bi-sliders me-2"></i>Website &amp; labels</span><i class="bi bi-chevron-right"></i></a>
+                    <a class="quick" href="${pageContext.request.contextPath}/admin/invoices"><span><i class="bi bi-receipt me-2"></i>Invoices &amp; receipts</span><i class="bi bi-chevron-right"></i></a>
                 </div>
-                <div class="card-body d-grid gap-2">
-                    <sec:authorize access="hasRole('ADMIN')">
-                        <a href="${pageContext.request.contextPath}/admin/doctors/add" class="btn btn-outline-primary d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-person-plus me-2"></i>Add New Doctor</span>
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/admin/patients" class="btn btn-outline-success d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-people me-2"></i>Manage Patients</span>
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/admin/pricing" class="btn btn-outline-info d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-currency-rupee me-2"></i>Update Pricing</span>
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/admin/invoices" class="btn btn-outline-warning d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-receipt me-2"></i>Manage Invoices</span>
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </sec:authorize>
-                    <a href="${pageContext.request.contextPath}/admin/appointments" class="btn btn-outline-dark d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-calendar-check me-2"></i>Manage Appointments</span>
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
-                    <a href="${pageContext.request.contextPath}/admin/profile" class="btn btn-outline-secondary d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-person-circle me-2"></i>My Profile</span>
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head"><h2 class="h6 fw-bold mb-1">Newest patients</h2><p class="small text-muted mb-0">Registered patient accounts.</p></div>
+                <div class="p-3">
+                    <c:forEach var="p" items="${patients}" varStatus="s">
+                        <c:if test="${s.index < 5}">
+                            <div class="d-flex align-items-center gap-2 py-2" style="border-bottom:1px dashed #edf2f8;">
+                                <div style="width:34px;height:34px;border-radius:50%;background:#eaf7f4;color:#0f766e;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;">${p.name.substring(0,1)}</div>
+                                <div class="min-w-0"><div class="fw-semibold small text-truncate"><c:out value="${p.name}" /></div><div class="text-muted" style="font-size:.76rem;"><c:out value="${p.email}" /></div></div>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                    <c:if test="${empty patients}"><div class="small text-muted py-2">No patients registered yet.</div></c:if>
+                    <a href="${pageContext.request.contextPath}/admin/patients" class="btn btn-sm btn-outline-success w-100 mt-3">Manage patients</a>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,7 +1,10 @@
 package com.subrat.clinic.config;
 
 import com.subrat.clinic.model.Doctor;
+import com.subrat.clinic.model.DoctorFee;
+import com.subrat.clinic.model.DoctorFeeStatus;
 import com.subrat.clinic.model.ServicePrice;
+import com.subrat.clinic.repository.DoctorFeeRepository;
 import com.subrat.clinic.repository.DoctorRepository;
 import com.subrat.clinic.repository.ServicePriceRepository;
 import jakarta.annotation.PostConstruct;
@@ -18,6 +21,9 @@ public class DataInitializer {
 
     @Autowired
     private ServicePriceRepository servicePriceRepository;
+
+    @Autowired
+    private DoctorFeeRepository doctorFeeRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -54,6 +60,30 @@ public class DataInitializer {
         seedServicePrice("Braces", "15000.00");
         seedServicePrice("Tooth Whitening", "2999.00");
         seedServicePrice("Dental Implants", "4999.00");
+
+        if (doctorFeeRepository.count() == 0) {
+            seedDoctorFee("priya.sharma@clinic.com", DoctorFee.CONSULTATION, "250.00");
+            seedDoctorFee("priya.sharma@clinic.com", "Braces", "16000.00");
+            seedDoctorFee("amit.verma@clinic.com", DoctorFee.CONSULTATION, "199.00");
+            seedDoctorFee("amit.verma@clinic.com", "Root Canal", "9500.00");
+            seedDoctorFee("neha.gupta@clinic.com", DoctorFee.CONSULTATION, "299.00");
+            seedDoctorFee("neha.gupta@clinic.com", "Tooth Whitening", "3500.00");
+            seedDoctorFee("neha.gupta@clinic.com", "Dental Implants", "5200.00");
+        }
+    }
+
+    private void seedDoctorFee(String doctorEmail, String serviceName, String fee) {
+        Doctor doctor = doctorRepository.findByEmail(doctorEmail);
+        if (doctor == null
+                || doctorFeeRepository.findByDoctorIdAndServiceNameIgnoreCase(doctor.getId(), serviceName) != null) {
+            return;
+        }
+        DoctorFee doctorFee = new DoctorFee();
+        doctorFee.setDoctor(doctor);
+        doctorFee.setServiceName(serviceName);
+        doctorFee.setFee(new BigDecimal(fee));
+        doctorFee.setStatus(DoctorFeeStatus.APPROVED);
+        doctorFeeRepository.save(doctorFee);
     }
 
     private void seedServicePrice(String name, String fee) {

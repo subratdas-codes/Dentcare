@@ -1,13 +1,24 @@
 package com.subrat.clinic.controller;
 
 import com.subrat.clinic.model.Appointment;
+import com.subrat.clinic.model.AppointmentStatus;
+import com.subrat.clinic.model.AppointmentType;
 import com.subrat.clinic.model.Doctor;
+import com.subrat.clinic.model.DoctorFee;
+import com.subrat.clinic.model.PaymentStatus;
 import com.subrat.clinic.service.AppointmentService;
+import com.subrat.clinic.service.DoctorFeeService;
 import com.subrat.clinic.service.DoctorPhotoStorage;
 import com.subrat.clinic.service.DoctorService;
 import com.subrat.clinic.service.PatientService;
+import com.subrat.clinic.service.ServicePriceService;
+import com.subrat.clinic.service.SiteSettingService;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,17 +43,26 @@ public class DoctorPortalController {
     private final AppointmentService appointmentService;
     private final PasswordEncoder passwordEncoder;
     private final DoctorPhotoStorage doctorPhotoStorage;
+    private final DoctorFeeService doctorFeeService;
+    private final ServicePriceService servicePriceService;
+    private final SiteSettingService siteSettingService;
 
     public DoctorPortalController(DoctorService doctorService,
                                   PatientService patientService,
                                   AppointmentService appointmentService,
                                   PasswordEncoder passwordEncoder,
-                                  DoctorPhotoStorage doctorPhotoStorage) {
+                                  DoctorPhotoStorage doctorPhotoStorage,
+                                  DoctorFeeService doctorFeeService,
+                                  ServicePriceService servicePriceService,
+                                  SiteSettingService siteSettingService) {
         this.doctorService = doctorService;
         this.patientService = patientService;
         this.appointmentService = appointmentService;
         this.passwordEncoder = passwordEncoder;
         this.doctorPhotoStorage = doctorPhotoStorage;
+        this.doctorFeeService = doctorFeeService;
+        this.servicePriceService = servicePriceService;
+        this.siteSettingService = siteSettingService;
     }
 
     @GetMapping({"", "/"})
@@ -119,8 +139,40 @@ public class DoctorPortalController {
         if (doctor == null) {
             return "redirect:/doctor/login";
         }
-        model.addAttribute("appointments", appointmentService.findByDoctorName(doctor.getName()));
+        model.addAttribute("appointments", appointmentService.findByDoctor(doctor));
         return "admin/appointment_list";
+    }
+
+    @GetMapping("/fees")
+    public String fees(Authentication authentication, Model model) {
+        Doctor doctor = requireDoctor(authentication);
+        if (doctor == null) {
+            return "redirect:/doctor/login";
+        }
+        model.addAttribute("doctor", doctor);
+        model.addAttribute("fees", doctorFeeService.findByDoctor(doctor));
+        model.addAttribute("servicePrices", servicePriceService.findAll());
+        model.addAttribute("consultationFee", siteSettingService.getConsultationFee());
+        return "admin/doctor_fees_portal";
+    }
+
+    @PostMapping("/fees")
+    public String requestFee(Authentication authentication,
+                             @RequestParam String serviceName,
+                             @RequestParam BigDecimal fee,
+                             RedirectAttributes redirectAttributes) {
+        Doctor doctor = requireDoctor(authentication);
+        if (doctor == null) {
+            return "redirect:/doctor/login";
+        }
+        try {
+            doctorFeeService.requestFee(doctor, serviceName, fee);
+            redirectAttributes.addFlashAttribute("success",
+                    "Fee request sent to admin for approval. Your current approved fee stays active until then.");
+        } catch (IllegalArgumentException exception) {
+            redirectAttributes.addFlashAttribute("error", exception.getMessage());
+        }
+        return "redirect:/doctor/fees";
     }
 
     @GetMapping("/profile")
@@ -209,16 +261,45 @@ public class DoctorPortalController {
             return "redirect:/doctor/login";
         }
 
-        List<Appointment> appointments = appointmentService.findByDoctorName(doctor.getName());
+        List<Appointment> appointments = appointmentService.findByDoctor(doctor);
         long assignedPatientCount = appointments.stream()
                 .map(Appointment::getEmail)
                 .filter(email -> email != null && !email.isBlank())
                 .distinct()
                 .count();
+        LocalDate today = LocalDate.now();
+        List<Appointment> todayAppointments = appointments.stream()
+                .filter(a -> today.equals(a.getAppointmentDate()))
+                .filter(a -> a.getStatus() != AppointmentStatus.CANCELLED)
+                .sorted(Comparator.comparing(Appointment::getAppointmentTime,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+        long upcomingCount = appointments.stream()
+                .filter(a -> a.getStatus() == AppointmentStatus.BOOKED)
+                .filter(a -> a.getAppointmentDate() != null && !a.getAppointmentDate().isBefore(today))
+                .count();
+        BigDecimal earnings = appointments.stream()
+                .filter(a -> a.getPaymentStatus() == PaymentStatus.PAID)
+                .map(Appointment::getAmount)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<DoctorFee> fees = doctorFeeService.findByDoctor(doctor);
+        long pendingFeeRequests = fees.stream().filter(DoctorFee::isPending).count();
+
         model.addAttribute("doctor", doctor);
         model.addAttribute("appointments", appointments);
+        model.addAttribute("todayAppointments", todayAppointments);
+        model.addAttribute("todayCount", todayAppointments.size());
+        model.addAttribute("upcomingCount", upcomingCount);
+        model.addAttribute("completedCount", appointments.stream()
+                .filter(a -> a.getStatus() == AppointmentStatus.COMPLETED).count());
+        model.addAttribute("earnings", earnings);
         model.addAttribute("appointmentCount", appointments.size());
         model.addAttribute("patientCount", assignedPatientCount);
+        model.addAttribute("fees", fees);
+        model.addAttribute("pendingFeeRequests", pendingFeeRequests);
+        model.addAttribute("consultationFee", doctorFeeService.resolveFee(doctor,
+                AppointmentType.CONSULTATION, null, siteSettingService.getConsultationFee()));
         return "admin/doctor_dashboard";
     }
 

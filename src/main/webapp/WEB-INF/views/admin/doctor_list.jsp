@@ -43,6 +43,13 @@
         <div class="alert alert-danger">Email address is required.</div>
     </c:if>
 
+    <c:if test="${not empty success}">
+        <div class="alert alert-success"><i class="bi bi-check-circle me-2"></i><c:out value="${success}" /></div>
+    </c:if>
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i><c:out value="${error}" /></div>
+    </c:if>
+
     <c:if test="${not empty doctors}">
         <div class="card card-table">
             <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
@@ -90,13 +97,16 @@
                             </td>
                             <td class="text-center">
                                 <sec:authorize access="hasRole('ADMIN')">
-                                    <a href="<c:url value='/admin/doctors/edit/${doctor.id}' />" class="btn btn-sm btn-outline-primary">
+                                    <a href="<c:url value='/admin/doctors/edit/${doctor.id}' />" class="btn btn-sm btn-outline-primary" title="Edit doctor">
                                         <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="<c:url value='/admin/doctor-fees' />" class="btn btn-sm btn-outline-success" title="Manage this doctor's fees">
+                                        <i class="bi bi-currency-rupee"></i>
                                     </a>
                                     <form action="<c:url value='/admin/doctors/delete/${doctor.id}' />" method="post" class="d-inline"
                                           onsubmit="return confirm('Delete ${doctor.name}?');">
                                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete doctor">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>

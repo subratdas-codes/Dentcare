@@ -11,4 +11,5 @@ public interface DoctorService {
     Doctor findById(Long id);
     List<Doctor> findAll();
     Doctor findByEmail(String email);
+    Doctor findByName(String name);
 }

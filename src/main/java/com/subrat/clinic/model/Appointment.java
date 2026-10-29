@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_appointment_email", columnList = "email"),
+        @Index(name = "idx_appointment_doctor", columnList = "doctorId"),
+        @Index(name = "idx_appointment_date", columnList = "appointmentDate")
+})
 public class Appointment {
 
     @Id
@@ -19,10 +24,21 @@ public class Appointment {
     private String patientName;
     private String email;
     private String phone;
+    private Long doctorId;
     private String doctorName;
     private String service;
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private AppointmentType appointmentType = AppointmentType.TREATMENT;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private AppointmentStatus status = AppointmentStatus.BOOKED;
+
+    private LocalDateTime cancelledAt;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal amount;
@@ -78,12 +94,44 @@ public class Appointment {
         this.phone = phone;
     }
 
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Long doctorId) {
+        this.doctorId = doctorId;
+    }
+
     public String getDoctorName() {
         return doctorName;
     }
 
     public void setDoctorName(String doctorName) {
         this.doctorName = doctorName;
+    }
+
+    public AppointmentType getAppointmentType() {
+        return appointmentType == null ? AppointmentType.TREATMENT : appointmentType;
+    }
+
+    public void setAppointmentType(AppointmentType appointmentType) {
+        this.appointmentType = appointmentType;
+    }
+
+    public AppointmentStatus getStatus() {
+        return status == null ? AppointmentStatus.BOOKED : status;
+    }
+
+    public void setStatus(AppointmentStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
     }
 
     public String getService() {
@@ -169,5 +217,35 @@ public class Appointment {
 
     public boolean isPaymentPending() {
         return getPaymentStatus() == PaymentStatus.PENDING;
+    }
+
+    public boolean isCancelled() {
+        return getStatus() == AppointmentStatus.CANCELLED;
+    }
+
+    public boolean isCompleted() {
+        return getStatus() == AppointmentStatus.COMPLETED;
+    }
+
+    public boolean isBooked() {
+        return getStatus() == AppointmentStatus.BOOKED;
+    }
+
+    public boolean isConsultation() {
+        return getAppointmentType() == AppointmentType.CONSULTATION;
+    }
+
+    public boolean isUpcoming() {
+        return isBooked() && appointmentDate != null
+                && !appointmentDate.isBefore(LocalDate.now());
+    }
+
+    public boolean isPastVisit() {
+        return !isCancelled() && appointmentDate != null
+                && appointmentDate.isBefore(LocalDate.now());
+    }
+
+    public String getStatusBadgeClass() {
+        return getStatus().getBadgeClass();
     }
 }
