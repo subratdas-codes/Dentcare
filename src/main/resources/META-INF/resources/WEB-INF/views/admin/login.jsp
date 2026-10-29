@@ -28,6 +28,7 @@
             <p class="mb-0">${selectedRole == 'DOCTOR' ? 'Doctor Portal' : 'Admin Portal'}</p>
         </div>
         <div class="card-body">
+            <%@ include file="../_portal_login_tabs.jsp" %>
             <div class="d-flex justify-content-between align-items-center mb-1">
                 <h5 class="mb-0">${selectedRole == 'DOCTOR' ? 'Doctor Login' : 'Admin Login'}</h5>
             </div>

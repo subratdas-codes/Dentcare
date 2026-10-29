@@ -171,6 +171,7 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/my/**")).hasRole("USER")
                         .requestMatchers(
                                 new AntPathRequestMatcher("/login"),
+                                new AntPathRequestMatcher("/portal"),
                                 new AntPathRequestMatcher("/register"),
                                 new AntPathRequestMatcher("/book"),
                                 new AntPathRequestMatcher("/booking/**"),

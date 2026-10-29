@@ -14,7 +14,8 @@
                 <a href="${pageContext.request.contextPath}/service" class="d-block small mb-2"><c:out value="${site.navServices}" /></a>
                 <a href="${pageContext.request.contextPath}/team" class="d-block small mb-2"><c:out value="${site.navDoctors}" /></a>
                 <a href="${pageContext.request.contextPath}/price" class="d-block small mb-2"><c:out value="${site.navPricing}" /></a>
-                <a href="${pageContext.request.contextPath}/contact" class="d-block small"><c:out value="${site.navContact}" /></a>
+                <a href="${pageContext.request.contextPath}/contact" class="d-block small mb-2"><c:out value="${site.navContact}" /></a>
+                <a href="${pageContext.request.contextPath}/portal" class="d-block small">Portal Login</a>
             </div>
             <div class="col-6 col-lg-3">
                 <h6 class="text-white fw-semibold mb-3">Clinic</h6>

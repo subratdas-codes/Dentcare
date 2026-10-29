@@ -94,6 +94,28 @@ public class AuthenticationController {
         return "login";
     }
 
+    @GetMapping("/portal")
+    public String showPortalChooser(Authentication authentication) {
+        if (authentication != null) {
+            boolean admin = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            boolean doctor = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_DOCTOR"));
+            boolean patient = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_USER"));
+            if (admin) {
+                return "redirect:/admin/dashboard";
+            }
+            if (doctor) {
+                return "redirect:/doctor/dashboard";
+            }
+            if (patient) {
+                return "redirect:/";
+            }
+        }
+        return "portal_chooser";
+    }
+
     @GetMapping("/profile")
     public String showProfile(Authentication authentication, Model model) {
         Patient patient = currentPatient(authentication);
