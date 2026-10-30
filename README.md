@@ -4,7 +4,7 @@ A full-stack web application for managing a dental clinic — appointment schedu
 
 **Live:** [https://carebydent.onrender.com](https://carebydent.onrender.com)
 
-Hosting options and the permanent always-on setup: [docs/HOSTING.md](docs/HOSTING.md).
+Permanent always-on hosting: [Oracle Cloud Always Free guide](docs/HOSTING.md). The same guide also covers the free Koyeb/Neon option and Render Starter.
 
 ---
 
