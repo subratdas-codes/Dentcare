@@ -1,3 +1,6 @@
+# Render's free PostgreSQL database expires 30 days after creation. For a
+# permanent setup, create a Neon database and set DB_URL/DB_USER/DB_PASSWORD in
+# the Render dashboard. See docs/HOSTING.md.
 databases:
   - name: dentcare-db
     plan: free
@@ -14,6 +17,11 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+      # Optional free-tier keep-alive. It uses roughly 730 of the workspace's
+      # 750 monthly free hours, so enable it only if DentCare is the only free
+      # service in this workspace (or accept the shared-quota risk).
+      # - key: APP_KEEPALIVE_ENABLED
+      #   value: "true"
       - key: DB_HOST
         fromDatabase:
           name: dentcare-db

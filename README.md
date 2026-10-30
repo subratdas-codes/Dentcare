@@ -4,6 +4,8 @@ A full-stack web application for managing a dental clinic — appointment schedu
 
 **Live:** [https://carebydent.onrender.com](https://carebydent.onrender.com)
 
+Hosting options and the permanent always-on setup: [docs/HOSTING.md](docs/HOSTING.md).
+
 ---
 
 ## Tech Stack
@@ -15,9 +17,9 @@ A full-stack web application for managing a dental clinic — appointment schedu
 | Frontend    | Bootstrap 5 · Font Awesome · Custom CSS         |
 | Persistence | Spring Data JPA · Hibernate 6                    |
 | Local DB    | MySQL 8 / H2 (zero-config profile)              |
-| Prod DB     | PostgreSQL (Render Free Managed)                 |
+| Prod DB     | PostgreSQL (Render, Neon, or self-hosted)        |
 | Build       | Maven (wrapper included)                        |
-| Deploy      | Docker · Render.com (free)                      |
+| Deploy      | Docker · Render / Koyeb / Oracle Always Free    |
 | CI          | GitHub Actions                                   |
 
 ---

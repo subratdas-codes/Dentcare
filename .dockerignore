@@ -1,4 +1,6 @@
 target/
+uploads/
+.env
 .kilo/
 .github/
 .settings/
@@ -8,4 +10,7 @@ target/
 *.log
 README.md
 render.yaml
+docs/
+docker-compose.yml
+Caddyfile
 .mvn/

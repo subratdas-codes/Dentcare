@@ -266,6 +266,10 @@ public class DoctorController {
             redirectAttributes.addFlashAttribute("error", "You cannot delete your own admin account.");
             return "redirect:/admin/doctors";
         }
+        Doctor doctor = doctorService.findById(id);
+        if (doctor != null) {
+            doctorPhotoStorage.delete(doctor.getProfileImagePath());
+        }
         doctorFeeService.deleteForDoctor(id);
         doctorService.deleteById(id);
         redirectAttributes.addFlashAttribute("success", "Doctor account deleted.");

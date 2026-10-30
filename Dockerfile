@@ -10,7 +10,8 @@ RUN mvn -B clean package -DskipTests
 FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 ENV SPRING_PROFILES_ACTIVE=prod
-ENV JAVA_OPTS=""
+# Keep the JVM comfortable inside a 512 MB free instance (Render/Koyeb).
+ENV JAVA_OPTS="-Xmx256m -XX:+UseSerialGC -Djava.awt.headless=true"
 EXPOSE 8080
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app/target/dentcare.jar app.jar

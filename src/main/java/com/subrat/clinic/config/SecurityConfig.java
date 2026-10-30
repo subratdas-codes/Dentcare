@@ -191,6 +191,7 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/img/**"),
                                 new AntPathRequestMatcher("/lib/**"),
                                 new AntPathRequestMatcher("/uploads/**"),
+                                new AntPathRequestMatcher("/doctor-photo/**"),
                                 new AntPathRequestMatcher("/favicon.ico"),
                                 new AntPathRequestMatcher("/actuator/health"),
                                 new AntPathRequestMatcher("/actuator/health/**")).permitAll()
