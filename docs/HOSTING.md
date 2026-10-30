@@ -117,70 +117,232 @@ Any booking made between the dump and the switch would otherwise be missing.
 ## Option 2: Oracle Cloud Always Free + Docker (true always-on)
 
 Oracle's Always Free Ampere A1 allowance is currently 2 OCPU and 12 GB RAM
-(Oracle reduced it from 4 OCPU / 24 GB in June 2026). A single small VM is more
-than enough for DentCare. The VM runs continuously; there is no PaaS sleep.
+(Oracle reduced it from 4 OCPU / 24 GB in June 2026). This is a real Linux VM
+that runs 24/7: no sleep, no cold start, and no monthly instance-hour quota.
 
-This repository now includes a complete `docker-compose.yml` with:
-- DentCare (the Spring Boot/JSP app)
-- PostgreSQL 16 with a persistent volume
-- Caddy with automatic HTTPS
+The repository includes everything needed:
+
+- `Dockerfile` — builds DentCare
+- `docker-compose.yml` — DentCare + PostgreSQL 16 + Caddy
+- `Caddyfile` — automatic HTTPS
+- `.env.example` — settings template
+
+You need an Oracle Cloud account (a card is used for identity verification;
+Always Free resources are not charged), a free DuckDNS account, and an SSH key.
 
 ### 1. Create the VM
 
-1. Create an Oracle Cloud account and choose an **Always Free** Ampere A1
-   instance, Ubuntu 22.04, with a public IPv4 address.
-2. Open ingress for TCP **80** and **443** in the VCN security list.
-3. On the VM, allow the ports:
-   ```bash
-   sudo ufw allow 80/tcp
-   sudo ufw allow 443/tcp
-   ```
+1. Sign in at <https://cloud.oracle.com> and pick a **home region** close to
+   your patients (for India, Mumbai or Hyderabad). The home region cannot be
+   changed later.
+2. **Menu → Compute → Instances → Create instance**.
+3. Name: `dentcare`.
+4. **Image and shape → Change image**: Canonical Ubuntu 22.04 (or 24.04).
+5. **Shape**: Ampere → `VM.Standard.A1.Flex`, **2 OCPUs**, **12 GB memory**
+   (the full Always Free allowance). If Oracle reports no capacity, try the
+   other availability domain, or retry later.
+6. **Networking**: create a new VCN with a public subnet and make sure
+   **Assign a public IPv4 address** is selected.
+7. **Add SSH keys**: choose **Generate a key pair** and download the private
+   key, or paste your own public key.
+8. Boot volume: 50 GB is enough (Always Free includes 200 GB total).
+9. Create the instance and wait until it is **Running**. Copy the **Public IP
+   address**.
 
-### 2. Point a free domain at it
+On Windows, create a key and connect (PowerShell):
 
-Create a free subdomain at <https://www.duckdns.org>, for example
-`carebydent.duckdns.org`, and point it at the VM's public IP. Caddy will obtain
-a Let's Encrypt certificate automatically.
+```powershell
+ssh-keygen -t ed25519 -f "$env:USERPROFILE\.ssh\dentcare"
+Get-Content "$env:USERPROFILE\.ssh\dentcare.pub"
+```
 
-### 3. Install Docker and start DentCare
+Paste the printed public key into Oracle's SSH key box. Then connect:
+
+```powershell
+ssh -i "$env:USERPROFILE\.ssh\dentcare" ubuntu@<PUBLIC_IP>
+```
+
+### 2. Open ports 80 and 443 (two firewalls)
+
+Oracle has a network firewall (security list) and Ubuntu has its own firewall.
+Both must allow the ports.
+
+**Oracle console:** VCN → Security Lists → Default Security List → Add Ingress
+Rules:
+
+- Source `0.0.0.0/0`, protocol TCP, destination port `80`
+- Source `0.0.0.0/0`, protocol TCP, destination port `443`
+
+**On the VM:**
 
 ```bash
-sudo apt update
-sudo apt install -y docker.io docker-compose-v2 git
-sudo usermod -aG docker "$USER"
-# log out and back in so the docker group applies
+sudo apt-get update
+sudo apt-get install -y iptables-persistent
+sudo iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+sudo netfilter-persistent save
+```
 
+Check that the ACCEPT rules are above the REJECT rule:
+
+```bash
+sudo iptables -L INPUT -n --line-numbers
+```
+
+### 3. Point a free domain at the VM
+
+1. Sign in at <https://www.duckdns.org>.
+2. Create a subdomain, for example `carebydent`, and set its IP to the VM's
+   public IP. The full name is `carebydent.duckdns.org`.
+3. Recommended: keep the IP updated automatically, because an ephemeral Oracle
+   IP can change if the instance is stopped and started. Create
+   `~/duckdns.sh`:
+
+   ```bash
+   #!/usr/bin/env bash
+   curl -fsS "https://www.duckdns.org/update?domains=carebydent&token=YOUR_TOKEN&ip=" >/dev/null
+   ```
+
+   ```bash
+   chmod +x ~/duckdns.sh
+   (crontab -l 2>/dev/null; echo "*/5 * * * * $HOME/duckdns.sh") | crontab -
+   ```
+
+### 4. Install Docker
+
+```bash
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker "$USER"
+```
+
+Log out and back in (or run `newgrp docker`) so the group change applies.
+
+```bash
+docker --version
+docker compose version
+```
+
+### 5. Get DentCare and configure it
+
+```bash
 git clone https://github.com/subratdas-codes/Dentcare.git
 cd Dentcare
 cp .env.example .env
-nano .env       # set DOMAIN and a strong POSTGRES_PASSWORD
-docker compose up -d --build
+nano .env
 ```
 
-Check it:
+Set at least:
+
+```dotenv
+DOMAIN=carebydent.duckdns.org
+POSTGRES_PASSWORD=<run: openssl rand -hex 24>
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+MAIL_USERNAME=<your SMTP login>
+MAIL_PASSWORD=<your SMTP key>
+```
+
+Use the same SMTP values that already work on Render. Without them DentCare
+still runs, but password-reset emails are only written to the log and never
+delivered. `DOMAIN` must be the DuckDNS name **without** `https://`.
+
+### 6. Move the existing Render database
+
+The current clinic data lives in Render's free PostgreSQL. Render deletes that
+database 30 days after creation, so migrate it now — **before starting the app
+for the first time on this VM**.
+
+1. Open **Render Dashboard → dentcare-db → Connect** and copy the **External
+   Database URL**.
+2. On the VM, start only the database:
+
+   ```bash
+   docker compose up -d db
+   ```
+
+3. Dump Render into a file. `read -s` hides the URL from the screen and from
+   shell history:
+
+   ```bash
+   read -rsp "Paste the Render External Database URL: " RENDER_DB_URL; echo
+   docker run --rm -e RENDER_DB_URL="$RENDER_DB_URL" postgres:16-alpine \
+     sh -c 'pg_dump --no-owner --no-privileges -Fc "$RENDER_DB_URL"' \
+     > ~/dentcare.dump
+   ls -lh ~/dentcare.dump
+   ```
+
+4. Restore into the new local database:
+
+   ```bash
+   docker compose exec -T db pg_restore --no-owner --no-privileges \
+     --clean --if-exists -U dentcare -d dentcare < ~/dentcare.dump
+   ```
+
+5. Verify the important tables:
+
+   ```bash
+   docker compose exec -T db psql -U dentcare -d dentcare \
+     -c "select count(*) from doctors;" \
+     -c "select count(*) from patients;" \
+     -c "select count(*) from appointments;"
+   ```
+
+Do not start the app before the restore. On an empty database Hibernate creates
+the tables and a default admin account; restoring is cleanest before that. If
+the app is already running, stop it first with `docker compose stop app`.
+
+### 7. Start DentCare
 
 ```bash
+docker compose up -d --build
 docker compose ps
 docker compose logs -f app
-curl -fsS https://carebydent.duckdns.org/actuator/health
 ```
 
-The database and uploads live in Docker volumes, so `docker compose down` and
-redeploys do not lose data.
+The first build takes a few minutes. Wait until `app` is `healthy` and `caddy`
+is `running`, then open `https://carebydent.duckdns.org`.
 
-### 4. Backups
+Caddy obtains the HTTPS certificate automatically on the first request. If it
+does not, check that DuckDNS points to the VM and that both firewalls allow
+ports 80 and 443.
 
-Run a nightly dump from the VM's crontab:
+### 8. Backups
+
+Create a backup script:
 
 ```bash
 mkdir -p ~/dentcare-backups
-0 2 * * * cd /home/ubuntu/Dentcare && docker compose exec -T db \
-  pg_dump -U dentcare dentcare | gzip > ~/dentcare-backups/dentcare-$(date +\%F).sql.gz
+cat > ~/backup-dentcare.sh <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$HOME/Dentcare"
+docker compose exec -T db pg_dump -U dentcare -d dentcare \
+  | gzip > "$HOME/dentcare-backups/dentcare-$(date +%F).sql.gz"
+find "$HOME/dentcare-backups" -name '*.sql.gz' -mtime +14 -delete
+EOF
+chmod +x ~/backup-dentcare.sh
+(crontab -l 2>/dev/null; echo "0 2 * * * $HOME/backup-dentcare.sh") | crontab -
 ```
 
-Copy the backups off the VM periodically.
+Copy backups off the VM regularly, for example from Windows:
 
-### 5. Updates
+```powershell
+scp -i "$env:USERPROFILE\.ssh\dentcare" `
+  ubuntu@<PUBLIC_IP>:~/dentcare-backups/*.sql.gz .
+```
+
+To restore a backup, stop the app, recreate the database, and load the dump:
+
+```bash
+docker compose stop app
+docker compose exec -T db dropdb -U dentcare --force dentcare
+docker compose exec -T db createdb -U dentcare dentcare
+gunzip -c ~/dentcare-backups/dentcare-YYYY-MM-DD.sql.gz \
+  | docker compose exec -T db psql -U dentcare -d dentcare
+docker compose start app
+```
+
+### 9. Updates
 
 ```bash
 cd ~/Dentcare
@@ -188,9 +350,17 @@ git pull
 docker compose up -d --build
 ```
 
+The database and uploads live in Docker volumes, so rebuilding does not lose
+data. Expect users to be logged out during the restart.
+
 Oracle may reclaim Always Free compute instances that are completely idle for
-seven days. A live clinic site with normal traffic is not idle, but if the site
-will be unused for long periods, keep a small external uptime monitor on it.
+seven days. A live clinic site is not idle. To be safe, add a free
+<https://uptimerobot.com> HTTP monitor for
+`https://carebydent.duckdns.org/actuator/health` every 5 minutes; it also emails
+you if the site goes down.
+
+Keep `.env` private — it contains the database and SMTP passwords. It is already
+listed in `.gitignore`.
 
 ---
 

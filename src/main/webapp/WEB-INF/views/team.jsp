@@ -60,7 +60,7 @@
                         <article class="dc-doctor d-flex flex-column">
                             <c:choose>
                                 <c:when test="${not empty doc.profileImagePath}">
-                                    <img src="${pageContext.request.contextPath}${doc.profileImagePath}" alt="<c:out value='${doc.name}' />">
+                                    <img src="${pageContext.request.contextPath}${doc.profileImagePath}" alt="<c:out value='${doc.name}' />" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/img/team-${teamImage}.jpg';">
                                 </c:when>
                                 <c:otherwise>
                                     <img src="${pageContext.request.contextPath}/img/team-${teamImage}.jpg" alt="<c:out value='${doc.name}' />">

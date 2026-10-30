@@ -410,12 +410,12 @@
                     <div class="col-md-6 col-lg-4 wow slideInUp" data-wow-delay="0.3s">
                         <div class="team-item h-100 d-flex flex-column">
                             <div class="position-relative rounded-top" style="z-index:1;">
+                                <c:set var="teamImage" value="${s.index % 3 + 1}" />
                                 <c:choose>
                                     <c:when test="${not empty doc.profileImagePath}">
-                                        <img class="img-fluid rounded-top w-100" src="${pageContext.request.contextPath}${doc.profileImagePath}" alt="<c:out value='${doc.name}' />" style="height:260px;object-fit:cover;">
+                                        <img class="img-fluid rounded-top w-100" src="${pageContext.request.contextPath}${doc.profileImagePath}" alt="<c:out value='${doc.name}' />" style="height:260px;object-fit:cover;" onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/img/team-${teamImage}.jpg';">
                                     </c:when>
                                     <c:otherwise>
-                                        <c:set var="teamImage" value="${s.index % 3 + 1}" />
                                         <img class="img-fluid rounded-top w-100" src="${pageContext.request.contextPath}/img/team-${teamImage}.jpg" alt="<c:out value='${doc.name}' />" style="height:260px;object-fit:cover;">
                                     </c:otherwise>
                                 </c:choose>
