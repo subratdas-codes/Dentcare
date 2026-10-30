@@ -140,7 +140,9 @@ Always Free resources are not charged), a free DuckDNS account, and an SSH key.
 4. **Image and shape → Change image**: Canonical Ubuntu 22.04 (or 24.04).
 5. **Shape**: Ampere → `VM.Standard.A1.Flex`, **2 OCPUs**, **12 GB memory**
    (the full Always Free allowance). If Oracle reports no capacity, try the
-   other availability domain, or retry later.
+   other availability domain, retry later, or use **1 OCPU / 6 GB**, which is
+   still plenty for DentCare. Do **not** use the AMD `VM.Standard.E2.1.Micro`
+   shape: its 1 GB RAM is too small to build the Docker image.
 6. **Networking**: create a new VCN with a public subnet and make sure
    **Assign a public IPv4 address** is selected.
 7. **Add SSH keys**: choose **Generate a key pair** and download the private
